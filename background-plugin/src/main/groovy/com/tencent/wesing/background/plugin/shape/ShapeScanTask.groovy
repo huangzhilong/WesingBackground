@@ -93,10 +93,8 @@ class ShapeScanTask extends DefaultTask {
                 }
             }
         }
-        LogUtil.logI(TAG, "getSourcesDirsWithVariant111111 shape xml size: ${BackgroundUtil.getCollectSize(drawableNodeXmlList)}")
-        drawableNodeXmlList = doFilterRepeatXmlFile(drawableNodeXmlList)
-        LogUtil.logI(TAG, "getSourcesDirsWithVariant shape xml size: ${BackgroundUtil.getCollectSize(drawableNodeXmlList)}")
 
+        drawableNodeXmlList = doFilterRepeatXmlFile(drawableNodeXmlList)
         if (BackgroundUtil.getCollectSize(drawableNodeXmlList) > 0)  {
             for (int i = 0; i < drawableNodeXmlList.size(); i++) {
                 collectShapeXml(drawableNodeXmlList.get(i), projectName)
@@ -136,8 +134,8 @@ class ShapeScanTask extends DefaultTask {
         LogUtil.logI(TAG, "collectShapeXml projectName: $projectName  drawableName: ${nodeInfo.fileName}")
         Node xmlParseResult = nodeInfo.xmlNode
         if (SHAPE_TAG == xmlParseResult.name()) {
-            LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}")
             ShapeInfo shapeInfo = ShapeParseUtil.getShapeInfoByParseNode(xmlParseResult)
+            LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}  shapeInfo: ${shapeInfo.getJsonString()} ")
         }
     }
 }

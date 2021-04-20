@@ -10,7 +10,7 @@ class BackgroundUtil {
         if (tag == null || tag.size() == 0) {
             return true
         }
-        reurn false
+        return false
     }
 
     static int getCollectSize(Collection list) {

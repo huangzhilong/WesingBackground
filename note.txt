@@ -1,0 +1,25 @@
+问题1: shape存在多个drawable中该怎么代码记录
+
+	这种情况比较少，判断存在的就不处理了，继续使用原来的drawable xml方式
+
+
+问题2: 不同module存在相同名字的drawable xml的怎么处理，该使用哪个
+
+	不同module存在相同的名字的drawable.xml本来就是问题，可使用开源项目 CheckResourceConflict来扫描！！，假设这两个模块的功能都使用同名的xml，
+	在编译时会进行覆盖只会保留一份（保留主工程的）。会造成UI不一致，甚至crash（比如findById查找失败）
+
+
+问题3: xml的值使用定义在value的Id怎么处理
+
+	生成code时候标记是准确数值还是Id，Id的话把Id记录下来。在生成drawabl的时候再通过Id代码获取对应的值 （所以扫描时要再自己的modlue里生成对应的java文件，编译的时候会自动替换成对应的ID值）
+
+
+获取ID：
+
+android ID：
+context.getResources().getDimension(android.R.dimen.app_icon_size)
+
+
+
+App ID：
+context.getResources().getDimension(R.dimen.app_icon_size)

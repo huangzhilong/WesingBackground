@@ -11,6 +11,9 @@ import org.gradle.api.tasks.TaskAction
 
 /**
  * create by zlonghuang on 2021/4/19
+ *
+ * 扫描整个项目的drawable xml 的shape标签，
+ * 生成属性代码和唯一Id
  **/
 
 class ShapeScanTask extends DefaultTask {
@@ -22,7 +25,7 @@ class ShapeScanTask extends DefaultTask {
     private XmlParser mXmlParser = new XmlParser()
 
     ShapeScanTask() {
-        LogUtil.logI(TAG, "create ShapeScanTask!!")
+        LogUtil.logI(TAG, "projectName: ${project.name} create ShapeScanTask!!")
         mScanProject.clear()
     }
 

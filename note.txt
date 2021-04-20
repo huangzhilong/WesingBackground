@@ -20,3 +20,16 @@
 
     App ID：
     context.getResources().getDimension(R.dimen.app_icon_size)
+
+
+问题4： A模块依赖B模块的xml shape，若每个模块自己扫描处理xml的话，A模块里面就找不到所需要B模块的shape xml的Id。
+
+    所以需要一次任务就全部一次扫描，把项目中所有的xml shape文件全部扫描出来生成代码熟悉和Id（id是递增的，用于替换layout xml里的background属性，改成自定义属性用id标记）
+
+    shape xml需要一次性扫描出来，生成全局Id，根据xml的名字
+
+
+
+
+
+先单线程处理，后期再加入多线程！！！！

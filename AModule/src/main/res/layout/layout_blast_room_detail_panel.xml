@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="15dp"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:background="@drawable/test_text_1"
+        android:layout_marginLeft="16dp"
+        android:text="炸房"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:id="@+id/tv_sub_text"
+        android:layout_below="@id/tv_title"
+        android:textColor="#9ba0a5"
+        android:textSize="12sp"
+        android:background="@drawable/test_text_2"
+        android:layout_marginLeft="16dp"
+        tools:text="减肥减肥减肥减肥就减肥减肥减肥减肥减肥减肥减肥家"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:layout_marginTop="160dp"
+        android:layout_below="@id/tv_sub_text"
+        android:id="@+id/iv_gift"
+        android:scaleType="centerCrop"
+        android:src="@drawable/icon_blast_room_gift_empty_state"
+        android:layout_centerHorizontal="true"
+        android:layout_width="162dp"
+        android:layout_height="109dp"/>
+
+
+    <Button
+        android:layout_marginTop="150dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/btn_send_gift"
+        android:text="Send"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_width="197dp"
+        android:layout_marginBottom="20dp"
+        android:layout_height="44dp"/>
+
+</RelativeLayout>

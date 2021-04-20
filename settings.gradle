@@ -1,0 +1,4 @@
+include ':background-plugin'
+include ':AModule'
+include ':app'
+rootProject.name = "WesingBackground"

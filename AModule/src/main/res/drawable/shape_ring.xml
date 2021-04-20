@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="ring"
+    android:innerRadius="50dp"
+    android:innerRadiusRatio="5"
+    android:thickness="120dp"
+    android:thicknessRatio="8"
+    android:useLevel="false"
+    >
+    <gradient
+        android:type="linear"
+        android:useLevel="false"
+        android:angle="45"
+        android:startColor="#000000"
+        android:centerColor="@android:color/black"
+        android:endColor="#ffffff"/>
+
+    <corners
+        android:radius="10dp"
+        android:topLeftRadius="14dp"
+        android:bottomRightRadius="13dp"
+        android:bottomLeftRadius="23dp"
+        android:topRightRadius="45dp"/>
+
+    <padding
+        android:top="20dp"
+        android:right="20px"
+        android:bottom="20dp"
+        android:left="20pt"/>
+
+    <size
+        android:width="100dp"
+        android:height="200dp"/>
+
+    <solid
+        android:color="#ffffff"/>
+
+    <stroke
+        android:width="2dp"
+        android:color="#333333"
+        android:dashWidth="@dimen/cardview_default_elevation"
+        android:dashGap="2dp"/>
+</shape>

@@ -13,13 +13,10 @@
 
 	生成code时候标记是准确数值还是Id，Id的话把Id记录下来。在生成drawabl的时候再通过Id代码获取对应的值 （所以扫描时要再自己的modlue里生成对应的java文件，编译的时候会自动替换成对应的ID值）
 
+    获取ID：
 
-获取ID：
+    android ID：
+    context.getResources().getDimension(android.R.dimen.app_icon_size)
 
-android ID：
-context.getResources().getDimension(android.R.dimen.app_icon_size)
-
-
-
-App ID：
-context.getResources().getDimension(R.dimen.app_icon_size)
+    App ID：
+    context.getResources().getDimension(R.dimen.app_icon_size)

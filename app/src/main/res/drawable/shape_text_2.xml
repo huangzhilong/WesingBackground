@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:dither="@bool/yes"
     android:shape="oval">
 
     <padding
         android:bottom="10dp"
         android:left="10dp"
-        android:right="10dp"
+        android:right="@dimen/top_height"
         android:top="10dp"/>
+
+    <gradient
+        android:startColor="@android:color/background_light"
+        android:angle="@integer/yyyy"/>
 
     <solid android:color="@color/teal_200"/>
 </shape>

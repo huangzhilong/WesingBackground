@@ -2,6 +2,7 @@ package com.tencent.wesing.background.plugin.shape
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.BaseVariant
+import com.tencent.wesing.background.plugin.code.GenerateShapeConfigUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import org.gradle.api.DefaultTask
@@ -95,9 +96,18 @@ class ShapeScanTask extends DefaultTask {
         }
 
         drawableNodeXmlList = doFilterRepeatXmlFile(drawableNodeXmlList)
+
         if (BackgroundUtil.getCollectSize(drawableNodeXmlList) > 0)  {
+            List<ShapeInfo> shapeInfoList = new ArrayList<>()
             for (int i = 0; i < drawableNodeXmlList.size(); i++) {
-                collectShapeXml(drawableNodeXmlList.get(i), projectName)
+                ShapeInfo info = collectShapeXml(drawableNodeXmlList.get(i), projectName)
+                if (info != null) {
+                    shapeInfoList.add(info)
+                }
+            }
+
+            if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {
+                GenerateShapeConfigUtil.generateConfigJavaCode(project, shapeInfoList)
             }
         }
     }
@@ -127,15 +137,14 @@ class ShapeScanTask extends DefaultTask {
     }
 
 
-    def collectShapeXml(XmlNodeInfo nodeInfo, String projectName) {
-        if (nodeInfo == null || nodeInfo.xmlNode ==  null) {
-            return
+    ShapeInfo collectShapeXml(XmlNodeInfo nodeInfo, String projectName) {
+        if (nodeInfo == null || nodeInfo.xmlNode == null) {
+            return null
         }
         LogUtil.logI(TAG, "collectShapeXml projectName: $projectName  drawableName: ${nodeInfo.fileName}")
         Node xmlParseResult = nodeInfo.xmlNode
-        if (SHAPE_TAG == xmlParseResult.name()) {
-            ShapeInfo shapeInfo = ShapeParseUtil.getShapeInfoByParseNode(xmlParseResult)
-            LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}  shapeInfo: ${shapeInfo.getJsonString()} ")
-        }
+        ShapeInfo shapeInfo = ShapeParseUtil.getShapeInfoByParseNode(xmlParseResult, nodeInfo.fileName)
+        LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}  shapeInfo: ${shapeInfo.getJsonString()}")
+        return shapeInfo
     }
 }

@@ -11,7 +11,10 @@
 
 问题3: xml的值使用定义在value的Id怎么处理
 
-	生成code时候标记是准确数值还是Id，Id的话把Id记录下来。在生成drawabl的时候再通过Id代码获取对应的值 （所以扫描时要再自己的modlue里生成对应的java文件，编译的时候会自动替换成对应的ID值）
+    https://blog.csdn.net/wjj1996825/article/details/103406881
+
+	这里要生成Java（不能生成json，不参与编译），需要参与编译。让Id在编译期变成准确的int值。生成code时候标记是准确数值还是Id，Id的话把Id记录下来。在生成drawable的时候再通过Id代码获取对应的值
+	（所以扫描时要再自己的module里生成对应的java文件，编译的时候会自动替换成对应的ID值）
 
     获取ID：
 

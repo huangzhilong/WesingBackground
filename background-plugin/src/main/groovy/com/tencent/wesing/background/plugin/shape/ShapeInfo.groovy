@@ -8,6 +8,9 @@ import com.tencent.wesing.background.plugin.util.BackgroundUtil
 
 class ShapeInfo {
 
+    //文件名
+    public String fileName
+
     //头
     String dither   //"false|true" 将在位图的像素配置与屏幕不同时（例如：ARGB 8888 位图和 RGB 565 屏幕）启用位图的抖动；值为“false”时则停用抖动。默认值为 true。
     String shape       //"rectangle|line|oval|ring" 分别为矩形、线、椭圆、环。默认为矩形rectangle
@@ -65,8 +68,74 @@ class ShapeInfo {
         if (!BackgroundUtil.isEmpty(dither)) {
             stringBuilder.append("\"dither\": \"" + dither + "\"")
         }
-        if (!BackgroundUtil.isEmpty(solidColor)) {
-            stringBuilder.append(", \"solidColor\": \"" + solidColor + "\"")
+        if (!BackgroundUtil.isEmpty(shape)) {
+            stringBuilder.append(", \"shape\": \"" + shape + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(innerRadius)) {
+            stringBuilder.append(", \"innerRadius\": \"" + innerRadius + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(innerRadiusRatio)) {
+            stringBuilder.append(", \"innerRadiusRatio\": \"" + innerRadiusRatio + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(thickness)) {
+            stringBuilder.append(", \"thickness\": \"" + thickness + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(thicknessRatio)) {
+            stringBuilder.append(", \"thicknessRatio\": \"" + thicknessRatio + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(tint)) {
+            stringBuilder.append(", \"tint\": \"" + tint + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(tintMod)) {
+            stringBuilder.append(", \"tintMod\": \"" + tintMod + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(useLevel)) {
+            stringBuilder.append(", \"useLevel\": \"" + useLevel + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(visible)) {
+            stringBuilder.append(", \"visible\": \"" + visible + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(radius)) {
+            stringBuilder.append(", \"radius\": \"" + radius + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(bottomLeftRadius)) {
+            stringBuilder.append(", \"bottomLeftRadius\": \"" + bottomLeftRadius + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(bottomRightRadius)) {
+            stringBuilder.append(", \"bottomRightRadius\": \"" + bottomRightRadius + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(topLeftRadius)) {
+            stringBuilder.append(", \"topLeftRadius\": \"" + topLeftRadius + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(topRightRadius)) {
+            stringBuilder.append(", \"topRightRadius\": \"" + topRightRadius + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(gradientUseLevel)) {
+            stringBuilder.append(", \"gradientUseLevel\": \"" + gradientUseLevel + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(type)) {
+            stringBuilder.append(", \"type\": \"" + type + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(angle)) {
+            stringBuilder.append(", \"angle\": \"" + angle + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(centerColor)) {
+            stringBuilder.append(", \"centerColor\": \"" + centerColor + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(startColor)) {
+            stringBuilder.append(", \"startColor\": \"" + startColor + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(endColor)) {
+            stringBuilder.append(", \"endColor\": \"" + endColor + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(centerX)) {
+            stringBuilder.append(", \"centerX\": \"" + centerX + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(centerY)) {
+            stringBuilder.append(", \"centerY\": \"" + centerY + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(gradientRadius)) {
+            stringBuilder.append(", \"gradientRadius\": \"" + gradientRadius + "\"")
         }
         if (!BackgroundUtil.isEmpty(bottom)) {
             stringBuilder.append(", \"bottom\": \"" + bottom + "\"")
@@ -76,6 +145,30 @@ class ShapeInfo {
         }
         if (!BackgroundUtil.isEmpty(left)) {
             stringBuilder.append(", \"left\": \"" + left + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(right)) {
+            stringBuilder.append(", \"right\": \"" + right + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(height)) {
+            stringBuilder.append(", \"height\": \"" + height + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(width)) {
+            stringBuilder.append(", \"width\": \"" + width + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(solidColor)) {
+            stringBuilder.append(", \"solidColor\": \"" + solidColor + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(strokeColor)) {
+            stringBuilder.append(", \"strokeColor\": \"" + strokeColor + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(strokeWidth)) {
+            stringBuilder.append(", \"strokeWidth\": \"" + strokeWidth + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(dashGap)) {
+            stringBuilder.append(", \"dashGap\": \"" + dashGap + "\"")
+        }
+        if (!BackgroundUtil.isEmpty(dashWidth)) {
+            stringBuilder.append(", \"dashWidth\": \"" + dashWidth + "\"")
         }
         stringBuilder.append("}")
         return stringBuilder.toString()

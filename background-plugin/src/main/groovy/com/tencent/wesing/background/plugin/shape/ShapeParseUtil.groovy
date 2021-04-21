@@ -1,7 +1,5 @@
 package com.tencent.wesing.background.plugin.shape
 
-import com.tencent.wesing.background.plugin.util.LogUtil
-
 /**
  * create by zlonghuang on 2021/4/19
  **/
@@ -10,11 +8,12 @@ class ShapeParseUtil {
 
     static final TAG = "ShapeParseUtil"
 
-    static ShapeInfo getShapeInfoByParseNode(Node xmlParseResult) {
+    static ShapeInfo getShapeInfoByParseNode(Node xmlParseResult, String fileName) {
         if (xmlParseResult == null) {
             return null
         }
         ShapeInfo shapeInfo = new ShapeInfo()
+        shapeInfo.fileName = fileName
         parseHeader(xmlParseResult, shapeInfo)
         parseGradient(xmlParseResult, shapeInfo)
         parseCorners(xmlParseResult, shapeInfo)

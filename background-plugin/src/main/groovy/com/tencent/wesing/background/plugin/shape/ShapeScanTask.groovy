@@ -2,6 +2,7 @@ package com.tencent.wesing.background.plugin.shape
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.BaseVariant
+import com.tencent.wesing.background.plugin.StartParams
 import com.tencent.wesing.background.plugin.code.GenerateShapeConfigUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
@@ -24,11 +25,20 @@ class ShapeScanTask extends DefaultTask {
 
     private HashSet<String> mScanProject = new HashSet<>()
     private volatile boolean isRunning = false
+    private StartParams mStartParams
+    private String packageName  // 包名
+    private String generateJavaDir  //生成java的目录
 
     ShapeScanTask() {
         LogUtil.logI(TAG, "projectName: ${project.name} create ShapeScanTask!!")
         mScanProject.clear()
         isRunning = false
+        packageName = null
+        generateJavaDir = null
+    }
+
+    void setStartParams(StartParams param) {
+        mStartParams = param
     }
 
     @TaskAction
@@ -56,35 +66,86 @@ class ShapeScanTask extends DefaultTask {
 
     def getSourcesDirsWithVariant(DomainObjectCollection<BaseVariant> collection, String projectName) {
         List<XmlNodeInfo> drawableNodeXmlList = new ArrayList<>()
+        String tempPackageName, tempJavaDir
+        boolean isDebug = false
+        if (mStartParams != null) {
+            isDebug = mStartParams.debug
+        }
+        String variantName = isDebug ? "debug" : "release"
         collection.all { variant ->
-            LogUtil.logI(TAG, "-------- variant: $variant.name")
-            if (variant.name == "debug") { //先写死debug，之后要根据具体构建方式判断
+            //有debug和release两种情况
+            if (variant.name == variantName) {
                 variant.sourceSets?.each { sourceSet ->
-                    LogUtil.logI(TAG, "sourceSets.${sourceSet.name} -->")
-                    if (sourceSet.resDirectories.empty) return
-                    XmlParser mXmlParser = new XmlParser()
-                    sourceSet.resDirectories.each { res ->
-                        if (res.exists()) {
-                            LogUtil.logI(TAG, "projectName: ${projectName}   res: ${res.path}")
-                            res.eachDir {
-                                //收集所有drawable目录里的shape中定义的xml
-                                if (it.directory && it.name.startsWith("drawable") && it.listFiles() != null && it.listFiles().size() > 0) {
-                                    List<File> drawableList = it.listFiles()
-                                    for (int i = 0; i < drawableList.size(); i++) {
-                                        File xmlFile = drawableList.get(i)
-                                        if (xmlFile == null || xmlFile.size() <= 0 || !xmlFile.name.endsWith(".xml")) {
-                                            continue
+                    //这里能拿到 sourceSet.name 为 release和main ，release和main目录src/release/AndroidManifest.xml  src/release/AndroidManifest.xml，忽略点
+                    //项目中一般不存在的
+                    if (sourceSet.name == "main") {
+                        XmlParser mXmlParser = new XmlParser()
+
+                        //解析manifest文件提取包名
+                        if (sourceSet.manifestFile.exists()) {
+                            Node xmlNode = mXmlParser.parse(sourceSet.manifestFile)
+                            if (xmlNode != null) {
+                                xmlNode.attributes().each {
+                                    attr ->
+                                        if (attr != null && attr.key != null && attr.value != null) {
+                                            String key = attr.key.toString()
+                                            String value = attr.value.toString()
+                                            if (key == "package") {
+                                                tempPackageName = value
+                                            }
                                         }
-                                        Node xmlParseResult = mXmlParser.parse(xmlFile)
-                                        if (xmlParseResult == null) {
-                                            LogUtil.logI(TAG, "collectShapeXml parse error node is null xmlFileName: ${xmlFile.name}")
-                                            continue
-                                        }
-                                        if (SHAPE_TAG == xmlParseResult.name()) {
-                                            XmlNodeInfo info = new XmlNodeInfo()
-                                            info.fileName = xmlFile.name
-                                            info.xmlNode = xmlParseResult
-                                            drawableNodeXmlList.add(info)
+                                }
+                            }
+                            LogUtil.logI(TAG, "projectName: ${projectName}  path: ${sourceSet.manifest}  packageName: $tempPackageName")
+                            if (BackgroundUtil.isEmpty(tempPackageName)) {
+                                LogUtil.logI(TAG, "projectName: ${projectName}  get packageName failed!!!")
+                                return
+                            }
+                        }
+                        //代码目录
+                        sourceSet.javaDirectories.each { dir ->
+                            if (dir.exists() && dir.directory) {
+                                tempJavaDir = dir.absolutePath
+                            } else {
+                                List<File> fileList = dir.listFiles()
+                                for (int i = 0; i < fileList.size(); i++) {
+                                    if (fileList.get(0).exists() && fileList.get(0).isDirectory()) {
+                                        tempJavaDir = fileList.get(0).absolutePath
+                                        break
+                                    }
+                                }
+                            }
+                            LogUtil.logI(TAG, "projectName: ${projectName}   get javaDir: $tempJavaDir")
+                            if (BackgroundUtil.isEmpty(tempJavaDir)) {
+                                LogUtil.logI(TAG, "projectName: ${projectName}  get javaDir failed!!!")
+                                return
+                            }
+                        }
+
+                        //解析res目录
+                        sourceSet.resDirectories.each { res ->
+                            if (res.exists()) {
+                                LogUtil.logI(TAG, "projectName: ${projectName}   res: ${res.path}")
+                                res.eachDir {
+                                    //收集所有drawable目录里的shape中定义的xml
+                                    if (it.directory && it.name.startsWith("drawable") && it.listFiles() != null && it.listFiles().size() > 0) {
+                                        List<File> drawableList = it.listFiles()
+                                        for (int i = 0; i < drawableList.size(); i++) {
+                                            File xmlFile = drawableList.get(i)
+                                            if (xmlFile == null || xmlFile.size() <= 0 || !xmlFile.name.endsWith(".xml")) {
+                                                continue
+                                            }
+                                            Node xmlParseResult = mXmlParser.parse(xmlFile)
+                                            if (xmlParseResult == null) {
+                                                LogUtil.logI(TAG, "collectShapeXml parse error node is null xmlFileName: ${xmlFile.name}")
+                                                continue
+                                            }
+                                            if (SHAPE_TAG == xmlParseResult.name()) {
+                                                XmlNodeInfo info = new XmlNodeInfo()
+                                                info.fileName = xmlFile.name
+                                                info.xmlNode = xmlParseResult
+                                                drawableNodeXmlList.add(info)
+                                            }
                                         }
                                     }
                                 }
@@ -96,7 +157,8 @@ class ShapeScanTask extends DefaultTask {
         }
 
         drawableNodeXmlList = doFilterRepeatXmlFile(drawableNodeXmlList)
-
+        packageName = tempPackageName
+        generateJavaDir = tempJavaDir
         if (BackgroundUtil.getCollectSize(drawableNodeXmlList) > 0)  {
             List<ShapeInfo> shapeInfoList = new ArrayList<>()
             for (int i = 0; i < drawableNodeXmlList.size(); i++) {
@@ -107,7 +169,7 @@ class ShapeScanTask extends DefaultTask {
             }
 
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {
-                GenerateShapeConfigUtil.generateConfigJavaCode(project, shapeInfoList)
+                GenerateShapeConfigUtil.generateConfigJavaCode(shapeInfoList, packageName, generateJavaDir)
             }
         }
     }

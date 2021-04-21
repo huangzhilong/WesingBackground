@@ -13,16 +13,13 @@ class GenerateShapeConfigUtil {
 
     static final String TAG = "GenerateShapeConfigUtil"
 
-    static final String JAVA_TEMPLATE = "public static final Object[] param%s  = { %s }"
+    static final String JAVA_NAME = "BackgroundShapeConfig"
+    static final String JAVA_TEMPLATE = "public static final Object[] param%s  = { %s };"
 
-    private static File initGenerateConfigJavaFile(Project project) {
-        File file = new File("./ShapeBackground.java")
+    private static File initGenerateConfigJavaFile(String path) {
+        File file = new File(path + File.separator + JAVA_NAME + ".java")
         if (file.exists()) {
             file.delete()
-        }
-        // 先创建目录
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs()
         }
         file.createNewFile()
         return file
@@ -31,8 +28,8 @@ class GenerateShapeConfigUtil {
     /**
      * 生成对应属性代码
      */
-    static void generateConfigJavaCode(Project project, List<ShapeInfo> shapeInfoList) {
-        File javaFile = initGenerateConfigJavaFile(project)
+    static void generateConfigJavaCode(List<ShapeInfo> shapeInfoList, String packageName, String javaPath) {
+        File javaFile = initGenerateConfigJavaFile(javaPath)
         if (!javaFile.exists()) {
             LogUtil.logI(TAG, "generateConfigJavaCode file is not exists!!!")
             return
@@ -42,21 +39,14 @@ class GenerateShapeConfigUtil {
             codeList.add(genJavaProperties(i + 1, shapeInfoList[i]))
         }
         javaFile.withWriter('utf-8') { writer ->
-            writer.writeLine("package com.yy.base.env;")
-            writer.writeLine("public class ShapeConfig {")
+            //writer.writeLine("package com.yy.base.env;")
+            writer.writeLine("import ${packageName}.R;")
+            writer.writeLine("public class $JAVA_NAME {")
             codeList.each { codeLine ->
                 writer.writeLine(codeLine)
             }
             writer.writeLine("}")
         }
-    }
-
-
-    // TODO 先写死debug
-    private static String getJavaFilePath(Project project) {
-        String path = project.getBuildDir().absolutePath + File.separator + "generated" + File.separator + "source" + File.separator + "shapeConfig" + File.separator + "debug"
-            + File.separator + "com" + File.separator + "wesing" + File.separator + "background" + File.separator + "ShapeBackground.java"
-        return path
     }
 
     /**

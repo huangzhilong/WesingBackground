@@ -17,8 +17,8 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     void apply(Project project) {
         LogUtil.logI(TAG, "apply Plugin!!")
         def shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
+        StartParams startParams = new StartParams(project.gradle.getStartParameter())
 
-        LogUtil.logI(TAG, project.gradle.getStartParameter().toString())
         project.afterEvaluate {
             LogUtil.logI(TAG, " dependsOn apply Plugin!!")
             def preBuildTask = project.getTasksByName("preBuild", true)

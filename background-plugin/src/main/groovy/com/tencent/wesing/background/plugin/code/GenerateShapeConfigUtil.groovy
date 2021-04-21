@@ -88,6 +88,8 @@ class GenerateShapeConfigUtil {
                 stringBuilder.append("\"" + it.value + "\"").append(", ")
             }
         }
-        return String.format(JAVA_TEMPLATE, id, stringBuilder.toString())
+        //去掉最后的逗号
+        String text = stringBuilder.toString().substring(0, stringBuilder.length() - 2)
+        return String.format(JAVA_TEMPLATE, id, text)
     }
 }

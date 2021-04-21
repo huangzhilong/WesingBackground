@@ -65,110 +65,247 @@ class ShapeInfo {
     String getJsonString() {
         StringBuilder stringBuilder = new StringBuilder()
         stringBuilder.append("{")
+        boolean addPoint = false
         if (!BackgroundUtil.isEmpty(dither)) {
             stringBuilder.append("\"dither\": \"" + dither + "\"")
+            addPoint = true
         }
         if (!BackgroundUtil.isEmpty(shape)) {
-            stringBuilder.append(", \"shape\": \"" + shape + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"shape\": \"" + shape + "\"")
         }
         if (!BackgroundUtil.isEmpty(innerRadius)) {
-            stringBuilder.append(", \"innerRadius\": \"" + innerRadius + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"innerRadius\": \"" + innerRadius + "\"")
         }
         if (!BackgroundUtil.isEmpty(innerRadiusRatio)) {
-            stringBuilder.append(", \"innerRadiusRatio\": \"" + innerRadiusRatio + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"innerRadiusRatio\": \"" + innerRadiusRatio + "\"")
         }
         if (!BackgroundUtil.isEmpty(thickness)) {
-            stringBuilder.append(", \"thickness\": \"" + thickness + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"thickness\": \"" + thickness + "\"")
         }
         if (!BackgroundUtil.isEmpty(thicknessRatio)) {
-            stringBuilder.append(", \"thicknessRatio\": \"" + thicknessRatio + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"thicknessRatio\": \"" + thicknessRatio + "\"")
         }
         if (!BackgroundUtil.isEmpty(tint)) {
-            stringBuilder.append(", \"tint\": \"" + tint + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"tint\": \"" + tint + "\"")
         }
         if (!BackgroundUtil.isEmpty(tintMod)) {
-            stringBuilder.append(", \"tintMod\": \"" + tintMod + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"tintMod\": \"" + tintMod + "\"")
         }
         if (!BackgroundUtil.isEmpty(useLevel)) {
-            stringBuilder.append(", \"useLevel\": \"" + useLevel + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"useLevel\": \"" + useLevel + "\"")
         }
         if (!BackgroundUtil.isEmpty(visible)) {
-            stringBuilder.append(", \"visible\": \"" + visible + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"visible\": \"" + visible + "\"")
         }
         if (!BackgroundUtil.isEmpty(radius)) {
-            stringBuilder.append(", \"radius\": \"" + radius + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"radius\": \"" + radius + "\"")
         }
         if (!BackgroundUtil.isEmpty(bottomLeftRadius)) {
-            stringBuilder.append(", \"bottomLeftRadius\": \"" + bottomLeftRadius + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"bottomLeftRadius\": \"" + bottomLeftRadius + "\"")
         }
         if (!BackgroundUtil.isEmpty(bottomRightRadius)) {
-            stringBuilder.append(", \"bottomRightRadius\": \"" + bottomRightRadius + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"bottomRightRadius\": \"" + bottomRightRadius + "\"")
         }
         if (!BackgroundUtil.isEmpty(topLeftRadius)) {
-            stringBuilder.append(", \"topLeftRadius\": \"" + topLeftRadius + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"topLeftRadius\": \"" + topLeftRadius + "\"")
         }
         if (!BackgroundUtil.isEmpty(topRightRadius)) {
-            stringBuilder.append(", \"topRightRadius\": \"" + topRightRadius + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"topRightRadius\": \"" + topRightRadius + "\"")
         }
         if (!BackgroundUtil.isEmpty(gradientUseLevel)) {
-            stringBuilder.append(", \"gradientUseLevel\": \"" + gradientUseLevel + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"gradientUseLevel\": \"" + gradientUseLevel + "\"")
         }
         if (!BackgroundUtil.isEmpty(type)) {
-            stringBuilder.append(", \"type\": \"" + type + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"type\": \"" + type + "\"")
         }
         if (!BackgroundUtil.isEmpty(angle)) {
-            stringBuilder.append(", \"angle\": \"" + angle + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"angle\": \"" + angle + "\"")
         }
         if (!BackgroundUtil.isEmpty(centerColor)) {
-            stringBuilder.append(", \"centerColor\": \"" + centerColor + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"centerColor\": \"" + centerColor + "\"")
         }
         if (!BackgroundUtil.isEmpty(startColor)) {
-            stringBuilder.append(", \"startColor\": \"" + startColor + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"startColor\": \"" + startColor + "\"")
         }
         if (!BackgroundUtil.isEmpty(endColor)) {
-            stringBuilder.append(", \"endColor\": \"" + endColor + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"endColor\": \"" + endColor + "\"")
         }
         if (!BackgroundUtil.isEmpty(centerX)) {
-            stringBuilder.append(", \"centerX\": \"" + centerX + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"centerX\": \"" + centerX + "\"")
         }
         if (!BackgroundUtil.isEmpty(centerY)) {
-            stringBuilder.append(", \"centerY\": \"" + centerY + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"centerY\": \"" + centerY + "\"")
         }
         if (!BackgroundUtil.isEmpty(gradientRadius)) {
-            stringBuilder.append(", \"gradientRadius\": \"" + gradientRadius + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"gradientRadius\": \"" + gradientRadius + "\"")
         }
         if (!BackgroundUtil.isEmpty(bottom)) {
-            stringBuilder.append(", \"bottom\": \"" + bottom + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"bottom\": \"" + bottom + "\"")
         }
         if (!BackgroundUtil.isEmpty(top)) {
-            stringBuilder.append(", \"top\": \"" + top + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"top\": \"" + top + "\"")
         }
         if (!BackgroundUtil.isEmpty(left)) {
-            stringBuilder.append(", \"left\": \"" + left + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"left\": \"" + left + "\"")
         }
         if (!BackgroundUtil.isEmpty(right)) {
-            stringBuilder.append(", \"right\": \"" + right + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"right\": \"" + right + "\"")
         }
         if (!BackgroundUtil.isEmpty(height)) {
-            stringBuilder.append(", \"height\": \"" + height + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"height\": \"" + height + "\"")
         }
         if (!BackgroundUtil.isEmpty(width)) {
-            stringBuilder.append(", \"width\": \"" + width + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"width\": \"" + width + "\"")
         }
         if (!BackgroundUtil.isEmpty(solidColor)) {
-            stringBuilder.append(", \"solidColor\": \"" + solidColor + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"solidColor\": \"" + solidColor + "\"")
         }
         if (!BackgroundUtil.isEmpty(strokeColor)) {
-            stringBuilder.append(", \"strokeColor\": \"" + strokeColor + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"strokeColor\": \"" + strokeColor + "\"")
         }
         if (!BackgroundUtil.isEmpty(strokeWidth)) {
-            stringBuilder.append(", \"strokeWidth\": \"" + strokeWidth + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"strokeWidth\": \"" + strokeWidth + "\"")
         }
         if (!BackgroundUtil.isEmpty(dashGap)) {
-            stringBuilder.append(", \"dashGap\": \"" + dashGap + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            addPoint = true
+            stringBuilder.append("\"dashGap\": \"" + dashGap + "\"")
         }
         if (!BackgroundUtil.isEmpty(dashWidth)) {
-            stringBuilder.append(", \"dashWidth\": \"" + dashWidth + "\"")
+            if (addPoint) {
+                stringBuilder.append(", ")
+            }
+            stringBuilder.append("\"dashWidth\": \"" + dashWidth + "\"")
         }
         stringBuilder.append("}")
         return stringBuilder.toString()

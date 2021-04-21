@@ -36,3 +36,8 @@
 
 
 先单线程处理，后期再加入多线程！！！！
+
+
+$project.android.compileSdkVersion 可获取project android下的属性
+
+

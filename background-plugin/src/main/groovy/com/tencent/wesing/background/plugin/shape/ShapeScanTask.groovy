@@ -27,14 +27,12 @@ class ShapeScanTask extends DefaultTask {
     private volatile boolean isRunning = false
     private StartParams mStartParams
     private String packageName  // 包名
-    private String generateJavaDir  //生成java的目录
 
     ShapeScanTask() {
         LogUtil.logI(TAG, "projectName: ${project.name} create ShapeScanTask!!")
         mScanProject.clear()
         isRunning = false
         packageName = null
-        generateJavaDir = null
     }
 
     void setStartParams(StartParams param) {
@@ -66,7 +64,7 @@ class ShapeScanTask extends DefaultTask {
 
     def getSourcesDirsWithVariant(DomainObjectCollection<BaseVariant> collection, String projectName) {
         List<XmlNodeInfo> drawableNodeXmlList = new ArrayList<>()
-        String tempPackageName, tempJavaDir
+        String tempPackageName
         boolean isDebug = false
         if (mStartParams != null) {
             isDebug = mStartParams.debug
@@ -104,22 +102,6 @@ class ShapeScanTask extends DefaultTask {
                         }
                         //代码目录
                         sourceSet.javaDirectories.each { dir ->
-                            if (dir.exists() && dir.directory) {
-                                tempJavaDir = dir.absolutePath
-                            } else {
-                                List<File> fileList = dir.listFiles()
-                                for (int i = 0; i < fileList.size(); i++) {
-                                    if (fileList.get(0).exists() && fileList.get(0).isDirectory()) {
-                                        tempJavaDir = fileList.get(0).absolutePath
-                                        break
-                                    }
-                                }
-                            }
-                            LogUtil.logI(TAG, "projectName: ${projectName}   get javaDir: $tempJavaDir")
-                            if (BackgroundUtil.isEmpty(tempJavaDir)) {
-                                LogUtil.logI(TAG, "projectName: ${projectName}  get javaDir failed!!!")
-                                return
-                            }
                         }
 
                         //解析res目录
@@ -158,7 +140,6 @@ class ShapeScanTask extends DefaultTask {
 
         drawableNodeXmlList = doFilterRepeatXmlFile(drawableNodeXmlList)
         packageName = tempPackageName
-        generateJavaDir = tempJavaDir
         if (BackgroundUtil.getCollectSize(drawableNodeXmlList) > 0)  {
             List<ShapeInfo> shapeInfoList = new ArrayList<>()
             for (int i = 0; i < drawableNodeXmlList.size(); i++) {
@@ -169,7 +150,13 @@ class ShapeScanTask extends DefaultTask {
             }
 
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {
-                GenerateShapeConfigUtil.generateConfigJavaCode(shapeInfoList, packageName, generateJavaDir)
+                String buildDirPath = project.getBuildDir().absolutePath
+                String packagePath = packageName.replaceAll("\\.", File.separator)
+                String javaPath = buildDirPath + File.separator + "generated" + File.separator + "background" + File.separator + packagePath
+
+                GenerateShapeConfigUtil.generateConfigJavaCode(project, shapeInfoList, packageName, javaPath)
+                //生成的Java文件添加到src
+                project.android.sourceSets.main.java.srcDirs += javaPath
             }
         }
     }

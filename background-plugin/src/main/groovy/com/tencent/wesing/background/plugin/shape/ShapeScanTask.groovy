@@ -26,6 +26,7 @@ class ShapeScanTask extends DefaultTask {
     private HashSet<String> mScanProject = new HashSet<>()
     private volatile boolean isRunning = false
     private StartParams mStartParams
+    private String mJavaFilePath
     private String packageName  // 包名
 
     ShapeScanTask() {
@@ -35,8 +36,9 @@ class ShapeScanTask extends DefaultTask {
         packageName = null
     }
 
-    void setStartParams(StartParams param) {
+    void setShapeScanTaskParams(StartParams param, String javaPath) {
         mStartParams = param
+        mJavaFilePath = javaPath
     }
 
     @TaskAction
@@ -150,13 +152,9 @@ class ShapeScanTask extends DefaultTask {
             }
 
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {
-                String buildDirPath = project.getBuildDir().absolutePath
                 String packagePath = packageName.replaceAll("\\.", File.separator)
-                String javaPath = buildDirPath + File.separator + "generated" + File.separator + "background" + File.separator + packagePath
-
+                String javaPath = mJavaFilePath + File.separator + packagePath
                 GenerateShapeConfigUtil.generateConfigJavaCode(project, shapeInfoList, packageName, javaPath)
-                //生成的Java文件添加到src
-                project.android.sourceSets.main.java.srcDirs += javaPath
             }
         }
     }

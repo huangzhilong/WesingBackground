@@ -58,13 +58,16 @@ class GenerateShapeConfigUtil {
      * @param id 标示id
      * @param shapeInfo
      * @return 生成的代码String
+     *
      */
     private static String genJavaProperties(int id, ShapeInfo shapeInfo) {
         String str = shapeInfo.getJsonString()
         def jsonSlurper = new JsonSlurper()
         def jsonObject = jsonSlurper.parseText(str)
         StringBuilder stringBuilder = new StringBuilder()
-        stringBuilder.append(id).append(", ")
+        //生成drawable Id
+        String fileName = shapeInfo.fileName.substring(0, shapeInfo.fileName.size() - 4) // 去除.xml后缀
+        stringBuilder.append("R.drawable." + fileName).append(", ")
         stringBuilder.append("\"" + shapeInfo.fileName + "\"").append(", ")
         ((Map) jsonObject).each {
             LogUtil.logI(TAG, "genJavaProperties key: ${it.key}  value: ${it.value}")

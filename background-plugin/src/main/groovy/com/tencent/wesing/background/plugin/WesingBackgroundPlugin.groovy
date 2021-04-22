@@ -18,11 +18,21 @@ class WesingBackgroundPlugin implements Plugin<Project> {
         LogUtil.logI(TAG, "apply Plugin!!")
         def shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
         StartParams startParams = new StartParams(project.gradle.getStartParameter())
+        shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaFile(project))
 
         project.afterEvaluate {
             LogUtil.logI(TAG, " dependsOn apply Plugin!!")
             def preBuildTask = project.getTasksByName("preBuild", true)
             preBuildTask[0].dependsOn(shapeScanTask)
         }
+    }
+
+    private String getGenerateJavaFile(Project project) {
+        String buildDirPath = project.getBuildDir().absolutePath
+        String javaPath = buildDirPath + File.separator + "background"
+
+        //生成的Java文件添加到src
+        project.android.sourceSets.main.java.srcDirs += javaPath
+        return javaPath
     }
 }

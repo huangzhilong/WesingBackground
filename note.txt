@@ -41,3 +41,18 @@
 $project.android.compileSdkVersion 可获取project android下的属性
 
 
+
+mergeResources 调用栈
+
+at com.tencent.wesing.background.plugin.layout.MyWorkerExecutor.submit(MyWorkerExecutor.groovy:33)
+	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:173)
+	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:146)
+	at com.android.ide.common.resources.MergedResourceWriter.addItem(MergedResourceWriter.java:377)
+	at com.android.ide.common.resources.MergedResourceWriter.addItem(MergedResourceWriter.java:70)
+	at com.android.ide.common.resources.DataMerger.mergeData(DataMerger.java:280)
+	at com.android.ide.common.resources.ResourceMerger.mergeData(ResourceMerger.java:385)
+	at com.android.build.gradle.tasks.MergeResources.lambda$doFullTaskAction$1(MergeResources.java:319)
+	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:58)
+	at com.android.build.gradle.tasks.MergeResources.doFullTaskAction(MergeResources.java:315)
+
+

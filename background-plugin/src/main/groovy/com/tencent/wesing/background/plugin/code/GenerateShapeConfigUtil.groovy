@@ -32,8 +32,8 @@ class GenerateShapeConfigUtil {
     /**
      * 生成对应属性代码
      */
-    static void generateConfigJavaCode(Project project, List<ShapeInfo> shapeInfoList, String packageName, String javaPath) {
-        File javaFile = initGenerateConfigJavaFile(project, packageName, javaPath)
+    static void generateConfigJavaCode(List<ShapeInfo> shapeInfoList, String packageName, String javaPath) {
+        File javaFile = initGenerateConfigJavaFile(javaPath)
         if (!javaFile.exists()) {
             LogUtil.logI(TAG, "generateConfigJavaCode file is not exists!!!")
             return

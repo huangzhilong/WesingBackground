@@ -154,7 +154,7 @@ class ShapeScanTask extends DefaultTask {
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {
                 String packagePath = packageName.replaceAll("\\.", File.separator)
                 String javaPath = mJavaFilePath + File.separator + packagePath
-                GenerateShapeConfigUtil.generateConfigJavaCode(project, shapeInfoList, packageName, javaPath)
+                GenerateShapeConfigUtil.generateConfigJavaCode(shapeInfoList, packageName, javaPath)
             }
         }
     }

@@ -8,7 +8,7 @@ dependencies {
     implementation localGroovy()
 
     //noinspection GradleDependency
-    implementation "com.android.tools.build:gradle:3.2.0"
+    implementation "com.android.tools.build:gradle:4.1.2"
     implementation "org.javassist:javassist:3.20.0-GA"
     implementation "commons-io:commons-io:2.6"
 }

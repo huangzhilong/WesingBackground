@@ -16,7 +16,7 @@ class GenerateShapeConfigUtil {
     static final String JAVA_NAME = "BackgroundShapeConfig"
     static final String JAVA_TEMPLATE = "public static final Object[] param%s  = { %s };"
 
-    private static File initGenerateConfigJavaFile(Project project, String packageName, String javaPath) {
+    private static File initGenerateConfigJavaFile(String javaPath) {
         File file = new File(javaPath + File.separator + JAVA_NAME + ".java")
         if (file.exists()) {
             file.delete()

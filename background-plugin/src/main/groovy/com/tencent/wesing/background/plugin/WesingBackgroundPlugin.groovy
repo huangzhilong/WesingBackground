@@ -4,7 +4,7 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.api.BaseVariantImpl
 import com.android.build.gradle.tasks.MergeResources
-import com.tencent.wesing.background.plugin.layout.MyWorkerExecutor
+import com.tencent.wesing.background.plugin.resource.MyWorkerExecutor
 import com.tencent.wesing.background.plugin.shape.ShapeScanTask
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Plugin

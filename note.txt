@@ -32,6 +32,10 @@
     shape xml需要一次性扫描出来，生成全局Id，根据xml的名字
 
 
+问题5： 删除了shape  xml文件后， xml布局中使用shape和代码中getDrawable中使用shape会编译不过。（要想想怎么减包）
+
+
+
 
 
 
@@ -41,6 +45,7 @@
 $project.android.compileSdkVersion 可获取project android下的属性
 
 
+CompileSourceSetResources : IncrementalTask()
 
 mergeResources 调用栈
 

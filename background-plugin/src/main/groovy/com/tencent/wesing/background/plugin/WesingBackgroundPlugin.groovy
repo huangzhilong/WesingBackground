@@ -47,7 +47,7 @@ class WesingBackgroundPlugin implements Plugin<Project> {
 
                 MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()
                 mergeResourcesTask.doFirst {
-                    hookMergeResourcesTask(mergeResourcesTask)
+                    hookMergeResourcesTask(mergeResourcesTask, project)
                 }
                 mergeResourcesTask.doLast {
                     recoveryMergeResourcesTask(mergeResourcesTask)
@@ -66,7 +66,7 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     }
 
 
-    private void hookMergeResourcesTask(MergeResources mergeResources) {
+    private void hookMergeResourcesTask(MergeResources mergeResources, Project project) {
         try {
             //反射替换里面的线程池
             Field mWorkerExecutorField
@@ -84,7 +84,7 @@ class WesingBackgroundPlugin implements Plugin<Project> {
             LogUtil.logI(TAG, "hookMergeResourcesTask get filed name: ${mWorkerExecutorField.name} getEnableGradleWorkers: ${mergeResources.getEnableGradleWorkers().get()}  getWorkerExecutor: ${mergeResources.getWorkerExecutor()}")
 
             mWorkerExecutor = mergeResources.getWorkerExecutor()
-            MyWorkerExecutor myWorkerExecutor = new MyWorkerExecutor()
+            MyWorkerExecutor myWorkerExecutor = new MyWorkerExecutor(project)
             myWorkerExecutor.workerExecutor = mWorkerExecutor
 
             mWorkerExecutorField.setAccessible(true)

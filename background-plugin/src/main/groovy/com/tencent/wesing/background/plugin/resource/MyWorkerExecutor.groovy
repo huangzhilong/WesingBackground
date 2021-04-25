@@ -7,6 +7,7 @@ import com.android.ide.common.resources.MergedResourceWriter
 import com.android.ide.common.resources.ResourceMergerItem
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Action
+import org.gradle.api.Project
 import org.gradle.workers.ClassLoaderWorkerSpec
 import org.gradle.workers.ProcessWorkerSpec
 import org.gradle.workers.WorkQueue
@@ -25,6 +26,11 @@ class MyWorkerExecutor implements WorkerExecutor {
     private static final String TAG = "MyWorkerExecutorFacade"
 
     private WorkerExecutor mWorkerExecutor
+    private Project mProject
+
+    MyWorkerExecutor(Project project) {
+        mProject = project
+    }
 
     void setWorkerExecutor(WorkerExecutor workerExecutor) {
         LogUtil.logI(TAG, "setWorkerExecutor ${workerExecutor} ")
@@ -50,12 +56,23 @@ class MyWorkerExecutor implements WorkerExecutor {
                     LogUtil.logI(TAG, "submit is  Aapt2CompileRunnable.Params ${aapt2Params.requests.size()}")
                     for (int i = 0; i < aapt2Params.requests.size(); i++) {
                         CompileResourceRequest request = aapt2Params.requests.get(i)
-                        if (request.inputDirectoryName == "layout") {
+                        if (request.inputDirectoryName == "layout" && !request.getInputFileIsFromDependency() && request.inputFile.name.endsWith(".xml")) {
                             LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                            hookAndroidBackground(request)
                         } else if (request.inputDirectoryName.startsWith("drawable")) {
                             LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
                         }
                     }
+
+                    //移除后layout xml background中找不到！！
+//                    for (int i = 0; i < aapt2Params.requests.size(); i++) {
+//                        CompileResourceRequest request = aapt2Params.requests.get(i)
+//                        if (request.inputFile.name.contains("shape_text_3")) {
+//                            aapt2Params.requests.remove(i)
+//                            LogUtil.logI(TAG, "remove!!!!!!!!")
+//                            break
+//                        }
+//                    }
                 }
             }
             mWorkerExecutor.submit(aClass, action)
@@ -116,6 +133,31 @@ class MyWorkerExecutor implements WorkerExecutor {
         if (mWorkerExecutor != null) {
             mWorkerExecutor.await()
         }
+    }
+
+    private String getDir() {
+        String buildDirPath = mProject.getBuildDir().absolutePath
+        String javaPath = buildDirPath + File.separator + "backgroundRes"
+        return javaPath
+    }
+
+    private void hookAndroidBackground(CompileResourceRequest request) {
+        File file = new File(getDir())
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+        File tempLayout = new File(getDir() + File.separator + request.inputFile.name)
+        byte[] contentByte = request.inputFile.readBytes()
+        if (contentByte == null || contentByte.size() == 0) {
+            LogUtil.logI(TAG, "hookAndroidBackground ${request.inputFile.path} contentByte is empty!!")
+            return
+        }
+        String content = new String(contentByte)
+        content = content.replaceAll("android:background=\"@drawable/shape_text_3\"", " android:background=\"@drawable/shape_text_4\"")
+        tempLayout.write(content)
+
+        request.inputFile = tempLayout
+        request.originalInputFile = tempLayout
     }
 
 }

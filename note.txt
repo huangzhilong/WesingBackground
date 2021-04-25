@@ -44,6 +44,10 @@ $project.android.compileSdkVersion 可获取project android下的属性
 
 mergeResources 调用栈
 
+
+MergedResourceWriter.addItem
+
+
 at com.tencent.wesing.background.plugin.layout.MyWorkerExecutor.submit(MyWorkerExecutor.groovy:33)
 	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:173)
 	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:146)

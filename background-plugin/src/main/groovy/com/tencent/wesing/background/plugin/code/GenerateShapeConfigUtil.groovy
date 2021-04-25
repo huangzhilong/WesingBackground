@@ -40,7 +40,9 @@ class GenerateShapeConfigUtil {
         }
         List<String> codeList = new ArrayList<>()
         for (int i = 0; i < shapeInfoList.size(); i++) {
-            codeList.add(genJavaProperties(i + 1, shapeInfoList[i]))
+            String codeJava = genJavaProperties(i + 1, shapeInfoList[i])
+            LogUtil.logI(TAG, "generateConfigJavaCode code: $codeJava")
+            codeList.add(codeJava)
         }
         javaFile.withWriter('utf-8') { writer ->
             writer.writeLine("package ${packageName};")
@@ -70,7 +72,6 @@ class GenerateShapeConfigUtil {
         stringBuilder.append("R.drawable." + fileName).append(", ")
         stringBuilder.append("\"" + shapeInfo.fileName + "\"").append(", ")
         ((Map) jsonObject).each {
-            LogUtil.logI(TAG, "genJavaProperties key: ${it.key}  value: ${it.value}")
             stringBuilder.append("\"" + it.key + "\"").append(", ")
             String value = it.value.toString()
             if (value.toString().startsWith("@android")) {

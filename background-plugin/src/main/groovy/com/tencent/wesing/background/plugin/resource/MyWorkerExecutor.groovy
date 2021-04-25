@@ -44,25 +44,24 @@ class MyWorkerExecutor implements WorkerExecutor {
                 if (actionParameters.delegateParameters instanceof MergedResourceWriter.FileGenerationParameters) {
                     MergedResourceWriter.FileGenerationParameters fileGenerationParameters = (MergedResourceWriter.FileGenerationParameters) actionParameters.delegateParameters
                     ResourceMergerItem item = fileGenerationParameters.resourceItem
-                    LogUtil.logI(TAG, "submit is  MergedResourceWriter.FileGenerationParameters ${item.name}  ${item.type}  ${item.getFile().path}")
+                    LogUtil.logI(TAG, "submit is  MergedResourceWriter.FileGenerationParameters  ${Thread.currentThread().id} ${item.name}  ${item.type}  ${item.getFile().path}")
                 } else if (actionParameters.delegateParameters instanceof Aapt2CompileRunnable.Params) {
-                    Exception e = new Exception("this is a log"); //相应的log标记
-
-                    e.printStackTrace();
-
                     Aapt2CompileRunnable.Params aapt2Params = (Aapt2CompileRunnable.Params) (actionParameters.delegateParameters)
+                    LogUtil.logI(TAG, "submit is  Aapt2CompileRunnable.Params ${aapt2Params.requests.size()}")
                     for (int i = 0; i < aapt2Params.requests.size(); i++) {
                         CompileResourceRequest request = aapt2Params.requests.get(i)
                         if (request.inputDirectoryName == "layout") {
-
+                            LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                        } else if (request.inputDirectoryName.startsWith("drawable")) {
+                            LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
                         }
-                       // LogUtil.logI(TAG, "CompileResourceRequest ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ")
                     }
                 }
             }
             mWorkerExecutor.submit(aClass, action)
         }
     }
+
 
     @Override
     WorkQueue noIsolation() {

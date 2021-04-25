@@ -16,6 +16,8 @@ import org.gradle.workers.WorkerExecutionException
 import org.gradle.workers.WorkerExecutor
 import org.gradle.workers.WorkerSpec
 
+import java.lang.reflect.Field
+
 
 /**
  * create by zlonghuang on 2021/4/21
@@ -27,9 +29,11 @@ class MyWorkerExecutor implements WorkerExecutor {
 
     private WorkerExecutor mWorkerExecutor
     private Project mProject
+    private String mResDir
 
-    MyWorkerExecutor(Project project) {
+    MyWorkerExecutor(Project project, String dir) {
         mProject = project
+        mResDir = dir
     }
 
     void setWorkerExecutor(WorkerExecutor workerExecutor) {
@@ -48,10 +52,12 @@ class MyWorkerExecutor implements WorkerExecutor {
                 Object value = params.get(0)
                 Workers.ActionParameters actionParameters = (Workers.ActionParameters) value
                 if (actionParameters.delegateParameters instanceof MergedResourceWriter.FileGenerationParameters) {
+                    //来源MergeResources -> MergedResourceWriter.addItem
                     MergedResourceWriter.FileGenerationParameters fileGenerationParameters = (MergedResourceWriter.FileGenerationParameters) actionParameters.delegateParameters
                     ResourceMergerItem item = fileGenerationParameters.resourceItem
                     LogUtil.logI(TAG, "submit is  MergedResourceWriter.FileGenerationParameters  ${Thread.currentThread().id} ${item.name}  ${item.type}  ${item.getFile().path}")
                 } else if (actionParameters.delegateParameters instanceof Aapt2CompileRunnable.Params) {
+                    //来源CompileSourceSetResources 提交的任务
                     Aapt2CompileRunnable.Params aapt2Params = (Aapt2CompileRunnable.Params) (actionParameters.delegateParameters)
                     LogUtil.logI(TAG, "submit is  Aapt2CompileRunnable.Params ${aapt2Params.requests.size()}")
                     for (int i = 0; i < aapt2Params.requests.size(); i++) {
@@ -135,18 +141,12 @@ class MyWorkerExecutor implements WorkerExecutor {
         }
     }
 
-    private String getDir() {
-        String buildDirPath = mProject.getBuildDir().absolutePath
-        String javaPath = buildDirPath + File.separator + "backgroundRes"
-        return javaPath
-    }
-
     private void hookAndroidBackground(CompileResourceRequest request) {
-        File file = new File(getDir())
+        File file = new File(mResDir)
         if (!file.exists()) {
             file.mkdirs()
         }
-        File tempLayout = new File(getDir() + File.separator + request.inputFile.name)
+        File tempLayout = new File(mResDir + File.separator + request.inputFile.name)
         byte[] contentByte = request.inputFile.readBytes()
         if (contentByte == null || contentByte.size() == 0) {
             LogUtil.logI(TAG, "hookAndroidBackground ${request.inputFile.path} contentByte is empty!!")
@@ -156,8 +156,17 @@ class MyWorkerExecutor implements WorkerExecutor {
         content = content.replaceAll("android:background=\"@drawable/shape_text_3\"", " android:background=\"@drawable/shape_text_4\"")
         tempLayout.write(content)
 
-        request.inputFile = tempLayout
-        request.originalInputFile = tempLayout
+        //反射修改成修改后的文件
+        try {
+            Field inputFileField = request.getClass().getDeclaredField("inputFile")
+            Field originalInputFileField = request.getClass().getDeclaredField("originalInputFile")
+            inputFileField.setAccessible(true)
+            originalInputFileField.setAccessible(true)
+            inputFileField.set(request, tempLayout)
+            originalInputFileField.set(request, tempLayout)
+        } catch (Exception e) {
+            LogUtil.logI(TAG, "hookAndroidBackground ex: $e")
+        }
     }
 
 }

@@ -28,7 +28,7 @@ class WesingBackgroundPlugin implements Plugin<Project> {
         LogUtil.logI(TAG, "apply Plugin!!")
         def shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
         StartParams startParams = new StartParams(project.gradle.getStartParameter())
-        shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaFile(project))
+        shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaDir(project))
 
         def variants
         if (project.plugins.hasPlugin("com.android.application")) {
@@ -56,9 +56,20 @@ class WesingBackgroundPlugin implements Plugin<Project> {
         }
     }
 
-    private String getGenerateJavaFile(Project project) {
+    //父目录一定要layout，不然会报错，内存有校验
+    private String getGenerateResDir(Project project) {
         String buildDirPath = project.getBuildDir().absolutePath
-        String javaPath = buildDirPath + File.separator + "background"
+        String resPath = buildDirPath + File.separator + "background" + File.separator + "layout"
+
+        //        String resPath = buildDirPath + File.separator + "layout"
+//        project.android.sourceSets.main.res.srcDirs += resPath
+
+        return resPath
+    }
+
+    private String getGenerateJavaDir(Project project) {
+        String buildDirPath = project.getBuildDir().absolutePath
+        String javaPath = buildDirPath + File.separator + "background" + File.separator + "java"
 
         //生成的Java文件添加到src
         project.android.sourceSets.main.java.srcDirs += javaPath
@@ -84,7 +95,7 @@ class WesingBackgroundPlugin implements Plugin<Project> {
             LogUtil.logI(TAG, "hookMergeResourcesTask get filed name: ${mWorkerExecutorField.name} getEnableGradleWorkers: ${mergeResources.getEnableGradleWorkers().get()}  getWorkerExecutor: ${mergeResources.getWorkerExecutor()}")
 
             mWorkerExecutor = mergeResources.getWorkerExecutor()
-            MyWorkerExecutor myWorkerExecutor = new MyWorkerExecutor(project)
+            MyWorkerExecutor myWorkerExecutor = new MyWorkerExecutor(project, getGenerateResDir(project))
             myWorkerExecutor.workerExecutor = mWorkerExecutor
 
             mWorkerExecutorField.setAccessible(true)

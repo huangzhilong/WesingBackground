@@ -2,4 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tencent.wesing.background.lib">
 
+    <provider
+        android:name="com.tencent.wesing.background.lib.TMEBackgroundContentProvider"
+        android:authorities="${applicationId}.backgroundLib"
+        android:exported="false" />
 </manifest>

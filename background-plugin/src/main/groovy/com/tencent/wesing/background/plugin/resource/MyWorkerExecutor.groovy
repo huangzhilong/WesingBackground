@@ -156,6 +156,7 @@ class MyWorkerExecutor implements WorkerExecutor {
         content = content.replaceAll("android:background=\"@drawable/shape_text_3\"", " android:background=\"@drawable/shape_text_4\"")
         tempLayout.write(content)
 
+
         //反射修改成修改后的文件
         try {
             Field inputFileField = request.getClass().getDeclaredField("inputFile")

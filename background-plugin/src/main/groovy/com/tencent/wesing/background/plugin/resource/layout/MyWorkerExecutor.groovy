@@ -146,7 +146,19 @@ class MyWorkerExecutor implements WorkerExecutor {
         }
     }
 
+    private String addCustomTagToXml(String content, String customTag) {
+        String customTxt = "\nxmlns:$customTag=\"http://schemas.android.com/apk/res-auto\""
+        if (content.indexOf("http://schemas.android.com/apk/res/android\"") > 0) {
+            content = content.replace("http://schemas.android.com/apk/res/android\"", "http://schemas.android.com/apk/res/android\"$customTxt")
+        } else {
+            LogUtil.logI(TAG, "add customTag failed!!!!")
+        }
+        return content
+    }
+
     private void hookAndroidBackground(CompileResourceRequest request) {
+        boolean needCheckInclude = true  //检查是否需要添加头
+        String customTag = ""
         File file = new File(mResDir)
         if (!file.exists()) {
             file.mkdirs()
@@ -167,6 +179,7 @@ class MyWorkerExecutor implements WorkerExecutor {
             String attribute = ""
             String value = ""
             int firstMark = 0
+            //解析value
             while ((endIndex = content.indexOf("\"", endIndex)) > 0) {
                 count ++
                 endIndex++
@@ -182,8 +195,31 @@ class MyWorkerExecutor implements WorkerExecutor {
             if (!BackgroundUtil.isEmpty(value) && !BackgroundUtil.isEmpty(attribute) && value.contains(DRAWABLE_TAG)) {
                 String drawableName = value.substring(value.indexOf(DRAWABLE_TAG) + DRAWABLE_TAG.length())
                 if (mProject.gradle.ext.shapeContainer.contains(drawableName)) {
-                    LogUtil.logI(TAG, "hookAndroidBackground attribute: $attribute  value: $value changeTo ")
-                    content = content.replaceAll(attribute, "kk=123")
+                    if (needCheckInclude) {
+                        needCheckInclude = false
+                        //查找有没有 xmlns:app="http://schemas.android.com/apk/res-auto"
+                        int autoIndex = content.indexOf("http://schemas.android.com/apk/res-auto")
+                        if (autoIndex > 0) {
+                            //有，把tag拿出来
+                            String startTag = "xmlns:"
+                            int startTagIndex = content.lastIndexOf(startTag, autoIndex)
+                            int equalsTagIndex = content.lastIndexOf("=", autoIndex)
+                            if (startTagIndex > 0 && equalsTagIndex > 0 && equalsTagIndex > startTagIndex) {
+                                customTag = content.substring(startTagIndex, equalsTagIndex - 1).replaceAll(" ", "")
+                            } else {
+                                //解析失败需要自己添加
+                                customTag = "app1"
+                                content = addCustomTagToXml(content, customTag)
+                            }
+                        } else {
+                            //没有需要自己添加
+                            customTag = "app1"
+                            content = addCustomTagToXml(content, customTag)
+                        }
+                    }
+                    String newAttribute = "$customTag:tme_background=\"@drawable/$drawableName\""
+                    LogUtil.logI(TAG, "hookAndroidBackground attribute: $attribute  value: $value  newAttribute: $newAttribute ")
+                    content = content.replaceAll(attribute, newAttribute)
                 }
             }
             index++ //加一查找下一个

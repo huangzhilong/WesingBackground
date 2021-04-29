@@ -1,4 +1,12 @@
-问题1: shape存在多个drawable中该怎么代码记录
+完整步骤：
+
+1、 根据模块来处理xml转换，在遍历该module的shape 的xml时用hashMap记录生成了代码的shape xml  key：文件名  value ：解析的属性值
+2、 利用解析到的属性值生成java文件，参与编译
+3、 编译layout。xml的background熟悉，根据文件名去hashMap中找，找到了说明已经生成了Java属性代码，可以用自己的定义的属性进行替换了（必须去hashMap里找，因为background不止
+    支持shape属性。这样就可以每个模块生成了）
+
+
+问题1: shape存在多个drawable文件夹中该怎么代码记录（根据设备获取对应的shape的xml）
 
 	这种情况比较少，判断存在的就不处理了，继续使用原来的drawable xml方式
 
@@ -25,18 +33,11 @@
     context.getResources().getDimension(R.dimen.app_icon_size)
 
 
-问题4： A模块依赖B模块的xml shape，若每个模块自己扫描处理xml的话，A模块里面就找不到所需要B模块的shape xml的Id。
-
-    所以需要一次任务就全部一次扫描，把项目中所有的xml shape文件全部扫描出来生成代码熟悉和Id（id是递增的，用于替换layout xml里的background属性，改成自定义属性用id标记）
-
-    shape xml需要一次性扫描出来，生成全局Id，根据xml的名字
-
-
-问题5： 删除了shape  xml文件后， xml布局中使用shape和代码中getDrawable中使用shape会编译不过。（要想想怎么减包）
+问题4： 删除了shape  xml文件后， xml布局中使用shape和代码中getDrawable中使用shape会编译不过。（要想想怎么减包）
 
 
 
-问题6： 不能换成别的xml文件，放在项目的layout目录不同名字代码中使用了找不到Id，不放在这个目录则编译不过，提示错误路径
+问题5： 不能换成别的xml文件，放在项目的layout目录不同名字代码中使用了找不到Id，不放在这个目录则编译不过，提示错误路径
 
 
 

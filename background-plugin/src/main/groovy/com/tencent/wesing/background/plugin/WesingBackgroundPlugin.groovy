@@ -4,8 +4,8 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.api.BaseVariantImpl
 import com.android.build.gradle.tasks.MergeResources
-import com.tencent.wesing.background.plugin.resource.MyWorkerExecutor
-import com.tencent.wesing.background.plugin.shape.ShapeScanTask
+import com.tencent.wesing.background.plugin.resource.layout.MyWorkerExecutor
+import com.tencent.wesing.background.plugin.resource.shape.ShapeScanTask
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,6 +26,10 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         LogUtil.logI(TAG, "apply Plugin!!")
+        if (!project.gradle.hasProperty("shapeContainer")) {
+            LogUtil.logI(TAG, "create shapeContainer Property!!")
+            project.gradle.ext.shapeContainer = new HashSet<String>()
+        }
         def shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
         StartParams startParams = new StartParams(project.gradle.getStartParameter())
         shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaDir(project))
@@ -56,13 +60,13 @@ class WesingBackgroundPlugin implements Plugin<Project> {
         }
     }
 
-    //父目录一定要layout，不然会报错，内存有校验
+    //父目录一定要layout，不然会报错，内部有校验
     private String getGenerateResDir(Project project) {
         String buildDirPath = project.getBuildDir().absolutePath
         String resPath = buildDirPath + File.separator + "background" + File.separator + "layout"
 
-        //        String resPath = buildDirPath + File.separator + "layout"
-//        project.android.sourceSets.main.res.srcDirs += resPath
+        // String resPath = buildDirPath + File.separator + "layout"
+        // project.android.sourceSets.main.res.srcDirs += resPath
 
         return resPath
     }

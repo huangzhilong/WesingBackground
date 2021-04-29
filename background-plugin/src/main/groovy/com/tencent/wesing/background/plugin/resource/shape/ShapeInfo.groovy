@@ -1,4 +1,4 @@
-package com.tencent.wesing.background.plugin.shape
+package com.tencent.wesing.background.plugin.resource.shape
 
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
 

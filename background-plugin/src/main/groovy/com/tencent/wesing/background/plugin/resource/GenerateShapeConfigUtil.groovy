@@ -1,9 +1,8 @@
-package com.tencent.wesing.background.plugin.code
+package com.tencent.wesing.background.plugin.resource
 
-import com.tencent.wesing.background.plugin.shape.ShapeInfo
+import com.tencent.wesing.background.plugin.resource.shape.ShapeInfo
 import com.tencent.wesing.background.plugin.util.LogUtil
 import groovy.json.JsonSlurper
-import org.gradle.api.Project
 
 /**
  * create by zlonghuang on 2021/4/20

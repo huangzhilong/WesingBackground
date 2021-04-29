@@ -1,9 +1,9 @@
-package com.tencent.wesing.background.plugin.shape
+package com.tencent.wesing.background.plugin.resource.shape
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.tencent.wesing.background.plugin.StartParams
-import com.tencent.wesing.background.plugin.code.GenerateShapeConfigUtil
+import com.tencent.wesing.background.plugin.resource.GenerateShapeConfigUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import org.gradle.api.DefaultTask
@@ -148,9 +148,11 @@ class ShapeScanTask extends DefaultTask {
                 ShapeInfo info = collectShapeXml(drawableNodeXmlList.get(i), projectName)
                 if (info != null) {
                     shapeInfoList.add(info)
+                    //去掉.xml
+                    project.gradle.ext.shapeContainer.add(info.fileName.substring(0, info.fileName.length() - 4))
                 }
             }
-
+            LogUtil.logI(TAG, "getDrawables name: ${project.gradle.ext.shapeContainer}")
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {
                 String packagePath = packageName.replaceAll("\\.", File.separator)
                 String javaPath = mJavaFilePath + File.separator + packagePath
@@ -188,10 +190,10 @@ class ShapeScanTask extends DefaultTask {
         if (nodeInfo == null || nodeInfo.xmlNode == null) {
             return null
         }
-        LogUtil.logI(TAG, "collectShapeXml projectName: $projectName  drawableName: ${nodeInfo.fileName}")
+        //LogUtil.logI(TAG, "collectShapeXml projectName: $projectName  drawableName: ${nodeInfo.fileName}")
         Node xmlParseResult = nodeInfo.xmlNode
         ShapeInfo shapeInfo = ShapeParseUtil.getShapeInfoByParseNode(xmlParseResult, nodeInfo.fileName)
-        LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}  shapeInfo: ${shapeInfo.getJsonString()}")
+        //LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}  shapeInfo: ${shapeInfo.getJsonString()}")
         return shapeInfo
     }
 }

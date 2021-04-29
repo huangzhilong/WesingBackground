@@ -1,10 +1,11 @@
-package com.tencent.wesing.background.plugin.resource
+package com.tencent.wesing.background.plugin.resource.layout
 
 import com.android.build.gradle.internal.res.Aapt2CompileRunnable
 import com.android.build.gradle.internal.tasks.Workers
 import com.android.ide.common.resources.CompileResourceRequest
 import com.android.ide.common.resources.MergedResourceWriter
 import com.android.ide.common.resources.ResourceMergerItem
+import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -15,6 +16,7 @@ import org.gradle.workers.WorkerConfiguration
 import org.gradle.workers.WorkerExecutionException
 import org.gradle.workers.WorkerExecutor
 import org.gradle.workers.WorkerSpec
+import sun.rmi.runtime.Log
 
 import java.lang.reflect.Field
 
@@ -26,6 +28,9 @@ import java.lang.reflect.Field
 class MyWorkerExecutor implements WorkerExecutor {
 
     private static final String TAG = "MyWorkerExecutorFacade"
+
+    private static final BACKGROUND_TAG = "android:background"
+    private static final DRAWABLE_TAG = "@drawable/"
 
     private WorkerExecutor mWorkerExecutor
     private Project mProject
@@ -55,18 +60,18 @@ class MyWorkerExecutor implements WorkerExecutor {
                     //来源MergeResources -> MergedResourceWriter.addItem
                     MergedResourceWriter.FileGenerationParameters fileGenerationParameters = (MergedResourceWriter.FileGenerationParameters) actionParameters.delegateParameters
                     ResourceMergerItem item = fileGenerationParameters.resourceItem
-                    LogUtil.logI(TAG, "submit is  MergedResourceWriter.FileGenerationParameters  ${Thread.currentThread().id} ${item.name}  ${item.type}  ${item.getFile().path}")
+                    //LogUtil.logI(TAG, "submit is  MergedResourceWriter.FileGenerationParameters  ${Thread.currentThread().id} ${item.name}  ${item.type}  ${item.getFile().path}")
                 } else if (actionParameters.delegateParameters instanceof Aapt2CompileRunnable.Params) {
                     //来源CompileSourceSetResources 提交的任务
                     Aapt2CompileRunnable.Params aapt2Params = (Aapt2CompileRunnable.Params) (actionParameters.delegateParameters)
-                    LogUtil.logI(TAG, "submit is  Aapt2CompileRunnable.Params ${aapt2Params.requests.size()}")
+                    //LogUtil.logI(TAG, "submit is  Aapt2CompileRunnable.Params ${aapt2Params.requests.size()}")
                     for (int i = 0; i < aapt2Params.requests.size(); i++) {
                         CompileResourceRequest request = aapt2Params.requests.get(i)
                         if (request.inputDirectoryName == "layout" && !request.getInputFileIsFromDependency() && request.inputFile.name.endsWith(".xml")) {
-                            LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                            //LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
                             hookAndroidBackground(request)
                         } else if (request.inputDirectoryName.startsWith("drawable")) {
-                            LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                           // LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
                         }
                     }
 
@@ -153,7 +158,36 @@ class MyWorkerExecutor implements WorkerExecutor {
             return
         }
         String content = new String(contentByte)
-        content = content.replaceAll("android:background=\"@drawable/shape_text_3\"", " android:background=\"@drawable/shape_text_4\"")
+        int index = 0
+        // 查找android:background属性
+        while ((index = content.indexOf(BACKGROUND_TAG, index)) > 0) {
+            //往后面找两个"号，就是完整的一句background属性啦
+            int endIndex = index + BACKGROUND_TAG.length()
+            int count = 0
+            String attribute = ""
+            String value = ""
+            int firstMark = 0
+            while ((endIndex = content.indexOf("\"", endIndex)) > 0) {
+                count ++
+                endIndex++
+                if (count == 1) {
+                    firstMark = endIndex
+                } else if (count > 1) {
+                    attribute = content.substring(index, endIndex)
+                    value = content.substring(firstMark, endIndex - 1)
+                    break
+                }
+            }
+            //是drawable的background且已经解析到了的shape
+            if (!BackgroundUtil.isEmpty(value) && !BackgroundUtil.isEmpty(attribute) && value.contains(DRAWABLE_TAG)) {
+                String drawableName = value.substring(value.indexOf(DRAWABLE_TAG) + DRAWABLE_TAG.length())
+                if (mProject.gradle.ext.shapeContainer.contains(drawableName)) {
+                    LogUtil.logI(TAG, "hookAndroidBackground attribute: $attribute  value: $value changeTo ")
+                    content = content.replaceAll(attribute, "kk=123")
+                }
+            }
+            index++ //加一查找下一个
+        }
         tempLayout.write(content)
 
 
@@ -169,5 +203,4 @@ class MyWorkerExecutor implements WorkerExecutor {
             LogUtil.logI(TAG, "hookAndroidBackground ex: $e")
         }
     }
-
 }

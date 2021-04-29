@@ -1,4 +1,4 @@
-package com.tencent.wesing.background.plugin.resource
+package com.tencent.wesing.background.plugin.resource.layout
 
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Action

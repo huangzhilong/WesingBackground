@@ -4,6 +4,7 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.api.BaseVariantImpl
 import com.android.build.gradle.tasks.MergeResources
+import com.tencent.wesing.background.plugin.resource.ResourceTransform
 import com.tencent.wesing.background.plugin.resource.layout.MyWorkerExecutor
 import com.tencent.wesing.background.plugin.resource.shape.ShapeScanTask
 import com.tencent.wesing.background.plugin.util.LogUtil
@@ -58,6 +59,10 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                 }
             }
         }
+
+        //注册transform
+        def android = project.extensions.getByType(AppExtension)
+        android.registerTransform(new ResourceTransform())
     }
 
     //父目录一定要layout，不然会报错，内部有校验

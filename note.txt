@@ -41,6 +41,10 @@
 
 
 
+问题5：注册transform需要在App module！！！
+
+    def android = project.extensions.getByType(AppExtension)
+    android.registerTransform(new ResourceTransform())
 
 
 先单线程处理，后期再加入多线程！！！！

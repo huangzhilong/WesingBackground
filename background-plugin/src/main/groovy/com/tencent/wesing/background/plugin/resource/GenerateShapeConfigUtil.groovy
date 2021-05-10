@@ -13,7 +13,7 @@ class GenerateShapeConfigUtil {
     static final String TAG = "GenerateShapeConfigUtil"
 
     static final String JAVA_NAME = "BackgroundShapeConfig"
-    static final String JAVA_VALUE_TEMPLATE = "public static final String background_param%s_value  = %s;"
+    static final String JAVA_VALUE_TEMPLATE = "public static final String background_param%s = %s;"
 
     private static File initGenerateConfigJavaFile(String javaPath) {
         File file = new File(javaPath + File.separator + JAVA_NAME + ".java")
@@ -86,8 +86,6 @@ class GenerateShapeConfigUtil {
                 stringBuilder.append(it.value).append("," + "\"")
             }
         }
-        //去掉最后的逗号和加号
-        String text = stringBuilder.toString().substring(0, stringBuilder.length() - 4)
-        return String.format(JAVA_VALUE_TEMPLATE, id, text)
+        return String.format(JAVA_VALUE_TEMPLATE, id, stringBuilder.toString())
     }
 }

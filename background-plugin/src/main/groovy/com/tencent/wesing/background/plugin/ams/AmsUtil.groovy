@@ -15,23 +15,6 @@ class AmsUtil {
 
     private static final String TAG = "AmsUtil"
 
-    static startParseClass(File f) {
-
-        FileInputStream fis = new FileInputStream(f)
-        ClassReader classReader = new ClassReader(fis)
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
-        //分析，处理结果写入cw EXPAND_FRAMES：栈图以扩展格式进行访问
-        classReader.accept(new ClassAdapterVisitor(classWriter), ClassReader.EXPAND_FRAMES);
-
-        //覆盖自己
-        byte [] newClassByte = classWriter.toByteArray()
-        FileOutputStream fos = new FileOutputStream(f)
-        fos.write(newClassByte)
-        fos.close()
-
-        fis.close()
-    }
-
     static void getParseXmlAttributeInfoByClass(File f, ClassShapeXmlAdapterVisitor.IVisitListener listener) {
         try {
             FileInputStream fis = new FileInputStream(f)
@@ -45,6 +28,27 @@ class AmsUtil {
             fis.close()
         } catch (Exception e) {
             LogUtil.logI(TAG, "getParseXmlAttributeInfoByClass ex: $e")
+        }
+    }
+
+    static void InsertTMEBackgroundMapClassAttribute(File f, List<AttributeInfo> attributeInfoList) {
+        try {
+            FileInputStream fis = new FileInputStream(f)
+            ClassReader classReader = new ClassReader(fis)
+            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
+            InsertBackgroundAttributeClassAdapterVisitor insertBackgroundAttributeClassAdapterVisitor = new InsertBackgroundAttributeClassAdapterVisitor(classWriter, attributeInfoList)
+            //分析，处理结果写入cw EXPAND_FRAMES：栈图以扩展格式进行访问
+            classReader.accept(insertBackgroundAttributeClassAdapterVisitor, ClassReader.EXPAND_FRAMES);
+
+            //覆盖自己
+            byte [] newClassByte = classWriter.toByteArray()
+            FileOutputStream fos = new FileOutputStream(f)
+            fos.write(newClassByte)
+            fos.close()
+
+            fis.close()
+        } catch (Exception e) {
+            LogUtil.logI(TAG, "InsertTMEBackgroundMapClassAttribute ex: $e")
         }
     }
 }

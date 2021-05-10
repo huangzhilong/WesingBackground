@@ -62,7 +62,9 @@ class WesingBackgroundPlugin implements Plugin<Project> {
 
         //注册transform
         def android = project.extensions.getByType(AppExtension)
-        android.registerTransform(new ResourceTransform())
+        ResourceTransform transform = new ResourceTransform()
+        transform.setProject(project)
+        android.registerTransform(transform)
     }
 
     //父目录一定要layout，不然会报错，内部有校验

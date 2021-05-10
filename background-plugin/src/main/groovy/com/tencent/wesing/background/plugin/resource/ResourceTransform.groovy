@@ -12,12 +12,13 @@ import com.android.build.api.transform.TransformInvocation
 import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.api.transform.Format
 import com.android.utils.FileUtils
-import org.apache.commons.codec.digest.DigestUtils
 import com.tencent.wesing.background.plugin.ams.AmsUtil
 import com.tencent.wesing.background.plugin.ams.ClassShapeXmlAdapterVisitor
 import com.tencent.wesing.background.plugin.ams.bean.AttributeInfo
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
+import com.tencent.wesing.background.plugin.util.JarZipUtils
 import com.tencent.wesing.background.plugin.util.LogUtil
+import org.gradle.api.Project
 
 /**
  * create by zlonghuang on 2021/4/21
@@ -25,8 +26,17 @@ import com.tencent.wesing.background.plugin.util.LogUtil
 
 class ResourceTransform extends Transform {
 
-    final static String TAG = "ResourceTransform"
+
+    private final static String TAG = "ResourceTransform"
+    private final static String TME_BACKGROUND_LIB_NAME = ":background-lib"
+
     private List<AttributeInfo> mParseShapeXmlAttributeList
+    private Project mProject
+    private JarInput mBackgroundLibJar
+
+    void setProject(Project project) {
+        mProject = project
+    }
 
     @Override
     String getName() {
@@ -53,10 +63,10 @@ class ResourceTransform extends Transform {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         LogUtil.logI(TAG, "start doTransform  isIncremental: ${transformInvocation.isIncremental()}")
         doTransform(transformInvocation)
+        afterTransform(transformInvocation)
     }
 
     private void doTransform(TransformInvocation transformInvocation) {
-        Collection<TransformInput> mInputCollection = transformInvocation.getInputs()
         // 创建一个对应名称表示的输出目录 位于app/build/intermediates/transforms/(transform的getName)
         // 是从0 、1、2开始递增。如果是目录，名称就是对应的数字，如果是jar包就类似0.jar
         TransformOutputProvider mOutputProvider = transformInvocation.getOutputProvider()
@@ -98,20 +108,40 @@ class ResourceTransform extends Transform {
                     break
                 case Status.CHANGED:
                 case Status.ADDED:
-                    doTransformJar(jarInput, dest)
+                    if (jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
+                        mBackgroundLibJar = jarInput
+                    } else {
+                        doTransformJar(jarInput, dest)
+                    }
                     break
                 default:
                     break
             }
         } else  {
-            doTransformJar(jarInput, dest)
+            if (jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
+                mBackgroundLibJar = jarInput
+            } else {
+                doTransformJar(jarInput, dest)
+            }
         }
     }
 
     private void doTransformJar(JarInput jarInput, File dest) {
-        //将修改过的字节码copy到dest，就可以实现编译期间干预字节码的目的了
-        LogUtil.logI(TAG, "processJarInput fileName: ${jarInput.getFile().absolutePath}  ${jarInput.name}  dest: ${dest.absolutePath}")
-        FileUtils.copyFile(jarInput.getFile(), dest)
+        if (jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
+            LogUtil.logI(TAG, "start doTransformJar jar: ${jarInput.name}")
+            String unzipTmp = "${mProject.getBuildDir().absolutePath}${File.separator}tmp${File.separator}" + getName()
+            unzipTmp = "${unzipTmp}${File.separator}${jarInput.name.replace(':', '')}"
+
+            JarZipUtils.unzipJarZip(jarInput.file.absolutePath, unzipTmp)
+            File f = new File(unzipTmp)
+
+            eachFileToDirectory(jarInput.name, f)
+
+            //修改完再压缩生成jar再copy到输出目录
+            JarZipUtils.zipJarZip(unzipTmp, dest.absolutePath)
+        } else {
+            FileUtils.copyFile(jarInput.getFile(), dest)
+        }
     }
 
     private void processDirectoryInputs(DirectoryInput directoryInput, TransformOutputProvider outputProvider, boolean isIncremental) {
@@ -183,7 +213,6 @@ class ResourceTransform extends Transform {
 
 
     private void onHandleDirectoryEachFile(String name, File file) {
-        LogUtil.logI(TAG, "onHandleDirectoryEachFile name: $name  fileName: ${file.name}")
         String fileName = file.name
         if (!fileName.endsWith(".class") || fileName.endsWith("R.class") || fileName.endsWith("BuildConfig.class")
                 || fileName.contains("R\$")) {
@@ -192,6 +221,7 @@ class ResourceTransform extends Transform {
 
         // 找到shape xml生成属性的class文件
         if (file.name.contains(GenerateShapeConfigUtil.JAVA_NAME + ".class")) {
+            LogUtil.logI(TAG, "start getParseXmlAttributeInfoByClass name: $name fileName: ${fileName}")
             AmsUtil.getParseXmlAttributeInfoByClass(file, new ClassShapeXmlAdapterVisitor.IVisitListener() {
                 @Override
                 void onGetShapeXmlAttribute(List<AttributeInfo> list) {
@@ -199,6 +229,27 @@ class ResourceTransform extends Transform {
                     mParseShapeXmlAttributeList = list
                 }
             })
+        }
+
+        if (fileName.contains("TMEBackgroundMap.class")) {
+            LogUtil.logI(TAG, "start handleTMEBackgroundMap name: $name fileName: ${fileName}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
+            if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {
+                AmsUtil.InsertTMEBackgroundMapClassAttribute(file, mParseShapeXmlAttributeList)
+            }
+        }
+    }
+
+    private void afterTransform(TransformInvocation transformInvocation) {
+        LogUtil.logI(TAG, "afterTransform!!")
+        TransformOutputProvider mOutputProvider = transformInvocation.getOutputProvider()
+        //要保证先解析生成的属性再插入属性，所以放到doTransform之后处理
+        if (mBackgroundLibJar != null) {
+            File dest = mOutputProvider.getContentLocation(
+                    mBackgroundLibJar.getFile().getAbsolutePath(),
+                    mBackgroundLibJar.getContentTypes(),
+                    mBackgroundLibJar.getScopes(),
+                    Format.JAR)
+            doTransformJar(mBackgroundLibJar, dest)
         }
     }
 }

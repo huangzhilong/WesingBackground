@@ -6,7 +6,7 @@ import java.util.zip.ZipFile
  * create by zlonghuang on 2021/4/30
  **/
 
-class JarZipUtil {
+class JarZipUtils {
 
     private final static String TAG = "JarZipUtils"
 

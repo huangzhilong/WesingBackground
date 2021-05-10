@@ -12,6 +12,11 @@ import com.android.build.api.transform.TransformInvocation
 import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.api.transform.Format
 import com.android.utils.FileUtils
+import org.apache.commons.codec.digest.DigestUtils
+import com.tencent.wesing.background.plugin.ams.AmsUtil
+import com.tencent.wesing.background.plugin.ams.ClassShapeXmlAdapterVisitor
+import com.tencent.wesing.background.plugin.ams.bean.AttributeInfo
+import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 
 /**
@@ -21,6 +26,7 @@ import com.tencent.wesing.background.plugin.util.LogUtil
 class ResourceTransform extends Transform {
 
     final static String TAG = "ResourceTransform"
+    private List<AttributeInfo> mParseShapeXmlAttributeList
 
     @Override
     String getName() {
@@ -40,16 +46,13 @@ class ResourceTransform extends Transform {
 
     @Override
     boolean isIncremental() {
-        return true
+        return false
     }
 
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        try {
-            doTransform(transformInvocation)
-        } catch (Exception e) {
-           LogUtil.logI(TAG, "doTransform get ex: $e")
-        }
+        LogUtil.logI(TAG, "start doTransform  isIncremental: ${transformInvocation.isIncremental()}")
+        doTransform(transformInvocation)
     }
 
     private void doTransform(TransformInvocation transformInvocation) {
@@ -117,41 +120,46 @@ class ResourceTransform extends Transform {
                 Format.DIRECTORY)
         //建立文件夹
         FileUtils.mkdirs(dest)
-        if (isIncremental) {
-            Map<File, Status> statusMap = directoryInput.getChangedFiles()
-            Iterator<File> iterator = statusMap.keySet().iterator()
-            //输出目录文件夹地址和输入文件夹地址
-            String destPath = dest.getAbsolutePath()
-            String directoryPath = directoryInput.file.getAbsolutePath()
-            while (iterator.hasNext()) {
-                File file = iterator.next()
-                Status status = statusMap.get(file)
-                //得到输出目录的文件路径
-                String fileDestPath = file.getAbsolutePath().replace(directoryPath, destPath)
-                File destFile = new File(fileDestPath)
-                switch (status) {
-                    case Status.NOTCHANGED:
-                        break
-                    case Status.REMOVED:
-                        if (destFile.exists()) {
-                            FileUtils.delete(destFile)
-                        }
-                        break
-                    case Status.ADDED:
-                    case Status.CHANGED:
-                        //操作修改对输入file，然后copy到输出目录
-                        onHandleDirectoryEachFile(directoryInput.name, file)
-                        FileUtils.copyFile(file, destFile)
-                        break
-                    default:
-                        break
-                }
-            }
-        } else {
-            //遍历操作每个文件再进行copy的输出目录
-            eachFileToDirectory(directoryInput.name, directoryInput.file)
-            FileUtils.copyDirectory(directoryInput.file, dest)
-        }
+         //不需要使用增量，每次都要获取属性
+//        if (isIncremental) {
+//            Map<File, Status> statusMap = directoryInput.getChangedFiles()
+//            Iterator<File> iterator = statusMap.keySet().iterator()
+//            //输出目录文件夹地址和输入文件夹地址
+//            String destPath = dest.getAbsolutePath()
+//            String directoryPath = directoryInput.file.getAbsolutePath()
+//            while (iterator.hasNext()) {
+//                File file = iterator.next()
+//                Status status = statusMap.get(file)
+//                //得到输出目录的文件路径
+//                String fileDestPath = file.getAbsolutePath().replace(directoryPath, destPath)
+//                File destFile = new File(fileDestPath)
+//                switch (status) {
+//                    case Status.NOTCHANGED:
+//                        break
+//                    case Status.REMOVED:
+//                        if (destFile.exists()) {
+//                            FileUtils.delete(destFile)
+//                        }
+//                        break
+//                    case Status.ADDED:
+//                    case Status.CHANGED:
+//                        //操作修改对输入file，然后copy到输出目录
+//                        onHandleDirectoryEachFile(directoryInput.name, file)
+//                        FileUtils.copyFile(file, destFile)
+//                        break
+//                    default:
+//                        break
+//                }
+//            }
+//        } else {
+//            //遍历操作每个文件再进行copy的输出目录
+//            eachFileToDirectory(directoryInput.name, directoryInput.file)
+//            FileUtils.copyDirectory(directoryInput.file, dest)
+//        }
+
+        //遍历操作每个文件再进行copy的输出目录
+        eachFileToDirectory(directoryInput.name, directoryInput.file)
+        FileUtils.copyDirectory(directoryInput.file, dest)
     }
 
     private void eachFileToDirectory(String name, File file) {
@@ -176,5 +184,21 @@ class ResourceTransform extends Transform {
 
     private void onHandleDirectoryEachFile(String name, File file) {
         LogUtil.logI(TAG, "onHandleDirectoryEachFile name: $name  fileName: ${file.name}")
+        String fileName = file.name
+        if (!fileName.endsWith(".class") || fileName.endsWith("R.class") || fileName.endsWith("BuildConfig.class")
+                || fileName.contains("R\$")) {
+            return
+        }
+
+        // 找到shape xml生成属性的class文件
+        if (file.name.contains(GenerateShapeConfigUtil.JAVA_NAME + ".class")) {
+            AmsUtil.getParseXmlAttributeInfoByClass(file, new ClassShapeXmlAdapterVisitor.IVisitListener() {
+                @Override
+                void onGetShapeXmlAttribute(List<AttributeInfo> list) {
+                    LogUtil.logI(TAG, "getParseXmlAttributeInfoByClass size: ${BackgroundUtil.getCollectSize(list)}")
+                    mParseShapeXmlAttributeList = list
+                }
+            })
+        }
     }
 }

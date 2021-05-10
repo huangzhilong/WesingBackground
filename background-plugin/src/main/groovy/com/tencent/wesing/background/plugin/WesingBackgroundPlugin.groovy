@@ -72,7 +72,6 @@ class WesingBackgroundPlugin implements Plugin<Project> {
 
         // String resPath = buildDirPath + File.separator + "layout"
         // project.android.sourceSets.main.res.srcDirs += resPath
-
         return resPath
     }
 

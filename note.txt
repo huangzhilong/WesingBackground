@@ -41,10 +41,25 @@
 
 
 
-问题5：注册transform需要在App module！！！
+
+
+问题6：注册transform需要在App module！！！
 
     def android = project.extensions.getByType(AppExtension)
     android.registerTransform(new ResourceTransform())
+
+
+
+问题7：hook layout只能拿到app module的layout xml
+
+
+问题8：生成的class都在app moduel，对呀的import 的R的class当app模块没依赖时会编译不了
+
+
+问题9：字节码操作到map的时候各个modlue的属性都是相同的，会覆盖，入A module有parma1 B也有Parma1
+
+
+
 
 
 先单线程处理，后期再加入多线程！！！！

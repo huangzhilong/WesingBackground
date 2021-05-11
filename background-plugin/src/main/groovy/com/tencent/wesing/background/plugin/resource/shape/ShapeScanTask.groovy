@@ -1,6 +1,7 @@
 package com.tencent.wesing.background.plugin.resource.shape
 
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.tencent.wesing.background.plugin.StartParams
 import com.tencent.wesing.background.plugin.resource.GenerateShapeConfigUtil

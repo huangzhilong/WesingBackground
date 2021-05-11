@@ -223,6 +223,9 @@ public class ShapeDrawableFactory {
                     }
                 }
                 return gradientDrawable;
+            } else {
+                // 找不到字节码属性用系统获取
+                return (GradientDrawable) TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
             }
         } catch (Exception e) {
             e.printStackTrace();

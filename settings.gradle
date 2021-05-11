@@ -1,3 +1,4 @@
+include ':BModule'
 include ':background-lib'
 include ':background-plugin'
 include ':AModule'

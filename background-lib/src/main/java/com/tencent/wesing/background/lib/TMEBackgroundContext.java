@@ -6,7 +6,7 @@ import android.content.Context;
  * create by zlonghuang on 2021/5/9
  **/
 
-class TMEBackgroundContext {
+public class TMEBackgroundContext {
 
     private static Context mContext;
 

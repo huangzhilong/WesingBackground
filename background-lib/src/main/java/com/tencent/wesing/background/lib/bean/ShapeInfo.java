@@ -1,5 +1,7 @@
 package com.tencent.wesing.background.lib.bean;
 
+import android.text.TextUtils;
+
 /**
  * create by zlonghuang on 2021/5/10
  **/

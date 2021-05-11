@@ -1,11 +1,15 @@
 package com.tencent.wesing.background.lib;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+
+import com.tencent.wesing.background.lib.drawable.ShapeDrawableFactory;
 
 public class TMEBackgroundFactory implements LayoutInflater.Factory2 {
 
@@ -44,7 +48,16 @@ public class TMEBackgroundFactory implements LayoutInflater.Factory2 {
 
     @Nullable
     public static View setViewBackground(Context context, AttributeSet attrs, View view) {
-        //return setViewBackground(null, context, attrs, view);
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.TMEBackground);
+        if (ta.getIndexCount() <= 0) {
+            ta.recycle();
+            return view;
+        }
+        GradientDrawable gradientDrawable = ShapeDrawableFactory.getInstance().getNeedGradientDrawable(ta);
+        if (gradientDrawable != null) {
+            view.setBackground(gradientDrawable);
+        }
+        ta.recycle();
         return view;
     }
 }

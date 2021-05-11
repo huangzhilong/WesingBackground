@@ -75,14 +75,17 @@ class GenerateShapeConfigUtil {
             stringBuilder.append("\"" + it.key).append(":")
             String value = it.value.toString()
             if (value.toString().startsWith("@android")) {
+                stringBuilder.append("1:")  //id类型使用1
                 //系统id  @android:color/background_dark  -> android.R.color.background_dark
                 value = value.replace("@android:", "android.R.").replace("/", ".")
                 stringBuilder.append("\"" + "+").append(value).append("+" + "\"" + "," + "\"")
             } else if (it.value.toString().startsWith("@")) {
+                stringBuilder.append("1:")
                 //项目id @dimen/top_height -> R.dimen.top_height
                 value = value.replace("@", "R.").replace("/", ".")
                 stringBuilder.append("\"" + "+").append(value).append("+" + "\"" + "," + "\"")
             } else {
+                stringBuilder.append("0:")
                 stringBuilder.append(it.value).append("," + "\"")
             }
         }

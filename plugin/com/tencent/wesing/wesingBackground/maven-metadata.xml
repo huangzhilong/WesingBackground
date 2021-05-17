@@ -3,13 +3,14 @@
   <groupId>com.tencent.wesing</groupId>
   <artifactId>wesingBackground</artifactId>
   <versioning>
-    <release>1.0.10</release>
+    <release>1.0.11</release>
     <versions>
       <version>"1.0.8"</version>
       <version>"1.0.9"</version>
       <version>1.0.9</version>
       <version>1.0.10</version>
+      <version>1.0.11</version>
     </versions>
-    <lastUpdated>20210511084246</lastUpdated>
+    <lastUpdated>20210514105718</lastUpdated>
   </versioning>
 </metadata>

@@ -1,7 +1,6 @@
 package com.tencent.wesing.background.plugin.resource.shape
 
 import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.tencent.wesing.background.plugin.StartParams
 import com.tencent.wesing.background.plugin.resource.GenerateShapeConfigUtil
@@ -144,20 +143,17 @@ class ShapeScanTask extends DefaultTask {
         drawableNodeXmlList = doFilterRepeatXmlFile(drawableNodeXmlList)
         packageName = tempPackageName
         if (BackgroundUtil.getCollectSize(drawableNodeXmlList) > 0)  {
-            List<ShapeInfo> shapeInfoList = new ArrayList<>()
+            List<AttributeValueInfo> shapeInfoList = new ArrayList<>()
             for (int i = 0; i < drawableNodeXmlList.size(); i++) {
-                ShapeInfo info = collectShapeXml(drawableNodeXmlList.get(i), projectName)
+                AttributeValueInfo info = collectShapeXml(drawableNodeXmlList.get(i), projectName)
                 if (info != null) {
                     shapeInfoList.add(info)
-                    //去掉.xml
-                    project.gradle.ext.shapeContainer.add(info.fileName.substring(0, info.fileName.length() - 4))
                 }
             }
-            LogUtil.logI(TAG, "getDrawables name: ${project.gradle.ext.shapeContainer}")
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {
                 String packagePath = packageName.replaceAll("\\.", File.separator)
                 String javaPath = mJavaFilePath + File.separator + packagePath
-                GenerateShapeConfigUtil.generateConfigJavaCode(shapeInfoList, packageName, javaPath)
+                GenerateShapeConfigUtil.generateConfigJavaCode(shapeInfoList, packageName, javaPath, projectName)
             }
         }
     }
@@ -187,14 +183,13 @@ class ShapeScanTask extends DefaultTask {
     }
 
 
-    ShapeInfo collectShapeXml(XmlNodeInfo nodeInfo, String projectName) {
+    AttributeValueInfo collectShapeXml(XmlNodeInfo nodeInfo, String projectName) {
         if (nodeInfo == null || nodeInfo.xmlNode == null) {
             return null
         }
-        //LogUtil.logI(TAG, "collectShapeXml projectName: $projectName  drawableName: ${nodeInfo.fileName}")
         Node xmlParseResult = nodeInfo.xmlNode
-        ShapeInfo shapeInfo = ShapeParseUtil.getShapeInfoByParseNode(xmlParseResult, nodeInfo.fileName)
-        //LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}  shapeInfo: ${shapeInfo.getJsonString()}")
-        return shapeInfo
+        AttributeValueInfo attributeInfo =  AttributeInfoParseUtil.getAttributeInfoByParseNode(xmlParseResult, nodeInfo.fileName)
+        LogUtil.logI(TAG, "parse xmlFileName: ${nodeInfo.fileName}  AttributeValueInfo: ${attributeInfo.getJsonString()}")
+        return attributeInfo
     }
 }

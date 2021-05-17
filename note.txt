@@ -60,6 +60,12 @@
 
 
 
+问题10：解析字节码属性来生成drawable解析太耗时，使得就比加载xml快一点，没有倍数增长
+2021-05-11 17:29:16.168 23075-23075/com.tencent.wesing.background I/longpo: parse cost time: 327031
+2021-05-11 17:29:16.168 23075-23075/com.tencent.wesing.background I/longpo: set attr cost time: 42969
+2021-05-11 17:29:16.168 23075-23075/com.tencent.wesing.background I/longpo: codeDrawable cost time: 518802
+
+
 
 
 先单线程处理，后期再加入多线程！！！！

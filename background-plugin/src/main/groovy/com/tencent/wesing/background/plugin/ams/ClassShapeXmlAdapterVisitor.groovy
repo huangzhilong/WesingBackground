@@ -37,9 +37,6 @@ class ClassShapeXmlAdapterVisitor extends ClassVisitor {
 
     @Override
     void visitEnd() {
-//        classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC,
-//                "USR", "Ljava/lang/String;", null, "CrazyMo_")
-        //classWriter.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL | Opcodes.ACC_STATIC, "shapeMap", "Ljava/util/HashMap;", "Ljava/util/HashMap<Ljava/lang/Integer;Ljava/lang/String;>;", null)
         if (mListener != null) {
             mListener.onGetShapeXmlAttribute(attributeInfoList)
         }

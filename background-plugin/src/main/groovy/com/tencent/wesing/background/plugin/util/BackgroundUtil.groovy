@@ -19,4 +19,14 @@ class BackgroundUtil {
         }
         return list.size()
     }
+
+    //判断属性值是不是Id类型
+    static boolean isIdValue(String attrValue) {
+        if (isEmpty(attrValue)) {
+            return false
+        }
+        if (attrValue.startsWith("@")) {
+            return true
+        }
+    }
 }

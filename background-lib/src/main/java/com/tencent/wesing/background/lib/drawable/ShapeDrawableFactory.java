@@ -60,7 +60,7 @@ public class ShapeDrawableFactory {
         return null;
     }
 
-    private GradientDrawable createDrawableById(int drawableId) {
+    public GradientDrawable createDrawableById(int drawableId) {
 
         String attribute = TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId);
         //不支持走系统的getDrawable

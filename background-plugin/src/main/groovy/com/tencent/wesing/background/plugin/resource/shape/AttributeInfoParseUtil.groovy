@@ -1,30 +1,30 @@
 package com.tencent.wesing.background.plugin.resource.shape
 
+
 /**
  * create by zlonghuang on 2021/4/19
  **/
 
-class ShapeParseUtil {
+class AttributeInfoParseUtil {
 
-    static final TAG = "ShapeParseUtil"
 
-    static ShapeInfo getShapeInfoByParseNode(Node xmlParseResult, String fileName) {
+    static AttributeValueInfo getAttributeInfoByParseNode(Node xmlParseResult, String fileName) {
         if (xmlParseResult == null) {
             return null
         }
-        ShapeInfo shapeInfo = new ShapeInfo()
-        shapeInfo.fileName = fileName
-        parseHeader(xmlParseResult, shapeInfo)
-        parseGradient(xmlParseResult, shapeInfo)
-        parseCorners(xmlParseResult, shapeInfo)
-        parsePadding(xmlParseResult, shapeInfo)
-        parseSize(xmlParseResult, shapeInfo)
-        parseSolid(xmlParseResult, shapeInfo)
-        parseStroke(xmlParseResult, shapeInfo)
-        return shapeInfo
+        AttributeValueInfo attributeInfo = new AttributeValueInfo()
+        attributeInfo.fileName = fileName
+        parseHeader(xmlParseResult, attributeInfo)
+        parseGradient(xmlParseResult, attributeInfo)
+        parseCorners(xmlParseResult, attributeInfo)
+        parsePadding(xmlParseResult, attributeInfo)
+        parseSize(xmlParseResult, attributeInfo)
+        parseSolid(xmlParseResult, attributeInfo)
+        parseStroke(xmlParseResult, attributeInfo)
+        return attributeInfo
     }
 
-    private static void parseHeader(Node xmlParseResult, ShapeInfo shapeInfo) {
+    private static void parseHeader(Node xmlParseResult, AttributeValueInfo attributeInfo) {
         // 头
         xmlParseResult.attributes().each {
             attr ->
@@ -33,40 +33,19 @@ class ShapeParseUtil {
                     String value = attr.value.toString()
                     //LogUtil.logI(TAG, "parseHeader $key  $value")
                     if (key.endsWith("dither")) {
-                        shapeInfo.dither = value
+                        attributeInfo.dither = value
                     }
                     if (key.endsWith("shape")) {
-                        shapeInfo.shape = value
-                    }
-                    if (key.endsWith("innerRadius")) {
-                        shapeInfo.innerRadius = value
-                    }
-                    if (key.endsWith("innerRadiusRatio")) {
-                        shapeInfo.innerRadiusRatio = value
-                    }
-                    if (key.endsWith("thickness")) {
-                        shapeInfo.thickness = value
-                    }
-                    if (key.endsWith("thicknessRatio")) {
-                        shapeInfo.thicknessRatio = value
+                        attributeInfo.shape = value
                     }
                     if (key.endsWith("tint")) {
-                        shapeInfo.tint = value
-                    }
-                    if (key.endsWith("tintMode")) {
-                        shapeInfo.tintMod = value
-                    }
-                    if (key.endsWith("useLevel")) {
-                        shapeInfo.useLevel = value
-                    }
-                    if (key.endsWith("visible")) {
-                        shapeInfo.visible = value
+                        attributeInfo.tint = value
                     }
                 }
         }
     }
 
-    private static void parseGradient(Node xmlParseResult, ShapeInfo shapeInfo) {
+    private static void parseGradient(Node xmlParseResult,  AttributeValueInfo attributeInfo) {
         if (xmlParseResult.gradient[0] == null) {
             return
         }
@@ -75,42 +54,38 @@ class ShapeParseUtil {
                 if (attr != null && attr.key != null && attr.value != null) {
                     String key = attr.key.toString()
                     String value = attr.value.toString()
-                    //LogUtil.logI(TAG, "parseGradient $key  $value")
                     if (key.endsWith("type")) {
-                        shapeInfo.type = value
-                    }
-                    if (key.endsWith("useLevel")) {
-                        shapeInfo.gradientUseLevel = value
+                        attributeInfo.type = value
                     }
                     if (key.endsWith("angle")) {
-                        shapeInfo.angle = value
+                        attributeInfo.angle = value
                     }
                     if (key.endsWith("centerColor")) {
-                        shapeInfo.centerColor = value
+                        attributeInfo.centerColor = value
                     }
                     if (key.endsWith("startColor")) {
-                        shapeInfo.startColor = value
+                        attributeInfo.startColor = value
                     }
                     if (key.endsWith("endColor")) {
-                        shapeInfo.endColor = value
+                        attributeInfo.endColor = value
                     }
                     if (key.endsWith("centerX")) {
-                        shapeInfo.centerX = value
+                        attributeInfo.centerX = value
                     }
                     if (key.endsWith("centerY")) {
-                        shapeInfo.centerY = value
+                        attributeInfo.centerY = value
                     }
                     if (key.endsWith("centerY")) {
-                        shapeInfo.centerY = value
+                        attributeInfo.centerY = value
                     }
                     if (key.endsWith("gradientRadius")) {
-                        shapeInfo.gradientRadius = value
+                        attributeInfo.gradientRadius = value
                     }
                 }
         }
     }
 
-    private static void parseCorners(Node xmlParseResult, ShapeInfo shapeInfo) {
+    private static void parseCorners(Node xmlParseResult, AttributeValueInfo attributeInfo) {
         if (xmlParseResult.corners[0] == null) {
             return
         }
@@ -121,25 +96,25 @@ class ShapeParseUtil {
                     String value = attr.value.toString()
                     //LogUtil.logI(TAG, "parseCorners $key  $value")
                     if (key.endsWith("radius")) {
-                        shapeInfo.radius = value
+                        attributeInfo.radius = value
                     }
                     if (key.endsWith("bottomLeftRadius")) {
-                        shapeInfo.bottomLeftRadius = value
+                        attributeInfo.bottomLeftRadius = value
                     }
                     if (key.endsWith("bottomRightRadius")) {
-                        shapeInfo.bottomRightRadius = value
+                        attributeInfo.bottomRightRadius = value
                     }
                     if (key.endsWith("topLeftRadius")) {
-                        shapeInfo.topLeftRadius = value
+                        attributeInfo.topLeftRadius = value
                     }
                     if (key.endsWith("topRightRadius")) {
-                        shapeInfo.topRightRadius = value
+                        attributeInfo.topRightRadius = value
                     }
                 }
         }
     }
 
-    private static void parsePadding(Node xmlParseResult, ShapeInfo shapeInfo) {
+    private static void parsePadding(Node xmlParseResult, AttributeValueInfo attributeInfo) {
         if (xmlParseResult.padding[0] == null) {
             return
         }
@@ -150,22 +125,22 @@ class ShapeParseUtil {
                     String value = attr.value.toString()
                     //LogUtil.logI(TAG, "parsePadding $key  $value")
                     if (key.endsWith("bottom")) {
-                        shapeInfo.bottom = value
+                        attributeInfo.bottom = value
                     }
                     if (key.endsWith("left")) {
-                        shapeInfo.left = value
+                        attributeInfo.left = value
                     }
                     if (key.endsWith("top")) {
-                        shapeInfo.top = value
+                        attributeInfo.top = value
                     }
                     if (key.endsWith("right")) {
-                        shapeInfo.right = value
+                        attributeInfo.right = value
                     }
                 }
         }
     }
 
-    private static void parseSize(Node xmlParseResult, ShapeInfo shapeInfo) {
+    private static void parseSize(Node xmlParseResult, AttributeValueInfo attributeInfo) {
         if (xmlParseResult.size[0] == null) {
             return
         }
@@ -176,16 +151,16 @@ class ShapeParseUtil {
                     String value = attr.value.toString()
                     //LogUtil.logI(TAG, "parseSize $key  $value")
                     if (key.endsWith("height")) {
-                        shapeInfo.height = value
+                        attributeInfo.height = value
                     }
                     if (key.endsWith("width")) {
-                        shapeInfo.width = value
+                        attributeInfo.width = value
                     }
                 }
         }
     }
 
-    private static void parseSolid(Node xmlParseResult, ShapeInfo shapeInfo) {
+    private static void parseSolid(Node xmlParseResult, AttributeValueInfo attributeInfo) {
         if (xmlParseResult.solid[0] == null) {
             return
         }
@@ -196,13 +171,13 @@ class ShapeParseUtil {
                     String value = attr.value.toString()
                     //LogUtil.logI(TAG, "parseSolid $key  $value")
                     if (key.endsWith("color")) {
-                        shapeInfo.solidColor = value
+                        attributeInfo.solidColor = value
                     }
                 }
         }
     }
 
-    private static void parseStroke(Node xmlParseResult, ShapeInfo shapeInfo) {
+    private static void parseStroke(Node xmlParseResult, AttributeValueInfo attributeInfo) {
         if (xmlParseResult.stroke[0] == null) {
             return
         }
@@ -213,16 +188,16 @@ class ShapeParseUtil {
                     String value = attr.value.toString()
                     //LogUtil.logI(TAG, "parseStroke $key  $value")
                     if (key.endsWith("color")) {
-                        shapeInfo.strokeColor = value
+                        attributeInfo.strokeColor = value
                     }
                     if (key.endsWith("width")) {
-                        shapeInfo.strokeWidth = value
+                        attributeInfo.strokeWidth = value
                     }
                     if (key.endsWith("dashGap")) {
-                        shapeInfo.dashGap = value
+                        attributeInfo.dashGap = value
                     }
                     if (key.endsWith("dashWidth")) {
-                        shapeInfo.dashWidth = value
+                        attributeInfo.dashWidth = value
                     }
                 }
         }

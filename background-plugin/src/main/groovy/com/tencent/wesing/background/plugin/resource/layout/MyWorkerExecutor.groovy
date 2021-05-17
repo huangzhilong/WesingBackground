@@ -16,7 +16,6 @@ import org.gradle.workers.WorkerConfiguration
 import org.gradle.workers.WorkerExecutionException
 import org.gradle.workers.WorkerExecutor
 import org.gradle.workers.WorkerSpec
-import sun.rmi.runtime.Log
 
 import java.lang.reflect.Field
 
@@ -194,33 +193,31 @@ class MyWorkerExecutor implements WorkerExecutor {
             //是drawable的background且已经解析到了的shape
             if (!BackgroundUtil.isEmpty(value) && !BackgroundUtil.isEmpty(attribute) && value.contains(DRAWABLE_TAG)) {
                 String drawableName = value.substring(value.indexOf(DRAWABLE_TAG) + DRAWABLE_TAG.length())
-                if (mProject.gradle.ext.shapeContainer.contains(drawableName)) {
-                    if (needCheckInclude) {
-                        needCheckInclude = false
-                        //查找有没有 xmlns:app="http://schemas.android.com/apk/res-auto"
-                        int autoIndex = content.indexOf("http://schemas.android.com/apk/res-auto")
-                        if (autoIndex > 0) {
-                            //有，把tag拿出来
-                            String startTag = "xmlns:"
-                            int startTagIndex = content.lastIndexOf(startTag, autoIndex)
-                            int equalsTagIndex = content.lastIndexOf("=", autoIndex)
-                            if (startTagIndex > 0 && equalsTagIndex > 0 && equalsTagIndex > startTagIndex) {
-                                customTag = content.substring(startTagIndex, equalsTagIndex - 1).replaceAll(" ", "")
-                            } else {
-                                //解析失败需要自己添加
-                                customTag = "app1"
-                                content = addCustomTagToXml(content, customTag)
-                            }
+                if (needCheckInclude) {
+                    needCheckInclude = false
+                    //查找有没有 xmlns:app="http://schemas.android.com/apk/res-auto"
+                    int autoIndex = content.indexOf("http://schemas.android.com/apk/res-auto")
+                    if (autoIndex > 0) {
+                        //有，把tag拿出来
+                        String startTag = "xmlns:"
+                        int startTagIndex = content.lastIndexOf(startTag, autoIndex)
+                        int equalsTagIndex = content.lastIndexOf("=", autoIndex)
+                        if (startTagIndex > 0 && equalsTagIndex > 0 && equalsTagIndex > startTagIndex) {
+                            customTag = content.substring(startTagIndex, equalsTagIndex - 1).replaceAll(" ", "")
                         } else {
-                            //没有需要自己添加
+                            //解析失败需要自己添加
                             customTag = "app1"
                             content = addCustomTagToXml(content, customTag)
                         }
+                    } else {
+                        //没有需要自己添加
+                        customTag = "app1"
+                        content = addCustomTagToXml(content, customTag)
                     }
-                    String newAttribute = "$customTag:tme_background=\"@drawable/$drawableName\""
-                    LogUtil.logI(TAG, "hookAndroidBackground attribute: $attribute  value: $value  newAttribute: $newAttribute ")
-                    content = content.replaceAll(attribute, newAttribute)
                 }
+                String newAttribute = "$customTag:tme_background=\"@drawable/$drawableName\""
+                LogUtil.logI(TAG, "hookAndroidBackground attribute: $attribute  value: $value  newAttribute: $newAttribute ")
+                content = content.replaceAll(attribute, newAttribute)
             }
             index++ //加一查找下一个
         }

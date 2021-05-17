@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tencent.wesing</groupId>
   <artifactId>wesingBackground</artifactId>
-  <version>1.0.10</version>
+  <version>1.0.11</version>
   <dependencies>
     <dependency>
       <groupId>com.android.tools.build</groupId>

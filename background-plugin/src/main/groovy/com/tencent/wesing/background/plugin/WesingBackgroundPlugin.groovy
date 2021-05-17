@@ -27,10 +27,10 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         LogUtil.logI(TAG, "apply Plugin!!")
-        if (!project.gradle.hasProperty("shapeContainer")) {
-            LogUtil.logI(TAG, "create shapeContainer Property!!")
-            project.gradle.ext.shapeContainer = new HashSet<String>()
-        }
+//        if (!project.gradle.hasProperty("shapeContainer")) {
+//            LogUtil.logI(TAG, "create shapeContainer Property!!")
+//            project.gradle.ext.shapeContainer = new HashSet<String>()
+//        }
         def shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
         StartParams startParams = new StartParams(project.gradle.getStartParameter())
         shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaDir(project))

@@ -10,10 +10,13 @@ import java.util.HashMap;
  **/
 
 public class TMEBackgroundMap {
-    public final static String BACKGROUND_PARAMS_TAG = "background_param";
+
     private final static HashMap<Integer, String> mBackgroundAttributeMap = new HashMap<>();
 
     public static HashMap<Integer, String> getBackgroundAttributeMap() {
         return mBackgroundAttributeMap;
+    }
+
+    public static void initDrawableDataMap() {
     }
 }

@@ -24,6 +24,15 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
     }
 
     @Override
+    MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+        // 删除掉原本定义的initDrawableDataMap方法，因为下面还会再生成该方法
+        if (name == "initDrawableDataMap") {
+            return null
+        }
+        return super.visitMethod(access, name, descriptor, signature, exceptions)
+    }
+
+    @Override
     void visitEnd() {
         //createAttributeParams()
         insertAttributeToMap()
@@ -34,9 +43,21 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
      * 把drawable的属性值插入map中
      */
     private void insertAttributeToMap() {
-        //FieldVisitor fieldVisitor
+        /**
+         *  public static void initDrawableDataMap() {*
+         *         Integer var0 = 2131165341;
+         *         Object[] var1 = new Object[]{134152442, 79691784, "rectangle", 2131100039, "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "80dp", "300dp", 2131034318, 2131034145, "4dp", "3dp", 2131100038};
+         *         mBackgroundAttributeMap.put(var0, var1);
+         *         var0 = 2131165339;
+         *         var1 = new Object[]{5179907, 4721153, 2130968580, "oval", 2131296277, 17170447, "10dp", "10dp", "10dp", 2131100038, 2131034318};
+         *         mBackgroundAttributeMap.put(var0, var1);
+         *         var0 = 2131165340;
+         *         var1 = new Object[]{4194546, 4194304, "oval", "10dp", "10dp", "10dp", "10dp", 17170444};
+         *         mBackgroundAttributeMap.put(var0, var1);
+         *     }
+         */
         MethodVisitor methodVisitor
-        // 生成赋值静态方法
+        //这个方法会生成赋值静态方法（之前的被删除了）
         methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "initDrawableDataMap", "()V", null, null)
         for (int i = 0; i < attributeInfoList.size(); i++) {
             AttributeInfo info = attributeInfoList.get(i)

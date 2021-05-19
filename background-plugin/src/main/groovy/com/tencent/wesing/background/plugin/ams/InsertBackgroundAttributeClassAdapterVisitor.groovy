@@ -25,10 +25,64 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
 
     @Override
     void visitEnd() {
-        createAttributeParams()
+        //createAttributeParams()
+        insertAttributeToMap()
         super.visitEnd()
     }
 
+    /**
+     * 把drawable的属性值插入map中
+     */
+    private void insertAttributeToMap() {
+        //FieldVisitor fieldVisitor
+        MethodVisitor methodVisitor
+        // 生成赋值静态方法
+        methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "initDrawableDataMap", "()V", null, null)
+        for (int i = 0; i < attributeInfoList.size(); i++) {
+            AttributeInfo info = attributeInfoList.get(i)
+            if (info == null || BackgroundUtil.isEmpty(info.name) || BackgroundUtil.isEmpty(info.value)) {
+                continue
+            }
+            String[] values = info.value.split(",")
+            // 第一位是drawableId 第二位是使用了哪些属性的位值  第三位是哪些属性的值是使用Id的位值，所以至少大于3
+            if (values.length <= 3) {
+                continue
+            }
+            //第一位是drawableId，拿出来当key
+            int drawableId = Integer.parseInt(values[0])
+            methodVisitor.visitLdcInsn(new Integer(drawableId))
+            methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false)
+            methodVisitor.visitVarInsn(Opcodes.ASTORE, 0)
+
+            // 创建属性数组，不包含第一位drawableId
+            visitInsn(methodVisitor, values.length - 1)   // 根据长度创建数组
+            methodVisitor.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object")
+            for (int j = 1; j < values.length; j++) {
+                //把每个分割的字符串存储到数组
+                methodVisitor.visitInsn(Opcodes.DUP)
+                visitInsn(methodVisitor, j - 1)  //数组下标,从0开始
+                if (BackgroundUtil.isNumeric(values[j])) {
+                    visitInsn(methodVisitor, Integer.parseInt(values[j]))
+                    methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+                } else {
+                    methodVisitor.visitLdcInsn(values[j])
+                }
+                methodVisitor.visitInsn(Opcodes.AASTORE)
+            }
+            methodVisitor.visitVarInsn(Opcodes.ASTORE, 1)
+            methodVisitor.visitFieldInsn(Opcodes.GETSTATIC, "com/tencent/wesing/background/lib/bean/TMEBackgroundMap", "mBackgroundAttributeMap", "Ljava/util/HashMap;")
+            methodVisitor.visitVarInsn(Opcodes.ALOAD, 0)
+            methodVisitor.visitVarInsn(Opcodes.ALOAD, 1)
+            methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/HashMap", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false)
+        }
+        methodVisitor.visitInsn(Opcodes.RETURN)
+        methodVisitor.visitMaxs(4, 2)
+        methodVisitor.visitEnd()
+    }
+
+    /**
+     * 生成class的属性记录drawable的属性，需要自己把属性插入map
+     */
     private void createAttributeParams() {
         //生成属性值的方式
         /**
@@ -37,9 +91,9 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
          *  public static final Object[] app_background_param3;
          *
          *  public static void initDrawableDataMap() {
-         *      app_background_param1 = new Object[]{"2131165341", "134152442", "79691784", "rectangle", "2131100039", "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "80dp", "300dp", "2131034318", "2131034145", "4dp", "3dp", "2131100038"};
-         *      app_background_param2 = new Object[]{"2131165339", "5179907", "4721153", "2130968580", "oval", "2131296277", "17170447", "10dp", "10dp", "10dp", "2131100038", "2131034318"};
-         *      app_background_param3 = new Object[]{"2131165340", "4194546", "4194304", "oval", "10dp", "10dp", "10dp", "10dp", "17170444"};
+         *        app_background_param1 = new Object[]{2131165341, 134152442, 79691784, "rectangle", 2131100039, "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "10dp", "80dp", "300dp", 2131034318, 2131034145, "4dp", "3dp", 2131100038};
+         *        app_background_param2 = new Object[]{2131165339, 5179907, 4721153, 2130968580, "oval", 2131296277, 17170447, "10dp", "10dp", "10dp", 2131100038, 2131034318};
+         *        app_background_param3 = new Object[]{2131165340, 4194546, 4194304, "oval", "10dp", "10dp", "10dp", "10dp", 17170444};
          *  }
          */
         FieldVisitor fieldVisitor

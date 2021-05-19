@@ -29,19 +29,6 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
         super.visitEnd()
     }
 
-    private void insertAttributeToMap() {
-        FieldVisitor fieldVisitor
-        MethodVisitor methodVisitor
-        // 生成赋值静态方法
-        methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "initDrawableDataMap", "()V", null, null)
-        for (int i = 0; i < attributeInfoList.size(); i++) {
-            AttributeInfo info = attributeInfoList.get(i)
-            if (info == null || BackgroundUtil.isEmpty(info.name) || BackgroundUtil.isEmpty(info.value)) {
-                continue
-            }
-        }
-    }
-
     private void createAttributeParams() {
         //生成属性值的方式
         /**
@@ -151,4 +138,5 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
         }
         methodVisitor.visitLdcInsn(new Integer(value))
     }
+
 }

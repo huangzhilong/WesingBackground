@@ -1,5 +1,7 @@
 package com.tencent.wesing.background;
 
+import java.util.HashMap;
+
 /**
  * create by zlonghuang on 2021/4/20
  **/
@@ -7,6 +9,7 @@ package com.tencent.wesing.background;
 class ShapeTest {
 
 
+    private final static HashMap<Integer, Object> mBackgroundAttributeMap = new HashMap<>();
 
 
     public static final Object[] param1  = { 11293, "shape_text_2.xml", "dither", R.bool.yes};
@@ -20,4 +23,11 @@ class ShapeTest {
 
 
     public static final Object[] test = {"ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk","ffhfh", R.id.btn_send_gift, "kfkfk"};
+
+
+    public static void  initData() {
+        Integer id = 2113456777;
+        Object[] param888  = { 24444, "shape_text_3.xml", "shape", 111, 555,4444, 5555};
+        mBackgroundAttributeMap.put(id, param888);
+    }
 }

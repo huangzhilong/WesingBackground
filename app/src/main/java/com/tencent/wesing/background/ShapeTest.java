@@ -12,7 +12,7 @@ class ShapeTest {
     private final static HashMap<Integer, Object> mBackgroundAttributeMap = new HashMap<>();
 
 
-    public static final Object[] param1  = { 11293, "shape_text_2.xml", "dither", R.bool.yes};
+    public static final Object[] param1  = { 1, 2, 3, 4, 6, 7, "shape_text_2.xml", "dither", R.bool.yes};
 
 
     public static final Object[] param2  = { 24444, "shape_text_3.xml", "shape"};
@@ -29,5 +29,6 @@ class ShapeTest {
         Integer id = 2113456777;
         Object[] param888  = { 24444, "shape_text_3.xml", "shape", 111, 555,4444, 5555};
         mBackgroundAttributeMap.put(id, param888);
+        mBackgroundAttributeMap.put(66666666, param888);
     }
 }

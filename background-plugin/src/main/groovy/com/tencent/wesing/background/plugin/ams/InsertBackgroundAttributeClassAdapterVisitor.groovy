@@ -65,7 +65,12 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
                 //把每个分割的字符串存储到数组
                 methodVisitor.visitInsn(Opcodes.DUP)
                 visitInsn(methodVisitor, j)  //数组下标
-                methodVisitor.visitLdcInsn(values[j])
+                if (BackgroundUtil.isNumeric(values[j])) {
+                    visitInsn(methodVisitor, Integer.parseInt(values[j]))
+                    methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+                } else {
+                    methodVisitor.visitLdcInsn(values[j])
+                }
                 methodVisitor.visitInsn(Opcodes.AASTORE)
 
                 //整数存储方式

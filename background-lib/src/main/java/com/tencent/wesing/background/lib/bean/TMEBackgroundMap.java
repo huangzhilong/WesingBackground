@@ -11,9 +11,9 @@ import java.util.HashMap;
 
 public class TMEBackgroundMap {
 
-    private final static HashMap<Integer, String> mBackgroundAttributeMap = new HashMap<>();
+    private final static HashMap<Integer, Object[]> mBackgroundAttributeMap = new HashMap<>();
 
-    public static HashMap<Integer, String> getBackgroundAttributeMap() {
+    public static HashMap<Integer, Object[]> getBackgroundAttributeMap() {
         return mBackgroundAttributeMap;
     }
 

@@ -9,9 +9,9 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.tencent.wesing.background.lib.drawable.ShapeDrawableFactory;
+import com.tencent.wesing.background.lib.drawable.GradientDrawableFactory;
 
-public class TMEBackgroundFactory implements LayoutInflater.Factory2 {
+class TMEBackgroundFactory implements LayoutInflater.Factory2 {
 
     private LayoutInflater.Factory mViewCreateFactory;
     private LayoutInflater.Factory2 mViewCreateFactory2;
@@ -53,7 +53,7 @@ public class TMEBackgroundFactory implements LayoutInflater.Factory2 {
             ta.recycle();
             return view;
         }
-        GradientDrawable gradientDrawable = ShapeDrawableFactory.getInstance().getNeedGradientDrawable(ta);
+        GradientDrawable gradientDrawable = GradientDrawableFactory.getInstance().getNeedGradientDrawable(ta);
         if (gradientDrawable != null) {
             view.setBackground(gradientDrawable);
         }

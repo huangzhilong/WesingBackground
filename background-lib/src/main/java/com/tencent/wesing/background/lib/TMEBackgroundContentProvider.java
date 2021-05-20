@@ -10,12 +10,15 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
+
 
 public class TMEBackgroundContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         if(getContext() != null && getContext() instanceof Application){
             TMEBackgroundLibrary.inject(getContext());
+            TMEBackgroundMap.initDrawableDataMap();
             TMEBackgroundContext.setApplicationContext(getContext());
             ((Application) getContext()).registerActivityLifecycleCallbacks(new TMEActivityLifecycleRegister());
         }

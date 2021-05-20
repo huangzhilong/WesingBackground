@@ -17,6 +17,10 @@ import com.tencent.wesing.background.lib.util.DimensionUtil;
  */
 public class GradientDrawableInfo {
 
+    private static final String TAG = "GradientDrawableInfo";
+
+    public int attrMask = 0;  //  属性位值
+
     //将在位图的像素配置与屏幕不同时（例如：ARGB 8888 位图和 RGB 565 屏幕）启用位图的抖动；值为“false”时则停用抖动。默认值为 false。
     public boolean dither = false;
 
@@ -86,6 +90,7 @@ public class GradientDrawableInfo {
             //不能根据是不是使用了整数就是Id，因为颜色也是整数，需要用id的位置来判断
             int attrValue = (int) values[0];
             int idValue = (int) values[1];
+            attrMask = attrValue;
 
             boolean isId;
             int index = 2; //第二个开始是属性值，根据位运算来处理，属性顺序是根据AttributeMask顺序来的
@@ -374,7 +379,7 @@ public class GradientDrawableInfo {
                 }
             }
         } catch (Exception e) {
-            Log.i("longpo", "parse attr ex: " + e);
+            Log.i(TAG, "parse attr ex: " + e);
             isDisable = true;
         }
     }
@@ -383,7 +388,7 @@ public class GradientDrawableInfo {
         return (idValue & mask) > 0;
     }
 
-    private boolean hasAttribute(int attrValue, int mask) {
+    public boolean hasAttribute(int attrValue, int mask) {
         return (attrValue & mask) > 0;
     }
 }

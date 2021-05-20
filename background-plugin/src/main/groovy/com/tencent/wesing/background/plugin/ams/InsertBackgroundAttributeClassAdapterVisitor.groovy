@@ -57,7 +57,7 @@ class InsertBackgroundAttributeClassAdapterVisitor extends ClassVisitor {
          */
         MethodVisitor methodVisitor
         //这个方法会生成赋值静态方法（之前的被删除了）
-        methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "initGradientDrawable", "()V", null, null)
+        methodVisitor = classWriter.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "initGradientDrawable", "()V", null, null)
         for (int i = 0; i < attributeInfoList.size(); i++) {
             AttributeInfo info = attributeInfoList.get(i)
             if (info == null || BackgroundUtil.isEmpty(info.name) || BackgroundUtil.isEmpty(info.value)) {

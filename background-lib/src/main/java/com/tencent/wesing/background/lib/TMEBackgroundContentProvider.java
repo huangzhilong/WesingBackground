@@ -19,7 +19,7 @@ public class TMEBackgroundContentProvider extends ContentProvider {
         if(getContext() != null && getContext() instanceof Application){
             TMEBackgroundLibrary.inject(getContext());
             TMEBackgroundContext.setApplicationContext(getContext());
-            TMEBackgroundMap.initGradientDrawable();
+            TMEBackgroundMap.startParseAttribute();
             ((Application) getContext()).registerActivityLifecycleCallbacks(new TMEActivityLifecycleRegister());
         }
         return true;

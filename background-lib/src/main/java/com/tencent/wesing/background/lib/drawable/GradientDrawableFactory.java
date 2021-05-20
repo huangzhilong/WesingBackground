@@ -9,6 +9,7 @@ import android.util.LruCache;
 import android.view.View;
 import com.tencent.wesing.background.lib.R;
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
+import com.tencent.wesing.background.lib.bean.AttributeMask;
 import com.tencent.wesing.background.lib.bean.GradientDrawableInfo;
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
 
@@ -22,6 +23,8 @@ import java.lang.reflect.Field;
  **/
 
 public class GradientDrawableFactory {
+
+    private static final String TAG = "GradientDrawableFactory";
 
     private GradientDrawableFactory() {
     }
@@ -60,19 +63,22 @@ public class GradientDrawableFactory {
     public GradientDrawable createDrawableById(int drawableId) {
         GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
         try {
-            if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
+            if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable || gradientDrawableInfo.attrMask <= 0) {
                 return (GradientDrawable) TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
             }
-            long startTime = System.nanoTime();
             GradientDrawable gradientDrawable = new GradientDrawable();
-            gradientDrawable.setDither(gradientDrawableInfo.dither);
-            gradientDrawable.setShape(gradientDrawableInfo.shape);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (gradientDrawableInfo.hasAttribute(gradientDrawableInfo.attrMask, AttributeMask.ditherMask)) {
+                gradientDrawable.setDither(gradientDrawableInfo.dither);
+            }
+            if (gradientDrawableInfo.hasAttribute(gradientDrawableInfo.attrMask, AttributeMask.shapeMask)) {
+                gradientDrawable.setShape(gradientDrawableInfo.shape);
+            }
+            if (gradientDrawableInfo.hasAttribute(gradientDrawableInfo.attrMask, AttributeMask.tintMask) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 gradientDrawable.setTint(gradientDrawableInfo.tint);
             }
-            
+
             //圆角
-            if (gradientDrawableInfo.radius > 0) {
+            if (gradientDrawableInfo.hasAttribute(gradientDrawableInfo.attrMask, AttributeMask.radiusMask) && gradientDrawableInfo.radius > 0) {
                 gradientDrawable.setCornerRadius(gradientDrawableInfo.radius);
             } else if (gradientDrawableInfo.topLeftRadius > 0 || gradientDrawableInfo.topRightRadius > 0 || gradientDrawableInfo.bottomLeftRadius > 0 || gradientDrawableInfo.bottomRightRadius > 0) {
                 float[] cornerRadius = new float[8];
@@ -157,25 +163,23 @@ public class GradientDrawableFactory {
                         paddingField.setAccessible(true);
                         paddingField.set(gradientDrawable, padding);
                     } catch (Exception e) {
-                        Log.i("longpo", "set padding ex: " +  e);
+                        Log.i(TAG, "set padding ex: " +  e);
 
                     }
                 }
             }
-
             //高度
             if (gradientDrawableInfo.height > 0 || gradientDrawableInfo.width > 0) {
                 gradientDrawable.setSize((int) gradientDrawableInfo.width, (int) gradientDrawableInfo.height);
             }
-
             //边框
             if (gradientDrawableInfo.strokeWidth > 0 || gradientDrawableInfo.dashWidth > 0 || gradientDrawableInfo.dashGap > 0) {
                 gradientDrawable.setStroke((int) gradientDrawableInfo.strokeWidth, gradientDrawableInfo.strokeColor, gradientDrawableInfo.dashWidth, gradientDrawableInfo.dashGap);
             }
-            Log.i("longpo", "jfjfjj costTime: " + (System.nanoTime() - startTime));
+
             return gradientDrawable;
         } catch (Exception e) {
-            Log.i("longpo", "create ex: " +  e);
+            Log.i(TAG, "create ex: " +  e);
         }
         // 找不到字节码属性用系统获取
         return (GradientDrawable) TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);

@@ -19,11 +19,20 @@ class   MainActivity : AppCompatActivity() {
 
     private fun test() {
         var startTime = System.nanoTime()
-        val xmlDrawable = resources.getDrawable(R.drawable.shape_text_4)
-        Log.i("longpo", "xmlDrawable cost time: " + (System.nanoTime() - startTime))
+        var xmlDrawable = resources.getDrawable(R.drawable.shape_text_2)
+        Log.i("longpo", " no cache xmlDrawable cost time: " + (System.nanoTime() - startTime))
 
         startTime = System.nanoTime()
-        val codeDrawable = GradientDrawableFactory.getInstance().createDrawableById(R.drawable.shape_text_4)
-        Log.i("longpo", "codeDrawable cost time: " + (System.nanoTime() - startTime))
+        var codeDrawable = GradientDrawableFactory.getInstance().createDrawableById(R.drawable.shape_text_2)
+        Log.i("longpo", " no cache codeDrawable cost time: " + (System.nanoTime() - startTime))
+
+
+        startTime = System.nanoTime()
+        xmlDrawable = resources.getDrawable(R.drawable.shape_text_2)
+        Log.i("longpo", " has cache codeDrawable cost time: " + (System.nanoTime() - startTime))
+
+        startTime = System.nanoTime()
+        codeDrawable = GradientDrawableFactory.getInstance().createDrawableById(R.drawable.shape_text_2)
+        Log.i("longpo", " has cache codeDrawable cost time: " + (System.nanoTime() - startTime))
     }
 }

@@ -1,9 +1,8 @@
-package com.tencent.wesing.background.base;
+package com.tencent.wesing.background;
 
 /**
  * create by zlonghuang on 2021/5/13
  **/
-
 
 /**
  * GradientDrawable 属性
@@ -63,5 +62,13 @@ public class GradientDrawableInfo {
     public int strokeWidth = 0;
     public float dashGap = 0.0f;
     public float dashWidth = 0.0f;
+
+
+    /**
+     * 解析属性
+     */
+    public GradientDrawableInfo(Object[] values) {
+
+    }
 }
 

@@ -11,12 +11,12 @@ import java.util.HashMap;
 
 public class TMEBackgroundMap {
 
-    private final static HashMap<Integer, Object[]> mBackgroundAttributeMap = new HashMap<>();
+    private final static HashMap<Integer, GradientDrawableInfo> mBackgroundAttributeMap = new HashMap<>();
 
-    public static HashMap<Integer, Object[]> getBackgroundAttributeMap() {
+    public static HashMap<Integer, GradientDrawableInfo> getBackgroundAttributeMap() {
         return mBackgroundAttributeMap;
     }
 
-    public static void initDrawableDataMap() {
+    public static void initGradientDrawable() {
     }
 }

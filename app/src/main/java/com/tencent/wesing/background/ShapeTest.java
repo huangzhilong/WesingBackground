@@ -31,4 +31,16 @@ class ShapeTest {
         mBackgroundAttributeMap.put(id, param888);
         mBackgroundAttributeMap.put(66666666, param888);
     }
+
+
+
+    private final static HashMap<Integer, GradientDrawableInfo> mGradientDrawableMap = new HashMap<>();
+
+
+    public static void initGradientDrawable() {
+        Object[] param888  = { 24444, "shape_text_3.xml", "shape", 111, 555,4444, 5555};
+        mGradientDrawableMap.put(2535336, new GradientDrawableInfo(param888));
+    }
+
+
 }

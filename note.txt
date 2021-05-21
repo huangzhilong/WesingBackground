@@ -6,6 +6,13 @@
     支持shape属性。这样就可以每个模块生成了）
 
 
+
+
+依赖关系
+App 依赖 AModule
+AModule 依赖 BModule
+
+
 问题1: shape存在多个drawable文件夹中该怎么代码记录（根据设备获取对应的shape的xml）
 
 	这种情况比较少，判断存在的就不处理了，继续使用原来的drawable xml方式
@@ -59,43 +66,7 @@
 问题9：字节码操作到map的时候各个modlue的属性都是相同的，会覆盖，入A module有parma1 B也有Parma1
 
 
-
-问题10：解析字节码属性来生成drawable解析太耗时，使得就比加载xml快一点，没有倍数增长
-最新数据：
-2021-05-20 11:46:46.285 14083-14083/com.tencent.wesing.background I/longpo: xmlDrawable cost time: 364375
-2021-05-20 11:46:46.286 14083-14083/com.tencent.wesing.background I/longpo: parse attr costTime: 184843
-2021-05-20 11:46:46.286 14083-14083/com.tencent.wesing.background I/longpo: new  attr costTime: 43698
-2021-05-20 11:46:46.286 14083-14083/com.tencent.wesing.background I/longpo: codeDrawable cost time: 330468
-
-
-
-
-2021-05-20 11:46:55.352 14153-14153/com.tencent.wesing.background I/longpo: xmlDrawable cost time: 367864
-2021-05-20 11:46:55.352 14153-14153/com.tencent.wesing.background I/longpo: parse attr costTime: 182031
-2021-05-20 11:46:55.352 14153-14153/com.tencent.wesing.background I/longpo: new  attr costTime: 42709
-2021-05-20 11:46:55.352 14153-14153/com.tencent.wesing.background I/longpo: codeDrawable cost time: 323646
-
-
-
-2021-05-20 11:47:02.223 14218-14218/com.tencent.wesing.background I/longpo: xmlDrawable cost time: 363958
-2021-05-20 11:47:02.223 14218-14218/com.tencent.wesing.background I/longpo: parse attr costTime: 201875
-2021-05-20 11:47:02.223 14218-14218/com.tencent.wesing.background I/longpo: new  attr costTime: 52552
-2021-05-20 11:47:02.223 14218-14218/com.tencent.wesing.background I/longpo: codeDrawable cost time: 365261
-
-
-2021-05-20 11:47:10.960 14281-14281/com.tencent.wesing.background I/longpo: xmlDrawable cost time: 397344
-2021-05-20 11:47:10.961 14281-14281/com.tencent.wesing.background I/longpo: parse attr costTime: 218125
-2021-05-20 11:47:10.961 14281-14281/com.tencent.wesing.background I/longpo: new  attr costTime: 55209
-2021-05-20 11:47:10.961 14281-14281/com.tencent.wesing.background I/longpo: codeDrawable cost time: 382031
-
-
-
-
-
-2021-05-20 11:47:57.383 14348-14348/com.tencent.wesing.background I/longpo: xmlDrawable cost time: 350573
-2021-05-20 11:47:57.383 14348-14348/com.tencent.wesing.background I/longpo: parse attr costTime: 169531
-2021-05-20 11:47:57.383 14348-14348/com.tencent.wesing.background I/longpo: new  attr costTime: 41042
-2021-05-20 11:47:57.383 14348-14348/com.tencent.wesing.background I/longpo: codeDrawable cost time: 317240
+问题：现在把解析放在了初始化，会不会影响启动？
 
 
 

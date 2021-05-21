@@ -1,6 +1,7 @@
 package com.tencent.wesing.background.plugin.resource.shape
 
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.tencent.wesing.background.plugin.StartParams
 import com.tencent.wesing.background.plugin.resource.GenerateShapeConfigUtil
@@ -56,11 +57,9 @@ class ShapeScanTask extends DefaultTask {
             Project temp = projectSet[i]
             if (temp.plugins.hasPlugin(AppPlugin)) {
                 getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) temp.android.applicationVariants, temp.name)
+            } else if (temp.plugins.hasPlugin(LibraryPlugin)) {
+                getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) temp.android.libraryVariants, temp.name)
             }
-            //先只处理App module
-//            else if (temp.plugins.hasPlugin(LibraryPlugin)) {
-//                getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) temp.android.libraryVariants, temp.name)
-//            }
         }
     }
 

@@ -3,8 +3,8 @@ package com.tencent.wesing.background
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.tencent.wesing.background.lib.bean.TMEBackgroundMap
 import com.tencent.wesing.background.lib.drawable.GradientDrawableFactory
+
 
 class   MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

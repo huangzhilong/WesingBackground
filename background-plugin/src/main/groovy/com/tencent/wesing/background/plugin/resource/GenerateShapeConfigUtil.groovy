@@ -13,11 +13,11 @@ class GenerateShapeConfigUtil {
 
     static final String TAG = "GenerateShapeConfigUtil"
 
-    static final String JAVA_NAME = "BackgroundShapeConfig"
+    static final String JAVA_NAME = "TMEBackgroundShapeConfig"
     static final String JAVA_VALUE_TEMPLATE = "public static final String %s_background_param%s = %s;"
 
-    private static File initGenerateConfigJavaFile(String javaPath) {
-        File file = new File(javaPath + File.separator + JAVA_NAME + ".java")
+    private static File initGenerateConfigJavaFile(String javaPath, String javaClassName) {
+        File file = new File(javaPath + File.separator + javaClassName + ".java")
         if (file.exists()) {
             file.delete()
         }
@@ -33,7 +33,9 @@ class GenerateShapeConfigUtil {
      * 生成对应属性代码
      */
     static void generateConfigJavaCode(List<AttributeValueInfo> shapeInfoList, String packageName, String javaPath, String projectName) {
-        File javaFile = initGenerateConfigJavaFile(javaPath)
+        String classPrefix = projectName.replaceAll(":", "").replace("-", "_").toUpperCase()
+        String javaClassName = classPrefix + "_" + JAVA_NAME
+        File javaFile = initGenerateConfigJavaFile(javaPath, javaClassName)
         if (!javaFile.exists()) {
             LogUtil.logI(TAG, "generateConfigJavaCode file is not exists!!!")
             return
@@ -47,7 +49,7 @@ class GenerateShapeConfigUtil {
         javaFile.withWriter('utf-8') { writer ->
             writer.writeLine("package ${packageName};")
             writer.writeLine("import ${packageName}.R;")
-            writer.writeLine("public class $JAVA_NAME {")
+            writer.writeLine("public class $javaClassName {")
             codeList.each { codeLine ->
                 writer.writeLine(codeLine)
             }

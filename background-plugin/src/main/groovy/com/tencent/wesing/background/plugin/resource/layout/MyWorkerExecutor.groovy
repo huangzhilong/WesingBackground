@@ -220,7 +220,7 @@ class MyWorkerExecutor implements WorkerExecutor {
                     }
                 }
                 String newAttribute = "$customTag:tme_background=\"@drawable/$drawableName\""
-                LogUtil.logI(TAG, "hookAndroidBackground attribute: $attribute  value: $value  newAttribute: $newAttribute ")
+                LogUtil.logI(TAG, "hookAndroidBackground inputName: ${request.inputFile.name}  attribute: $attribute  value: $value  newAttribute: $newAttribute ")
                 content = content.replaceAll(attribute, newAttribute)
             }
             index++ //加一查找下一个

@@ -28,15 +28,35 @@ class ResourceTransform extends Transform {
 
 
     private final static String TAG = "ResourceTransform"
-    private final static String TME_BACKGROUND_LIB_NAME = ":background-lib"
+    private final static String TME_BACKGROUND_LIB_NAME = "background-lib" //属性map的值
 
     private List<AttributeInfo> mParseShapeXmlAttributeList = new ArrayList<>()
+    private List<String> mProjectNameList = new ArrayList<>()
     private Project mProject
     private JarInput mBackgroundLibJar
     private File mAttributeMapFile
 
     void setProject(Project project) {
         mProject = project
+        //获取项目的所有module name
+        Iterator<Project> iterator = mProject.rootProject.allprojects.iterator()
+        while (iterator.hasNext()) {
+            Project p = iterator.next()
+            if (p.name == project.rootProject.name) {
+                continue
+            }
+            mProjectNameList.add(p.name)
+        }
+        LogUtil.logI(TAG, "setProject list: ${mProjectNameList} ")
+    }
+
+    private boolean isSubProjectLib(JarInput jarInput) {
+        for (int i = 0; i < mProjectNameList.size(); i++) {
+            if (jarInput.name == mProjectNameList.get(i)) {
+                return true
+            }
+        }
+        return false
     }
 
     @Override
@@ -97,6 +117,7 @@ class ResourceTransform extends Transform {
                 jarInput.getContentTypes(),
                 jarInput.getScopes(),
                 Format.JAR)
+        LogUtil.logI(TAG, "processJarInput name: ${jarInput.name}  ${jarInput.file.name}")
         if (isIncremental) {
             Status status = jarInput.getStatus()
             switch (status) {
@@ -128,7 +149,8 @@ class ResourceTransform extends Transform {
     }
 
     private void doTransformJar(JarInput jarInput, File dest) {
-        if (jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
+        // 只处理本项目的project
+        if (isSubProjectLib(jarInput)) {
             LogUtil.logI(TAG, "start doTransformJar jar: ${jarInput.name}")
             String unzipTmp = "${mProject.getBuildDir().absolutePath}${File.separator}tmp${File.separator}" + getName()
             unzipTmp = "${unzipTmp}${File.separator}${jarInput.name.replace(':', '')}"
@@ -151,46 +173,41 @@ class ResourceTransform extends Transform {
                 Format.DIRECTORY)
         //建立文件夹
         FileUtils.mkdirs(dest)
-         //不需要使用增量，每次都要获取属性
-//        if (isIncremental) {
-//            Map<File, Status> statusMap = directoryInput.getChangedFiles()
-//            Iterator<File> iterator = statusMap.keySet().iterator()
-//            //输出目录文件夹地址和输入文件夹地址
-//            String destPath = dest.getAbsolutePath()
-//            String directoryPath = directoryInput.file.getAbsolutePath()
-//            while (iterator.hasNext()) {
-//                File file = iterator.next()
-//                Status status = statusMap.get(file)
-//                //得到输出目录的文件路径
-//                String fileDestPath = file.getAbsolutePath().replace(directoryPath, destPath)
-//                File destFile = new File(fileDestPath)
-//                switch (status) {
-//                    case Status.NOTCHANGED:
-//                        break
-//                    case Status.REMOVED:
-//                        if (destFile.exists()) {
-//                            FileUtils.delete(destFile)
-//                        }
-//                        break
-//                    case Status.ADDED:
-//                    case Status.CHANGED:
-//                        //操作修改对输入file，然后copy到输出目录
-//                        onHandleDirectoryEachFile(directoryInput.name, file)
-//                        FileUtils.copyFile(file, destFile)
-//                        break
-//                    default:
-//                        break
-//                }
-//            }
-//        } else {
-//            //遍历操作每个文件再进行copy的输出目录
-//            eachFileToDirectory(directoryInput.name, directoryInput.file)
-//            FileUtils.copyDirectory(directoryInput.file, dest)
-//        }
-
-        //遍历操作每个文件再进行copy的输出目录
-        eachFileToDirectory(directoryInput.name, directoryInput.file)
-        FileUtils.copyDirectory(directoryInput.file, dest)
+        if (isIncremental) {
+            Map<File, Status> statusMap = directoryInput.getChangedFiles()
+            Iterator<File> iterator = statusMap.keySet().iterator()
+            //输出目录文件夹地址和输入文件夹地址
+            String destPath = dest.getAbsolutePath()
+            String directoryPath = directoryInput.file.getAbsolutePath()
+            while (iterator.hasNext()) {
+                File file = iterator.next()
+                Status status = statusMap.get(file)
+                //得到输出目录的文件路径
+                String fileDestPath = file.getAbsolutePath().replace(directoryPath, destPath)
+                File destFile = new File(fileDestPath)
+                switch (status) {
+                    case Status.NOTCHANGED:
+                        break
+                    case Status.REMOVED:
+                        if (destFile.exists()) {
+                            FileUtils.delete(destFile)
+                        }
+                        break
+                    case Status.ADDED:
+                    case Status.CHANGED:
+                        //操作修改对输入file，然后copy到输出目录
+                        onHandleDirectoryEachFile(directoryInput.name, file)
+                        FileUtils.copyFile(file, destFile)
+                        break
+                    default:
+                        break
+                }
+            }
+        } else {
+            //遍历操作每个文件再进行copy的输出目录
+            eachFileToDirectory(directoryInput.name, directoryInput.file)
+            FileUtils.copyDirectory(directoryInput.file, dest)
+        }
     }
 
     private void eachFileToDirectory(String name, File file) {

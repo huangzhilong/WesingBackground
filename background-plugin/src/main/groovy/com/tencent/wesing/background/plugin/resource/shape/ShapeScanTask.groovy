@@ -9,7 +9,6 @@ import com.tencent.wesing.background.plugin.util.LogUtil
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import org.gradle.api.DefaultTask
 import org.gradle.api.DomainObjectCollection
-import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -24,7 +23,6 @@ class ShapeScanTask extends DefaultTask {
     static final String TAG = "ShapeScanTask"
     static final String SHAPE_TAG = "shape"
 
-    private HashSet<String> mScanProject = new HashSet<>()
     private volatile boolean isRunning = false
     private StartParams mStartParams
     private String mJavaFilePath
@@ -32,7 +30,6 @@ class ShapeScanTask extends DefaultTask {
 
     ShapeScanTask() {
         LogUtil.logI(TAG, "projectName: ${project.name} create ShapeScanTask!!")
-        mScanProject.clear()
         isRunning = false
         packageName = null
     }
@@ -47,19 +44,15 @@ class ShapeScanTask extends DefaultTask {
         //避免调用多次
         if (!isRunning) {
             isRunning = true
-            getSourcesDirs(project.rootProject)
+            getSourcesDirs()
         }
     }
 
-    def getSourcesDirs(Project root) {
-        Set<Project> projectSet = root.getAllprojects()
-        for (int i = 0; i < projectSet.size(); i++) {
-            Project temp = projectSet[i]
-            if (temp.plugins.hasPlugin(AppPlugin)) {
-                getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) temp.android.applicationVariants, temp.name)
-            } else if (temp.plugins.hasPlugin(LibraryPlugin)) {
-                getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) temp.android.libraryVariants, temp.name)
-            }
+    def getSourcesDirs() {
+        if (project.plugins.hasPlugin(AppPlugin)) {
+            getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) project.android.applicationVariants, project.name)
+        } else if (project.plugins.hasPlugin(LibraryPlugin)) {
+            getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) project.android.libraryVariants, project.name)
         }
     }
 

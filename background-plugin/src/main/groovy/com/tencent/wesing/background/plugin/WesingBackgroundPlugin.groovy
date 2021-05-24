@@ -3,6 +3,7 @@ package com.tencent.wesing.background.plugin
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.api.BaseVariantImpl
+import com.android.build.gradle.internal.tasks.AndroidVariantTask
 import com.android.build.gradle.tasks.MergeResources
 import com.tencent.wesing.background.plugin.resource.ResourceTransform
 import com.tencent.wesing.background.plugin.resource.layout.MyWorkerExecutor
@@ -26,11 +27,7 @@ class WesingBackgroundPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        LogUtil.logI(TAG, "apply Plugin!!")
-//        if (!project.gradle.hasProperty("shapeContainer")) {
-//            LogUtil.logI(TAG, "create shapeContainer Property!!")
-//            project.gradle.ext.shapeContainer = new HashSet<String>()
-//        }
+        LogUtil.logI(TAG, "apply WesingBackgroundPlugin  projectName: ${project.name} ")
         def shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
         StartParams startParams = new StartParams(project.gradle.getStartParameter())
         shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaDir(project))
@@ -38,33 +35,44 @@ class WesingBackgroundPlugin implements Plugin<Project> {
         def variants
         if (project.plugins.hasPlugin("com.android.application")) {
             variants = (project.property("android") as AppExtension).applicationVariants
+
+            //app module 注册transform
+            def android = project.extensions.getByType(AppExtension)
+            ResourceTransform transform = new ResourceTransform()
+            transform.setProject(project)
+            android.registerTransform(transform)
         } else {
             variants = (project.property("android") as LibraryExtension).libraryVariants
         }
 
         project.afterEvaluate {
-
             variants.all { variant ->
                 variant as BaseVariantImpl
 
+                //扫描drawable xml task
                 def preBuildTask = variant.getPreBuildProvider().get()
                 preBuildTask.dependsOn(shapeScanTask)
 
-                MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()
-                mergeResourcesTask.doFirst {
-                    hookMergeResourcesTask(mergeResourcesTask, project)
-                }
-                mergeResourcesTask.doLast {
-                    recoveryMergeResourcesTask(mergeResourcesTask)
+                //hook 编译资处理
+                if (project.plugins.hasPlugin("com.android.application")) {
+                    MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()
+                    mergeResourcesTask.doFirst {
+                        hookAndroidVariantTask(mergeResourcesTask, project)
+                    }
+                    mergeResourcesTask.doLast {
+                        recoveryAndroidVariantTask(mergeResourcesTask)
+                    }
+                } else {
+                    def resourcesTask = project.getTasksByName("compileDebugLibraryResources", true)
+                    resourcesTask[0].doFirst {
+                        hookAndroidVariantTask(resourcesTask[0], project)
+                    }
+                    resourcesTask[0].doLast {
+                        recoveryAndroidVariantTask(resourcesTask[0])
+                    }
                 }
             }
         }
-
-        //注册transform
-        def android = project.extensions.getByType(AppExtension)
-        ResourceTransform transform = new ResourceTransform()
-        transform.setProject(project)
-        android.registerTransform(transform)
     }
 
     //父目录一定要layout，不然会报错，内部有校验
@@ -87,11 +95,15 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     }
 
 
-    private void hookMergeResourcesTask(MergeResources mergeResources, Project project) {
+    private void hookAndroidVariantTask(AndroidVariantTask androidVariantTask, Project project) {
+        //避免多次调用
+        if (mWorkerExecutor != null) {
+            return
+        }
         try {
             //反射替换里面的线程池
             Field mWorkerExecutorField
-            Field[] fields = mergeResources.class.getDeclaredFields()
+            Field[] fields = androidVariantTask.class.getDeclaredFields()
             for (int i = 0; i < fields.length; i++) {
                 if (fields[i].type.toString().contains("org.gradle.workers.WorkerExecutor")) {
                     mWorkerExecutorField = fields[i]
@@ -99,28 +111,31 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                 }
             }
             if (mWorkerExecutorField == null) {
-                LogUtil.logI(TAG, "hookMergeResourcesTask not found mWorkerExecutorField!!")
+                LogUtil.logI(TAG, "hookAndroidVariantTask not found mWorkerExecutorField!!")
                 return
             }
-            LogUtil.logI(TAG, "hookMergeResourcesTask get filed name: ${mWorkerExecutorField.name} getEnableGradleWorkers: ${mergeResources.getEnableGradleWorkers().get()}  getWorkerExecutor: ${mergeResources.getWorkerExecutor()}")
+            LogUtil.logI(TAG, "hookAndroidVariantTask get filed name: ${mWorkerExecutorField.name} getEnableGradleWorkers: ${androidVariantTask.getEnableGradleWorkers().get()}  getWorkerExecutor: ${androidVariantTask.getWorkerExecutor()}")
 
-            mWorkerExecutor = mergeResources.getWorkerExecutor()
+            mWorkerExecutor = androidVariantTask.getWorkerExecutor()
             MyWorkerExecutor myWorkerExecutor = new MyWorkerExecutor(project, getGenerateResDir(project))
             myWorkerExecutor.workerExecutor = mWorkerExecutor
 
             mWorkerExecutorField.setAccessible(true)
             //替换成自己的
-            mWorkerExecutorField.set(mergeResources, myWorkerExecutor)
+            mWorkerExecutorField.set(androidVariantTask, myWorkerExecutor)
         } catch (Exception e) {
-            LogUtil.logI(TAG, "hookMergeResourcesTask failed ex: $e")
+            LogUtil.logI(TAG, "hookAndroidVariantTask failed ex: $e")
         }
     }
 
-    private void recoveryMergeResourcesTask(MergeResources mergeResources) {
+    private void recoveryAndroidVariantTask(AndroidVariantTask androidVariantTask) {
+        if (mWorkerExecutor == null) {
+            return
+        }
         try {
             //反射还原里面的线程池
             Field mWorkerExecutorField
-            Field[] fields = mergeResources.class.getDeclaredFields()
+            Field[] fields = androidVariantTask.class.getDeclaredFields()
             for (int i = 0; i < fields.length; i++) {
                 if (fields[i].type.toString().contains("org.gradle.workers.WorkerExecutor")) {
                     mWorkerExecutorField = fields[i]
@@ -128,18 +143,15 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                 }
             }
             if (mWorkerExecutorField == null) {
-                LogUtil.logI(TAG, "recoveryMergeResourcesTask not found mWorkerExecutorField!!")
+                LogUtil.logI(TAG, "recoveryAndroidVariantTask not found mWorkerExecutorField!!")
                 return
             }
-            LogUtil.logI(TAG, "recoveryMergeResourcesTask get filed name: ${mWorkerExecutorField.name}  mWorkerExecutor: ${mWorkerExecutor}  curWorkerExecutor: ${mergeResources.getWorkerExecutor()}")
+            LogUtil.logI(TAG, "recoveryAndroidVariantTask get filed name: ${mWorkerExecutorField.name}  mWorkerExecutor: ${mWorkerExecutor}  curWorkerExecutor: ${androidVariantTask.getWorkerExecutor()}")
             mWorkerExecutorField.setAccessible(true)
-            if (mWorkerExecutor == null) {
-                LogUtil.logI(TAG, "recoveryMergeResourcesTask myWorkerExecutor.workerExecutor == null !!")
-                return
-            }
-            mWorkerExecutorField.set(mergeResources, mWorkerExecutor)
+            mWorkerExecutorField.set(androidVariantTask, mWorkerExecutor)
+            mWorkerExecutor = null
         } catch (Exception e) {
-            LogUtil.logI(TAG, "recoveryMergeResourcesTask failed ex: $e")
+            LogUtil.logI(TAG, "recoveryAndroidVariantTask failed ex: $e")
         }
     }
 }

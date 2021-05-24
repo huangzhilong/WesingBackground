@@ -13,6 +13,11 @@ App 依赖 AModule
 AModule 依赖 BModule
 
 
+gradle 具体任务： TaskManager   子类： ApplicationTaskManager   LibraryTaskManager
+
+
+
+
 问题1: shape存在多个drawable文件夹中该怎么代码记录（根据设备获取对应的shape的xml）
 
 	这种情况比较少，判断存在的就不处理了，继续使用原来的drawable xml方式

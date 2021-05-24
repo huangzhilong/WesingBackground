@@ -3,22 +3,13 @@ package com.tencent.wesing.background.plugin.resource.layout
 import com.android.build.gradle.internal.res.Aapt2CompileRunnable
 import com.android.build.gradle.internal.tasks.Workers
 import com.android.ide.common.resources.CompileResourceRequest
-import com.android.ide.common.resources.MergedResourceWriter
-import com.android.ide.common.resources.ResourceMergerItem
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.workers.ClassLoaderWorkerSpec
-import org.gradle.workers.ProcessWorkerSpec
-import org.gradle.workers.WorkQueue
-import org.gradle.workers.WorkerConfiguration
-import org.gradle.workers.WorkerExecutionException
-import org.gradle.workers.WorkerExecutor
-import org.gradle.workers.WorkerSpec
+import org.gradle.workers.*
 
 import java.lang.reflect.Field
-
 
 /**
  * create by zlonghuang on 2021/4/21
@@ -55,37 +46,50 @@ class MyWorkerExecutor implements WorkerExecutor {
             if (params.size() > 0) {
                 Object value = params.get(0)
                 Workers.ActionParameters actionParameters = (Workers.ActionParameters) value
-                if (actionParameters.delegateParameters instanceof MergedResourceWriter.FileGenerationParameters) {
-                    //来源MergeResources -> MergedResourceWriter.addItem
-                    MergedResourceWriter.FileGenerationParameters fileGenerationParameters = (MergedResourceWriter.FileGenerationParameters) actionParameters.delegateParameters
-                    ResourceMergerItem item = fileGenerationParameters.resourceItem
-                    //LogUtil.logI(TAG, "submit is  MergedResourceWriter.FileGenerationParameters  ${Thread.currentThread().id} ${item.name}  ${item.type}  ${item.getFile().path}")
-                } else if (actionParameters.delegateParameters instanceof Aapt2CompileRunnable.Params) {
-                    //来源CompileSourceSetResources 提交的任务
+                //主要是app图标资源，不处理
+//                if (actionParameters.delegateParameters instanceof MergedResourceWriter.FileGenerationParameters) {
+//                    //来源MergeResources -> MergedResourceWriter.addItem
+//                    MergedResourceWriter.FileGenerationParameters fileGenerationParameters = (MergedResourceWriter.FileGenerationParameters) actionParameters.delegateParameters
+//                    ResourceMergerItem item = fileGenerationParameters.resourceItem
+//                }
+
+                if (actionParameters.delegateParameters instanceof Aapt2CompileRunnable.Params) {
                     Aapt2CompileRunnable.Params aapt2Params = (Aapt2CompileRunnable.Params) (actionParameters.delegateParameters)
-                    //LogUtil.logI(TAG, "submit is  Aapt2CompileRunnable.Params ${aapt2Params.requests.size()}")
-                    for (int i = 0; i < aapt2Params.requests.size(); i++) {
-                        CompileResourceRequest request = aapt2Params.requests.get(i)
-                        if (request.inputDirectoryName == "layout" && !request.getInputFileIsFromDependency() && request.inputFile.name.endsWith(".xml")) {
-                            //LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
-                            hookAndroidBackground(request)
-                        } else if (request.inputDirectoryName.startsWith("drawable")) {
-                           // LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                    if (BackgroundUtil.getCollectSize(aapt2Params.requests) > 0) {
+                        for (int i = 0; i < aapt2Params.requests.size(); i++) {
+                            CompileResourceRequest request = aapt2Params.requests.get(i)
+                            if (request.inputDirectoryName == "layout" && !request.getInputFileIsFromDependency() && request.inputFile.name.endsWith(".xml")) {
+                                //LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                                hookAndroidBackground(request)
+                            } else if (request.inputDirectoryName.startsWith("drawable")) {
+                                //LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                            }
                         }
                     }
+                } else {
+                    //针对私有类，用反射
+                    Class aClass1 = actionParameters.delegateParameters.class
 
-                    //移除后layout xml background中找不到！！
-//                    for (int i = 0; i < aapt2Params.requests.size(); i++) {
-//                        CompileResourceRequest request = aapt2Params.requests.get(i)
-//                        if (request.inputFile.name.contains("shape_text_3")) {
-//                            aapt2Params.requests.remove(i)
-//                            LogUtil.logI(TAG, "remove!!!!!!!!")
-//                            break
-//                        }
-//                    }
+                    // 针对library的资源
+                    if (aClass1.name.contains("CompileLibraryResourcesParams")) {
+                        Field field = aClass1.getDeclaredField("requests")
+                        field.setAccessible(true)
+                        Object o = field.get(actionParameters.delegateParameters)
+                        List<CompileResourceRequest> requestList = (List<CompileResourceRequest>) o
+                        if (BackgroundUtil.getCollectSize(requestList) > 0) {
+                            for (int i = 0; i < requestList.size(); i++) {
+                                CompileResourceRequest request = requestList.get(i)
+                                if (request.inputDirectoryName == "layout" && !request.getInputFileIsFromDependency() && request.inputFile.name.endsWith(".xml")) {
+                                    hookAndroidBackground(request)
+                                } else if (request.inputDirectoryName.startsWith("drawable")) {
+                                    //LogUtil.logI(TAG, "CompileResourceRequest  ${Thread.currentThread().id} ${request.inputFile.path}  ${request.inputDirectoryName}  ${request.originalInputFile.path} ${request.inputFileIsFromDependency}")
+                                }
+                            }
+                        }
+                    }
                 }
+                mWorkerExecutor.submit(aClass, action)
             }
-            mWorkerExecutor.submit(aClass, action)
         }
     }
 

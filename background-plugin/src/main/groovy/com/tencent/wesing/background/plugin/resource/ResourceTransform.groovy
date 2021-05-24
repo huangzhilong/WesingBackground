@@ -30,9 +30,10 @@ class ResourceTransform extends Transform {
     private final static String TAG = "ResourceTransform"
     private final static String TME_BACKGROUND_LIB_NAME = ":background-lib"
 
-    private List<AttributeInfo> mParseShapeXmlAttributeList
+    private List<AttributeInfo> mParseShapeXmlAttributeList = new ArrayList<>()
     private Project mProject
     private JarInput mBackgroundLibJar
+    private File mAttributeMapFile
 
     void setProject(Project project) {
         mProject = project
@@ -226,22 +227,25 @@ class ResourceTransform extends Transform {
                 @Override
                 void onGetShapeXmlAttribute(List<AttributeInfo> list) {
                     LogUtil.logI(TAG, "getParseXmlAttributeInfoByClass size: ${BackgroundUtil.getCollectSize(list)}")
-                    mParseShapeXmlAttributeList = list
+                    mParseShapeXmlAttributeList.addAll(list)
                 }
             })
         }
 
         if (fileName.contains("TMEBackgroundMap.class")) {
-            LogUtil.logI(TAG, "start handleTMEBackgroundMap name: $name fileName: ${fileName}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
-            if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {
-                AmsUtil.InsertTMEBackgroundMapClassAttribute(file, mParseShapeXmlAttributeList)
-            }
+            mAttributeMapFile = file
         }
     }
 
     private void afterTransform(TransformInvocation transformInvocation) {
         LogUtil.logI(TAG, "afterTransform!!")
         TransformOutputProvider mOutputProvider = transformInvocation.getOutputProvider()
+        if (mAttributeMapFile != null) {
+            LogUtil.logI(TAG, "afterTransform start handleTMEBackgroundMapfileName: ${mAttributeMapFile.name}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
+            if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {
+                AmsUtil.InsertTMEBackgroundMapClassAttribute(mAttributeMapFile, mParseShapeXmlAttributeList)
+            }
+        }
         //要保证先解析生成的属性再插入属性，所以放到doTransform之后处理
         if (mBackgroundLibJar != null) {
             File dest = mOutputProvider.getContentLocation(

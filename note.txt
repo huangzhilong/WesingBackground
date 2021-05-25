@@ -72,7 +72,13 @@ gradle 具体任务： TaskManager   子类： ApplicationTaskManager   LibraryT
 
 
 问题：现在把解析放在了初始化，会不会影响启动？
+使用闲时载入，未载入时因为都已经hook成调用自己的方法，此时没有属性会调用系统的，也可以把对呀的id和drawable存起来
 
+
+
+问题：
+生成属性的java文件，在非app module中时不会被编译成整数Id，而是使用了R文件的引用，此时编译出来的class文件的属性值是在static代码块中赋值的，需要
+加载class才实现赋值。所以字节码无法获取到string的属性值
 
 
 

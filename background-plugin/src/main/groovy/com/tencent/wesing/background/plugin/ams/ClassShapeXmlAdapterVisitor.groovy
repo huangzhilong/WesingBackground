@@ -26,6 +26,7 @@ class ClassShapeXmlAdapterVisitor extends ClassVisitor {
 
     @Override
     FieldVisitor visitField(int i, String s, String s1, String s2, Object o) {
+        LogUtil.logI("ClassShapeXmlAdapterVisitor", "visitField i: $i  s: $s  s1: $s1  s2: $s2  o: $o")
         if (o != null && !BackgroundUtil.isEmpty(s)) {
             AttributeInfo attributeInfo = new AttributeInfo()
             attributeInfo.name = s

@@ -7,4 +7,7 @@ package com.tencent.wesing.test.library;
 class AppInfo {
 
     public String appName = "WesingBackground";
+
+    public int drawableId = R.drawable.test_text_1;
+    public int drawableId2 = R.drawable.test_text_2;
 }

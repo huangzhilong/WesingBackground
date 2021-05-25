@@ -28,9 +28,7 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         LogUtil.logI(TAG, "apply WesingBackgroundPlugin  projectName: ${project.name} ")
-        def shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
-        StartParams startParams = new StartParams(project.gradle.getStartParameter())
-        shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaDir(project))
+        def shapeScanTask = null
 
         def variants
         if (project.plugins.hasPlugin("com.android.application")) {
@@ -41,6 +39,11 @@ class WesingBackgroundPlugin implements Plugin<Project> {
             ResourceTransform transform = new ResourceTransform()
             transform.setProject(project)
             android.registerTransform(transform)
+
+            //由app module来遍历drawable xml文件
+            shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
+            StartParams startParams = new StartParams(project.gradle.getStartParameter())
+            shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaDir(project))
         } else {
             variants = (project.property("android") as LibraryExtension).libraryVariants
         }
@@ -49,9 +52,11 @@ class WesingBackgroundPlugin implements Plugin<Project> {
             variants.all { variant ->
                 variant as BaseVariantImpl
 
-                //扫描drawable xml task
-                def preBuildTask = variant.getPreBuildProvider().get()
-                preBuildTask.dependsOn(shapeScanTask)
+                if (shapeScanTask != null) {
+                    //扫描drawable xml task
+                    def preBuildTask = variant.getPreBuildProvider().get()
+                    preBuildTask.dependsOn(shapeScanTask)
+                }
 
                 //hook 编译资处理
                 if (project.plugins.hasPlugin("com.android.application")) {

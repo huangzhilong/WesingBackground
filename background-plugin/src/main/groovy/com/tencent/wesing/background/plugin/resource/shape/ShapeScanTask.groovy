@@ -9,6 +9,7 @@ import com.tencent.wesing.background.plugin.util.LogUtil
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import org.gradle.api.DefaultTask
 import org.gradle.api.DomainObjectCollection
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -26,12 +27,10 @@ class ShapeScanTask extends DefaultTask {
     private volatile boolean isRunning = false
     private StartParams mStartParams
     private String mJavaFilePath
-    private String packageName  // 包名
 
     ShapeScanTask() {
         LogUtil.logI(TAG, "projectName: ${project.name} create ShapeScanTask!!")
         isRunning = false
-        packageName = null
     }
 
     void setShapeScanTaskParams(StartParams param, String javaPath) {
@@ -49,16 +48,23 @@ class ShapeScanTask extends DefaultTask {
     }
 
     def getSourcesDirs() {
-        if (project.plugins.hasPlugin(AppPlugin)) {
-            getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) project.android.applicationVariants, project.name)
-        } else if (project.plugins.hasPlugin(LibraryPlugin)) {
-            getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) project.android.libraryVariants, project.name)
+        Iterator<Project> iterator = project.rootProject.allprojects.iterator()
+        while (iterator.hasNext()) {
+            Project p = iterator.next()
+            if (p.name == project.rootProject.name) {
+                continue
+            }
+            if (p.plugins.hasPlugin(AppPlugin)) {
+                getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) p.android.applicationVariants, p.name)
+            } else if (p.plugins.hasPlugin(LibraryPlugin)) {
+                getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) p.android.libraryVariants, p.name)
+            }
         }
     }
 
     def getSourcesDirsWithVariant(DomainObjectCollection<BaseVariant> collection, String projectName) {
         List<XmlNodeInfo> drawableNodeXmlList = new ArrayList<>()
-        String tempPackageName
+        String packageName  // 包名
         boolean isDebug = false
         if (mStartParams != null) {
             isDebug = mStartParams.debug
@@ -83,13 +89,13 @@ class ShapeScanTask extends DefaultTask {
                                             String key = attr.key.toString()
                                             String value = attr.value.toString()
                                             if (key == "package") {
-                                                tempPackageName = value
+                                                packageName = value
                                             }
                                         }
                                 }
                             }
-                            LogUtil.logI(TAG, "projectName: ${projectName}  path: ${sourceSet.manifest}  packageName: $tempPackageName")
-                            if (BackgroundUtil.isEmpty(tempPackageName)) {
+                            LogUtil.logI(TAG, "projectName: ${projectName}  path: ${sourceSet.manifest}  packageName: $packageName")
+                            if (BackgroundUtil.isEmpty(packageName)) {
                                 LogUtil.logI(TAG, "projectName: ${projectName}  get packageName failed!!!")
                                 return
                             }
@@ -133,7 +139,6 @@ class ShapeScanTask extends DefaultTask {
         }
 
         drawableNodeXmlList = doFilterRepeatXmlFile(drawableNodeXmlList)
-        packageName = tempPackageName
         if (BackgroundUtil.getCollectSize(drawableNodeXmlList) > 0)  {
             List<AttributeValueInfo> shapeInfoList = new ArrayList<>()
             for (int i = 0; i < drawableNodeXmlList.size(); i++) {

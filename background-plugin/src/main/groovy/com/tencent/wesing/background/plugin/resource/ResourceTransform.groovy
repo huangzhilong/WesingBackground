@@ -51,8 +51,9 @@ class ResourceTransform extends Transform {
     }
 
     private boolean isSubProjectLib(JarInput jarInput) {
+        String jarName = jarInput.name.replace(":", "")
         for (int i = 0; i < mProjectNameList.size(); i++) {
-            if (jarInput.name == mProjectNameList.get(i)) {
+            if (jarName == mProjectNameList.get(i)) {
                 return true
             }
         }

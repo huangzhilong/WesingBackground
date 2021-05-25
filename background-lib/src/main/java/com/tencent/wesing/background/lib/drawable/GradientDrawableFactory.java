@@ -78,9 +78,10 @@ public class GradientDrawableFactory {
             }
 
             //圆角
-            if (gradientDrawableInfo.hasAttribute(gradientDrawableInfo.attrMask, AttributeMask.radiusMask) && gradientDrawableInfo.radius > 0) {
+            if (gradientDrawableInfo.radius > 0) {
                 gradientDrawable.setCornerRadius(gradientDrawableInfo.radius);
-            } else if (gradientDrawableInfo.topLeftRadius > 0 || gradientDrawableInfo.topRightRadius > 0 || gradientDrawableInfo.bottomLeftRadius > 0 || gradientDrawableInfo.bottomRightRadius > 0) {
+            }
+            if (gradientDrawableInfo.topLeftRadius > 0 || gradientDrawableInfo.topRightRadius > 0 || gradientDrawableInfo.bottomLeftRadius > 0 || gradientDrawableInfo.bottomRightRadius > 0) {
                 float[] cornerRadius = new float[8];
                 cornerRadius[0] = gradientDrawableInfo.topLeftRadius;
                 cornerRadius[1] = gradientDrawableInfo.topLeftRadius;
@@ -93,11 +94,16 @@ public class GradientDrawableFactory {
                 gradientDrawable.setCornerRadii(cornerRadius);
             }
 
+            //填充
+            if (gradientDrawableInfo.solidColor != 0) {
+                gradientDrawable.setColor(gradientDrawableInfo.solidColor);
+            }
+
             //渐变
-            if (gradientDrawableInfo.startColor > 0 && gradientDrawableInfo.endColor > 0) {
+            if (gradientDrawableInfo.startColor != 0 && gradientDrawableInfo.endColor != 0) {
                 gradientDrawable.setGradientType(gradientDrawableInfo.type);
                 int[] color;
-                if (gradientDrawableInfo.centerColor > 0) {
+                if (gradientDrawableInfo.centerColor != 0) {
                     color = new int[]{gradientDrawableInfo.startColor, gradientDrawableInfo.centerColor, gradientDrawableInfo.endColor};
                 } else {
                     color = new int[]{gradientDrawableInfo.startColor, gradientDrawableInfo.endColor};

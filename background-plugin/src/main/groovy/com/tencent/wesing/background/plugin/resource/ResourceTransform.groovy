@@ -34,7 +34,6 @@ class ResourceTransform extends Transform {
     private List<String> mProjectNameList = new ArrayList<>()
     private Project mProject
     private JarInput mBackgroundLibJar
-    private File mAttributeMapFile
 
     void setProject(Project project) {
         mProject = project
@@ -59,6 +58,7 @@ class ResourceTransform extends Transform {
         }
         return false
     }
+
 
     @Override
     String getName() {

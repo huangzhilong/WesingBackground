@@ -151,7 +151,7 @@ class ResourceTransform extends Transform {
 
     private void doTransformJar(JarInput jarInput, File dest) {
         // 只处理本项目的project
-        if (isSubProjectLib(jarInput)) {
+        if (isSubProjectLib(jarInput) || jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
             LogUtil.logI(TAG, "start doTransformJar jar: ${jarInput.name}")
             String unzipTmp = "${mProject.getBuildDir().absolutePath}${File.separator}tmp${File.separator}" + getName()
             unzipTmp = "${unzipTmp}${File.separator}${jarInput.name.replace(':', '')}"
@@ -248,22 +248,22 @@ class ResourceTransform extends Transform {
                     mParseShapeXmlAttributeList.addAll(list)
                 }
             })
+        } else if (fileName.contains("TMEBackgroundMap.class")) {
+            //插入
+            handleInsertBackgroundLibMap(file)
         }
+    }
 
-        if (fileName.contains("TMEBackgroundMap.class")) {
-            mAttributeMapFile = file
+    private void handleInsertBackgroundLibMap(File f) {
+        LogUtil.logI(TAG, "handleInsertBackgroundLibMap: ${f.name}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
+        if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {
+            AmsUtil.InsertTMEBackgroundMapClassAttribute(f, mParseShapeXmlAttributeList)
         }
     }
 
     private void afterTransform(TransformInvocation transformInvocation) {
         LogUtil.logI(TAG, "afterTransform!!")
         TransformOutputProvider mOutputProvider = transformInvocation.getOutputProvider()
-        if (mAttributeMapFile != null) {
-            LogUtil.logI(TAG, "afterTransform start handleTMEBackgroundMapfileName: ${mAttributeMapFile.name}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
-            if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {
-                AmsUtil.InsertTMEBackgroundMapClassAttribute(mAttributeMapFile, mParseShapeXmlAttributeList)
-            }
-        }
         //要保证先解析生成的属性再插入属性，所以放到doTransform之后处理
         if (mBackgroundLibJar != null) {
             File dest = mOutputProvider.getContentLocation(

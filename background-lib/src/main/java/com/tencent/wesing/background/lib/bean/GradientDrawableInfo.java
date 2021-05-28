@@ -12,14 +12,14 @@ import android.util.Log;
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
 import com.tencent.wesing.background.lib.util.DimensionUtil;
 
+import java.util.Objects;
+
 /**
  * GradientDrawable 属性
  */
 public class GradientDrawableInfo {
 
     private static final String TAG = "GradientDrawableInfo";
-
-    public int attrMask = 0;  //  属性位值
 
     //将在位图的像素配置与屏幕不同时（例如：ARGB 8888 位图和 RGB 565 屏幕）启用位图的抖动；值为“false”时则停用抖动。默认值为 false。
     public boolean dither = false;
@@ -36,18 +36,22 @@ public class GradientDrawableInfo {
     public float bottomRightRadius = 0.0f;
     public float topLeftRadius = 0.0f;
     public float topRightRadius = 0.0f;
+    public float[] radiusArray = null;
 
 
     //-- 渐变 --
     // 渐变类型，分别为线性、放射性、扫描性渐变，默认为线性渐变linear
     public int type = 0;
+
     // 渐变角度，当上面type为线性渐变linear时有效。角度为45的倍数，0度时从左往右渐变，角度方向逆时针
     public int angle = 0;
+    public GradientDrawable.Orientation mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;
 
     // 渐变中间位置颜色  开始位置颜色  结束位置颜色
     public int centerColor = 0;
     public int startColor = 0;
     public int endColor = 0;
+    public int[] colorArray = null;
 
     //type为放射性渐变radial时有效，设置渐变中心的X(Y)坐标，取值区间[0,1]，默认为0.5，即中心位置
     public float centerX = 0.5f;
@@ -78,6 +82,9 @@ public class GradientDrawableInfo {
 
     public boolean isDisable = false;
 
+    public GradientDrawableInfo() {
+    }
+
     /**
      * 解析属性
      */
@@ -90,7 +97,6 @@ public class GradientDrawableInfo {
             //不能根据是不是使用了整数就是Id，因为颜色也是整数，需要用id的位置来判断
             int attrValue = (int) values[0];
             int idValue = (int) values[1];
-            attrMask = attrValue;
 
             boolean isId;
             int index = 2; //第二个开始是属性值，根据位运算来处理，属性顺序是根据AttributeMask顺序来的
@@ -142,61 +148,83 @@ public class GradientDrawableInfo {
                 }
                 index++;
             }
-            if (hasAttribute(attrValue, AttributeMask.radiusMask)) {
-                isId = isId(idValue, AttributeMask.radiusMask);
-                float radius;
-                if (isId) {
-                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                } else {
-                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+
+            //圆角
+            if (hasAttribute(attrValue, AttributeMask.radiusMask) || hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask) || hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask)
+                    || hasAttribute(attrValue, AttributeMask.topLeftRadiusMask) || hasAttribute(attrValue, AttributeMask.topLeftRadiusMask)) {
+                radiusArray = new float[8];
+                for (int i = 0; i < 8; i++) {
+                    radiusArray[i] = 0.0f;
                 }
-                index++;
-                this.radius = radius;
-            }
-            if (hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask)) {
-                isId = isId(idValue, AttributeMask.bottomLeftRadiusMask);
-                float radius;
-                if (isId) {
-                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                } else {
-                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                if (hasAttribute(attrValue, AttributeMask.radiusMask)) {
+                    isId = isId(idValue, AttributeMask.radiusMask);
+                    float radius;
+                    if (isId) {
+                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                    } else {
+                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                    }
+                    index++;
+                    this.radius = radius;
+                    for (int i = 0; i < 8; i++) {
+                        radiusArray[i] = this.radius;
+                    }
                 }
-                bottomLeftRadius = radius;
-                index++;
-            }
-            if (hasAttribute(attrValue, AttributeMask.bottomRightRadiusMask)) {
-                isId = isId(idValue, AttributeMask.bottomRightRadiusMask);
-                float radius;
-                if (isId) {
-                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                } else {
-                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+
+                if (hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask)) {
+                    isId = isId(idValue, AttributeMask.bottomLeftRadiusMask);
+                    float radius;
+                    if (isId) {
+                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                    } else {
+                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                    }
+                    bottomLeftRadius = radius;
+                    radiusArray[6] = bottomLeftRadius;
+                    radiusArray[7] = bottomLeftRadius;
+                    index++;
                 }
-                bottomRightRadius = radius;
-                index++;
-            }
-            if (hasAttribute(attrValue, AttributeMask.topLeftRadiusMask)) {
-                isId = isId(idValue, AttributeMask.topLeftRadiusMask);
-                float radius;
-                if (isId) {
-                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                } else {
-                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                if (hasAttribute(attrValue, AttributeMask.bottomRightRadiusMask)) {
+                    isId = isId(idValue, AttributeMask.bottomRightRadiusMask);
+                    float radius;
+                    if (isId) {
+                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                    } else {
+                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                    }
+                    bottomRightRadius = radius;
+                    radiusArray[4] = bottomRightRadius;
+                    radiusArray[5] = bottomRightRadius;
+                    index++;
                 }
-                topLeftRadius = radius;
-                index++;
-            }
-            if (hasAttribute(attrValue, AttributeMask.topRightRadiusMask)) {
-                isId = isId(idValue, AttributeMask.topRightRadiusMask);
-                float radius;
-                if (isId) {
-                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                } else {
-                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                if (hasAttribute(attrValue, AttributeMask.topLeftRadiusMask)) {
+                    isId = isId(idValue, AttributeMask.topLeftRadiusMask);
+                    float radius;
+                    if (isId) {
+                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                    } else {
+                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                    }
+                    topLeftRadius = radius;
+                    radiusArray[0] = topLeftRadius;
+                    radiusArray[1] = topLeftRadius;
+                    index++;
                 }
-                this.topRightRadius = radius;
-                index++;
+                if (hasAttribute(attrValue, AttributeMask.topRightRadiusMask)) {
+                    isId = isId(idValue, AttributeMask.topRightRadiusMask);
+                    float radius;
+                    if (isId) {
+                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                    } else {
+                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                    }
+                    this.topRightRadius = radius;
+                    radiusArray[2] = topRightRadius;
+                    radiusArray[3] = topRightRadius;
+                    index++;
+                }
             }
+
             if (hasAttribute(attrValue, AttributeMask.typeMask)) {
                 isId = isId(idValue, AttributeMask.typeMask);
                 int gradientType = GradientDrawable.LINEAR_GRADIENT;
@@ -221,7 +249,42 @@ public class GradientDrawableInfo {
                 } else {
                     gradientAngle = (int) values[index];
                 }
+                //必须是45度的倍数
                 this.angle = gradientAngle;
+                if (angle > 0) {
+                    angle %= 360;
+                    // 取整
+                    if (angle % 45 != 0) {
+                        int remind = angle % 45;
+                        angle = angle - remind;
+                    }
+                    switch (angle) {
+                        case 0:
+                            mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;
+                            break;
+                        case 45:
+                            mOrientation = GradientDrawable.Orientation.BL_TR;
+                            break;
+                        case 90:
+                            mOrientation = GradientDrawable.Orientation.BOTTOM_TOP;
+                            break;
+                        case 135:
+                            mOrientation = GradientDrawable.Orientation.BR_TL;
+                            break;
+                        case 180:
+                            mOrientation = GradientDrawable.Orientation.RIGHT_LEFT;
+                            break;
+                        case 225:
+                            mOrientation = GradientDrawable.Orientation.TR_BL;
+                            break;
+                        case 270:
+                            mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
+                            break;
+                        case 315:
+                            mOrientation = GradientDrawable.Orientation.TL_BR;
+                            break;
+                    }
+                }
                 index++;
             }
             if (hasAttribute(attrValue, AttributeMask.centerColorMask)) {
@@ -251,6 +314,14 @@ public class GradientDrawableInfo {
                 }
                 index++;
             }
+            if (startColor != 0 && endColor != 0) {
+                if (centerColor != 0) {
+                    colorArray = new int[]{startColor, centerColor, endColor};
+                } else {
+                    colorArray = new int[]{startColor, endColor};
+                }
+            }
+
             if (hasAttribute(attrValue, AttributeMask.centerXMask)) {
                 isId = isId(idValue, AttributeMask.centerXMask);
                 if (isId) {
@@ -390,6 +461,45 @@ public class GradientDrawableInfo {
 
     public boolean hasAttribute(int attrValue, int mask) {
         return (attrValue & mask) > 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GradientDrawableInfo)) return false;
+        GradientDrawableInfo that = (GradientDrawableInfo) o;
+        return dither == that.dither &&
+                shape == that.shape &&
+                tint == that.tint &&
+                Float.compare(that.radius, radius) == 0 &&
+                Float.compare(that.bottomLeftRadius, bottomLeftRadius) == 0 &&
+                Float.compare(that.bottomRightRadius, bottomRightRadius) == 0 &&
+                Float.compare(that.topLeftRadius, topLeftRadius) == 0 &&
+                Float.compare(that.topRightRadius, topRightRadius) == 0 &&
+                type == that.type &&
+                angle == that.angle &&
+                centerColor == that.centerColor &&
+                startColor == that.startColor &&
+                endColor == that.endColor &&
+                Float.compare(that.centerX, centerX) == 0 &&
+                Float.compare(that.centerY, centerY) == 0 &&
+                Float.compare(that.gradientRadius, gradientRadius) == 0 &&
+                Float.compare(that.top, top) == 0 &&
+                Float.compare(that.left, left) == 0 &&
+                Float.compare(that.bottom, bottom) == 0 &&
+                Float.compare(that.right, right) == 0 &&
+                Float.compare(that.height, height) == 0 &&
+                Float.compare(that.width, width) == 0 &&
+                solidColor == that.solidColor &&
+                strokeColor == that.strokeColor &&
+                Float.compare(that.strokeWidth, strokeWidth) == 0 &&
+                Float.compare(that.dashGap, dashGap) == 0 &&
+                Float.compare(that.dashWidth, dashWidth) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dither, shape, tint, radius, bottomLeftRadius, bottomRightRadius, topLeftRadius, topRightRadius, type, angle, centerColor, startColor, endColor, centerX, centerY, gradientRadius, top, left, bottom, right, height, width, solidColor, strokeColor, strokeWidth, dashGap, dashWidth);
     }
 }
 

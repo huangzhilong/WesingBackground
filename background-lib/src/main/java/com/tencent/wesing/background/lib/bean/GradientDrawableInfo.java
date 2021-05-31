@@ -86,7 +86,7 @@ public class GradientDrawableInfo {
     }
 
     /**
-     * 解析属性
+     * 解析属性, 禁止删除，会在字节码插桩中使用
      */
     public GradientDrawableInfo(Object[] values) {
         if (values == null || values.length <= 2) {
@@ -150,81 +150,62 @@ public class GradientDrawableInfo {
             }
 
             //圆角
-            if (hasAttribute(attrValue, AttributeMask.radiusMask) || hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask) || hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask)
-                    || hasAttribute(attrValue, AttributeMask.topLeftRadiusMask) || hasAttribute(attrValue, AttributeMask.topLeftRadiusMask)) {
-                radiusArray = new float[8];
-                for (int i = 0; i < 8; i++) {
-                    radiusArray[i] = 0.0f;
+            if (hasAttribute(attrValue, AttributeMask.radiusMask)) {
+                isId = isId(idValue, AttributeMask.radiusMask);
+                float radius;
+                if (isId) {
+                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                } else {
+                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
                 }
-                if (hasAttribute(attrValue, AttributeMask.radiusMask)) {
-                    isId = isId(idValue, AttributeMask.radiusMask);
-                    float radius;
-                    if (isId) {
-                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                    } else {
-                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
-                    }
-                    index++;
-                    this.radius = radius;
-                    for (int i = 0; i < 8; i++) {
-                        radiusArray[i] = this.radius;
-                    }
-                }
-
-                if (hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask)) {
-                    isId = isId(idValue, AttributeMask.bottomLeftRadiusMask);
-                    float radius;
-                    if (isId) {
-                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                    } else {
-                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
-                    }
-                    bottomLeftRadius = radius;
-                    radiusArray[6] = bottomLeftRadius;
-                    radiusArray[7] = bottomLeftRadius;
-                    index++;
-                }
-                if (hasAttribute(attrValue, AttributeMask.bottomRightRadiusMask)) {
-                    isId = isId(idValue, AttributeMask.bottomRightRadiusMask);
-                    float radius;
-                    if (isId) {
-                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                    } else {
-                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
-                    }
-                    bottomRightRadius = radius;
-                    radiusArray[4] = bottomRightRadius;
-                    radiusArray[5] = bottomRightRadius;
-                    index++;
-                }
-                if (hasAttribute(attrValue, AttributeMask.topLeftRadiusMask)) {
-                    isId = isId(idValue, AttributeMask.topLeftRadiusMask);
-                    float radius;
-                    if (isId) {
-                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                    } else {
-                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
-                    }
-                    topLeftRadius = radius;
-                    radiusArray[0] = topLeftRadius;
-                    radiusArray[1] = topLeftRadius;
-                    index++;
-                }
-                if (hasAttribute(attrValue, AttributeMask.topRightRadiusMask)) {
-                    isId = isId(idValue, AttributeMask.topRightRadiusMask);
-                    float radius;
-                    if (isId) {
-                        radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
-                    } else {
-                        radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
-                    }
-                    this.topRightRadius = radius;
-                    radiusArray[2] = topRightRadius;
-                    radiusArray[3] = topRightRadius;
-                    index++;
-                }
+                index++;
+                this.radius = radius;
             }
 
+            if (hasAttribute(attrValue, AttributeMask.bottomLeftRadiusMask)) {
+                isId = isId(idValue, AttributeMask.bottomLeftRadiusMask);
+                float radius;
+                if (isId) {
+                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                } else {
+                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                }
+                bottomLeftRadius = radius;
+                index++;
+            }
+            if (hasAttribute(attrValue, AttributeMask.bottomRightRadiusMask)) {
+                isId = isId(idValue, AttributeMask.bottomRightRadiusMask);
+                float radius;
+                if (isId) {
+                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                } else {
+                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                }
+                bottomRightRadius = radius;
+                index++;
+            }
+            if (hasAttribute(attrValue, AttributeMask.topLeftRadiusMask)) {
+                isId = isId(idValue, AttributeMask.topLeftRadiusMask);
+                float radius;
+                if (isId) {
+                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                } else {
+                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                }
+                topLeftRadius = radius;
+                index++;
+            }
+            if (hasAttribute(attrValue, AttributeMask.topRightRadiusMask)) {
+                isId = isId(idValue, AttributeMask.topRightRadiusMask);
+                float radius;
+                if (isId) {
+                    radius = TMEBackgroundContext.getContext().getResources().getDimension((int) values[index]);
+                } else {
+                    radius = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
+                }
+                this.topRightRadius = radius;
+                index++;
+            }
             if (hasAttribute(attrValue, AttributeMask.typeMask)) {
                 isId = isId(idValue, AttributeMask.typeMask);
                 int gradientType = GradientDrawable.LINEAR_GRADIENT;
@@ -251,40 +232,6 @@ public class GradientDrawableInfo {
                 }
                 //必须是45度的倍数
                 this.angle = gradientAngle;
-                if (angle > 0) {
-                    angle %= 360;
-                    // 取整
-                    if (angle % 45 != 0) {
-                        int remind = angle % 45;
-                        angle = angle - remind;
-                    }
-                    switch (angle) {
-                        case 0:
-                            mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;
-                            break;
-                        case 45:
-                            mOrientation = GradientDrawable.Orientation.BL_TR;
-                            break;
-                        case 90:
-                            mOrientation = GradientDrawable.Orientation.BOTTOM_TOP;
-                            break;
-                        case 135:
-                            mOrientation = GradientDrawable.Orientation.BR_TL;
-                            break;
-                        case 180:
-                            mOrientation = GradientDrawable.Orientation.RIGHT_LEFT;
-                            break;
-                        case 225:
-                            mOrientation = GradientDrawable.Orientation.TR_BL;
-                            break;
-                        case 270:
-                            mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
-                            break;
-                        case 315:
-                            mOrientation = GradientDrawable.Orientation.TL_BR;
-                            break;
-                    }
-                }
                 index++;
             }
             if (hasAttribute(attrValue, AttributeMask.centerColorMask)) {
@@ -314,14 +261,6 @@ public class GradientDrawableInfo {
                 }
                 index++;
             }
-            if (startColor != 0 && endColor != 0) {
-                if (centerColor != 0) {
-                    colorArray = new int[]{startColor, centerColor, endColor};
-                } else {
-                    colorArray = new int[]{startColor, endColor};
-                }
-            }
-
             if (hasAttribute(attrValue, AttributeMask.centerXMask)) {
                 isId = isId(idValue, AttributeMask.centerXMask);
                 if (isId) {
@@ -449,6 +388,7 @@ public class GradientDrawableInfo {
                     dashWidth = DimensionUtil.getDimensionPxByAttrValue((String) values[index]);
                 }
             }
+            parseAttribute();
         } catch (Exception e) {
             Log.i(TAG, "parse attr ex: " + e);
             isDisable = true;
@@ -500,6 +440,76 @@ public class GradientDrawableInfo {
     @Override
     public int hashCode() {
         return Objects.hash(dither, shape, tint, radius, bottomLeftRadius, bottomRightRadius, topLeftRadius, topRightRadius, type, angle, centerColor, startColor, endColor, centerX, centerY, gradientRadius, top, left, bottom, right, height, width, solidColor, strokeColor, strokeWidth, dashGap, dashWidth);
+    }
+
+
+    public void parseAttribute() {
+        //圆角
+        if (radius > 0 || topLeftRadius > 0 || topRightRadius > 0 || bottomLeftRadius > 0 || bottomRightRadius > 0) {
+            radiusArray = new float[8];
+            for (int i = 0; i < 8; i++) {
+                radiusArray[i] = radius;
+            }
+            if (bottomLeftRadius > 0) {
+                radiusArray[6] = bottomLeftRadius;
+                radiusArray[7] = bottomLeftRadius;
+            }
+            if (bottomRightRadius > 0) {
+                radiusArray[4] = bottomRightRadius;
+                radiusArray[5] = bottomRightRadius;
+            }
+            if (topLeftRadius > 0) {
+                radiusArray[0] = topLeftRadius;
+                radiusArray[1] = topLeftRadius;
+            }
+            if (topRightRadius > 0) {
+                radiusArray[2] = topRightRadius;
+                radiusArray[3] = topRightRadius;
+            }
+        }
+
+        if (angle > 0) {
+            angle %= 360;
+            // 取整
+            if (angle % 45 != 0) {
+                int remind = angle % 45;
+                angle = angle - remind;
+            }
+            switch (angle) {
+                case 0:
+                    mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;
+                    break;
+                case 45:
+                    mOrientation = GradientDrawable.Orientation.BL_TR;
+                    break;
+                case 90:
+                    mOrientation = GradientDrawable.Orientation.BOTTOM_TOP;
+                    break;
+                case 135:
+                    mOrientation = GradientDrawable.Orientation.BR_TL;
+                    break;
+                case 180:
+                    mOrientation = GradientDrawable.Orientation.RIGHT_LEFT;
+                    break;
+                case 225:
+                    mOrientation = GradientDrawable.Orientation.TR_BL;
+                    break;
+                case 270:
+                    mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
+                    break;
+                case 315:
+                    mOrientation = GradientDrawable.Orientation.TL_BR;
+                    break;
+            }
+        }
+
+        if (startColor != 0 && endColor != 0) {
+            if (centerColor != 0) {
+                colorArray = new int[]{startColor, centerColor, endColor};
+            } else {
+                colorArray = new int[]{startColor, endColor};
+            }
+        }
     }
 }
 

@@ -2,6 +2,7 @@ package com.tencent.wesing.background.lib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -53,9 +54,9 @@ class TMEBackgroundFactory implements LayoutInflater.Factory2 {
             ta.recycle();
             return view;
         }
-        GradientDrawable gradientDrawable = TMEBackgroundDrawableFactory.getInstance().getNeedGradientDrawable(ta);
-        if (gradientDrawable != null) {
-            view.setBackground(gradientDrawable);
+        Drawable drawable = TMEBackgroundDrawableFactory.getInstance().getNeedGradientDrawable(ta);
+        if (drawable != null) {
+            view.setBackground(drawable);
         }
         ta.recycle();
         return view;

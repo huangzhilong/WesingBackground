@@ -1,6 +1,5 @@
 package com.tencent.wesing.background.plugin.ams
 
-import com.tencent.wesing.background.plugin.ams.ClassShapeXmlAdapterVisitor.IVisitListener
 import com.tencent.wesing.background.plugin.ams.bean.AttributeInfo
 import com.tencent.wesing.background.plugin.ams.bean.DrawableEntity
 import com.tencent.wesing.background.plugin.util.LogUtil
@@ -58,7 +57,7 @@ class AmsUtil {
         }
     }
 
-    static void onHookCodeCreateDrawable(File f) {
+    static void doHookCodeCreateDrawable(File f) {
         try {
             String path = f.absolutePath
             boolean isHook = false

@@ -251,8 +251,11 @@ class ResourceTransform extends Transform {
         } else if (fileName.contains("TMEBackgroundMap.class")) {
             //插入
             handleInsertBackgroundLibMap(file)
-        } else if (isSubProjectLib(name)) {
-            AmsUtil.onHookCodeCreateDrawable(file)
+        } else {
+            //不是mBackgroundLibJar的进行hook
+            if (mBackgroundLibJar == null || name != mBackgroundLibJar.name) {
+                AmsUtil.doHookCodeCreateDrawable(file)
+            }
         }
     }
 

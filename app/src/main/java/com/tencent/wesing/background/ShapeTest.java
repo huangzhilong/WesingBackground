@@ -1,5 +1,12 @@
 package com.tencent.wesing.background;
 
+import android.graphics.drawable.Drawable;
+
+import androidx.core.content.ContextCompat;
+
+import com.tencent.wesing.background.lib.TMEBackgroundContext;
+import com.tencent.wesing.background.lib.drawable.TMEBackgroundDrawableFactory;
+
 import java.util.HashMap;
 
 /**
@@ -13,6 +20,9 @@ class ShapeTest {
 
 
     public static final Object[] param1  = { 1, 2, 3, 4, 6, 7, "shape_text_2.xml", "dither", R.bool.yes};
+
+
+    public Drawable drawable = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher);
 
 
     public static final Object[] param2  = { 24444, "shape_text_3.xml", "shape"};
@@ -32,6 +42,16 @@ class ShapeTest {
         mBackgroundAttributeMap.put(66666666, param888);
     }
 
+
+    public void testDrawable() {
+        Drawable drawable = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Drawable drawable1 = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher, TMEBackgroundContext.getContext().getTheme());
+        }
+        Drawable drawable2 = ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.ic_launcher);
+
+        Drawable drawable3 = TMEBackgroundDrawableFactory.getInstance().createDrawableById(R.drawable.shape_text_2);
+    }
 
 
     private final static HashMap<Integer, GradientDrawableInfo> mGradientDrawableMap = new HashMap<>();

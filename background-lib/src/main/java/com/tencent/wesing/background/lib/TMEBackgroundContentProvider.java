@@ -12,8 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
 
-
-public class TMEBackgroundContentProvider extends ContentProvider {
+class TMEBackgroundContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         if(getContext() != null && getContext() instanceof Application){

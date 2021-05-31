@@ -49,8 +49,8 @@ class ResourceTransform extends Transform {
         LogUtil.logI(TAG, "setProject list: ${mProjectNameList} ")
     }
 
-    private boolean isSubProjectLib(JarInput jarInput) {
-        String jarName = jarInput.name.replace(":", "")
+    private boolean isSubProjectLib(String jarInputName) {
+        String jarName = jarInputName.replace(":", "")
         for (int i = 0; i < mProjectNameList.size(); i++) {
             if (jarName == mProjectNameList.get(i)) {
                 return true
@@ -151,7 +151,7 @@ class ResourceTransform extends Transform {
 
     private void doTransformJar(JarInput jarInput, File dest) {
         // 只处理本项目的project
-        if (isSubProjectLib(jarInput) || jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
+        if (isSubProjectLib(jarInput.name) || jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
             LogUtil.logI(TAG, "start doTransformJar jar: ${jarInput.name}")
             String unzipTmp = "${mProject.getBuildDir().absolutePath}${File.separator}tmp${File.separator}" + getName()
             unzipTmp = "${unzipTmp}${File.separator}${jarInput.name.replace(':', '')}"
@@ -251,6 +251,8 @@ class ResourceTransform extends Transform {
         } else if (fileName.contains("TMEBackgroundMap.class")) {
             //插入
             handleInsertBackgroundLibMap(file)
+        } else if (isSubProjectLib(name)) {
+            AmsUtil.onHookCodeCreateDrawable(file)
         }
     }
 

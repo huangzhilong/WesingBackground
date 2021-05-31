@@ -9,7 +9,6 @@ import android.util.LruCache;
 import android.view.View;
 import com.tencent.wesing.background.lib.R;
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
-import com.tencent.wesing.background.lib.bean.AttributeMask;
 import com.tencent.wesing.background.lib.bean.GradientDrawableInfo;
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
 
@@ -22,18 +21,18 @@ import java.lang.reflect.Field;
  * 生成drawable 给View，现只支持GradientDrawable
  **/
 
-public class GradientDrawableFactory {
+public class TMEBackgroundDrawableFactory {
 
     private static final String TAG = "GradientDrawableFactory";
 
-    private GradientDrawableFactory() {
+    private TMEBackgroundDrawableFactory() {
     }
 
     private static class SingleHolder {
-        private static GradientDrawableFactory mFactory = new GradientDrawableFactory();
+        private static TMEBackgroundDrawableFactory mFactory = new TMEBackgroundDrawableFactory();
     }
 
-    public static GradientDrawableFactory getInstance() {
+    public static TMEBackgroundDrawableFactory getInstance() {
         return SingleHolder.mFactory;
     }
 

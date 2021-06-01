@@ -1,6 +1,7 @@
 package com.tencent.wesing.background.lib.util;
 
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -67,5 +68,20 @@ public class DimensionUtil {
             return applyDimension(value, TypedValue.COMPLEX_UNIT_MM);
         }
         return 0;
+    }
+
+    public static float getFloatOrFractionOrDimension(TypedArray a, int index, float defaultValue) {
+        TypedValue tv = a.peekValue(index);
+        float v = defaultValue;
+        if (tv != null) {
+            if (tv.type == TypedValue.TYPE_FRACTION) {
+                v = tv.getFraction(1.0f, 1.0f);
+            } else if (tv.type == TypedValue.TYPE_DIMENSION) {
+                v = a.getDimension(index, defaultValue);
+            } else {
+                v = tv.getFloat();
+            }
+        }
+        return v;
     }
 }

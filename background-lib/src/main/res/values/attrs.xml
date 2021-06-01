@@ -16,13 +16,14 @@
         <attr name="tme_corners_topLeftRadius" format="dimension" />
         <attr name="tme_corners_topRightRadius" format="dimension" />
 
-        <attr name="tme_gradient_angle" format="integer" />
-        <attr name="tme_gradient_centerX" format="float" />
-        <attr name="tme_gradient_centerY" format="float" />
+        <attr name="tme_gradient_angle" format="float" />
         <attr name="tme_gradient_centerColor" format="color" />
         <attr name="tme_gradient_endColor" format="color" />
         <attr name="tme_gradient_startColor" format="color" />
-        <attr name="tme_gradient_gradientRadius" format="dimension" />
+        <!-- fraction 是指百分比的意思，以%结尾，如20% -->
+        <attr name="tme_gradient_centerX" format="float|fraction" />
+        <attr name="tme_gradient_centerY" format="float|fraction" />
+        <attr name="tme_gradient_gradientRadius" format="float|fraction|dimension" />
         <attr name="tme_gradient_type" format="enum">
             <enum name="linear" value="0" />
             <enum name="radial" value="1" />

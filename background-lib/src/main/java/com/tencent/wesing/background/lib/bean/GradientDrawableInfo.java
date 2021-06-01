@@ -468,13 +468,11 @@ public class GradientDrawableInfo {
             }
         }
 
-        if (angle > 0) {
+        //默认值
+        mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
+        if (angle >= 0) {
             angle %= 360;
             // 取整
-            if (angle % 45 != 0) {
-                int remind = angle % 45;
-                angle = angle - remind;
-            }
             switch (angle) {
                 case 0:
                     mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;

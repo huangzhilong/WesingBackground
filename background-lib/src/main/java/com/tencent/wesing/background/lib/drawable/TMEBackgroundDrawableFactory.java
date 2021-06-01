@@ -12,6 +12,7 @@ import com.tencent.wesing.background.lib.R;
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
 import com.tencent.wesing.background.lib.bean.GradientDrawableInfo;
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
+import com.tencent.wesing.background.lib.util.DimensionUtil;
 
 import java.lang.reflect.Field;
 
@@ -74,11 +75,11 @@ public class TMEBackgroundDrawableFactory {
                 } else if (attr == R.styleable.TMEBackground_tme_corners_topRightRadius) {
                     gradientDrawableInfo.topRightRadius = ta.getDimension(attr, 0);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_angle) {
-                    gradientDrawableInfo.angle = ta.getInteger(attr, 0);
+                    gradientDrawableInfo.angle = (int) ta.getFloat(attr, 0);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_centerX) {
-                    gradientDrawableInfo.centerX = ta.getFloat(attr, -1);
+                    gradientDrawableInfo.centerX = DimensionUtil.getFloatOrFractionOrDimension(ta, attr, 0.5f);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_centerY) {
-                    gradientDrawableInfo.centerY = ta.getFloat(attr, -1);
+                    gradientDrawableInfo.centerY = DimensionUtil.getFloatOrFractionOrDimension(ta, attr, 0.5f);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_centerColor) {
                     gradientDrawableInfo.centerColor = ta.getColor(attr, 0);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_endColor) {
@@ -86,7 +87,7 @@ public class TMEBackgroundDrawableFactory {
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_startColor) {
                     gradientDrawableInfo.startColor = ta.getColor(attr, 0);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_gradientRadius) {
-                    gradientDrawableInfo.gradientRadius = ta.getDimension(attr, -1);
+                    gradientDrawableInfo.gradientRadius = DimensionUtil.getFloatOrFractionOrDimension(ta, attr, 0.5f);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_type) {
                     gradientDrawableInfo.type = ta.getInt(attr, 0);
                 } else if (attr == R.styleable.TMEBackground_tme_gradient_useLevel) {

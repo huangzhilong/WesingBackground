@@ -11,9 +11,6 @@ class   MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val shapeId = resources.getDrawable(R.drawable.shape_text_3)
-
-        TMEBackgroundDrawableFactory.getInstance()
-
         test()
     }
 

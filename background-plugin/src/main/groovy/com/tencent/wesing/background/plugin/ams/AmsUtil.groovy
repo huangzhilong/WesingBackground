@@ -8,6 +8,8 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.tree.LineNumberNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
@@ -59,7 +61,6 @@ class AmsUtil {
 
     static void doHookCodeCreateDrawable(File f) {
         try {
-            String path = f.absolutePath
             boolean isHook = false
             FileInputStream fis = new FileInputStream(f)
             ClassReader classReader = new ClassReader(fis)
@@ -69,27 +70,45 @@ class AmsUtil {
             Iterator<MethodNode> iterator = classNode.methods.iterator()
             while (iterator.hasNext()) {
                 MethodNode node = iterator.next()
-                if (node == null || node.instructions == null || node.instructions.iterator()== null) {
+                if (node == null || node.instructions == null || node.instructions.iterator() == null) {
                     continue
                 }
-                Iterator<AbstractInsnNode> eIterator = node.instructions.iterator().iterator()
-                while (eIterator.hasNext()) {
-                    AbstractInsnNode abstractInsnNode = eIterator.next()
+                AbstractInsnNode[] abstractInsnNodeList = node.instructions.toArray()
+                //需要用行数来区分getDrawable方法，如 TMEBackgroundContext.getContext().getResources().getDrawable(2131165295);
+                // 会有3个MethodInsnNode
+                // getContext  com/tencent/wesing/background/lib/TMEBackgroundContext  ()Landroid/content/Context;   5
+                // getResources  android/content/Context  ()Landroid/content/res/Resources;   5
+                // getDrawable  android/content/res/Resources  (I)Landroid/graphics/drawable/Drawable;   5
+
+                List<MethodInsnNode> MethodInsnNodeList = new ArrayList<>()
+                boolean isDrawableMethodCreator = false
+
+                for (int i = 0; i < abstractInsnNodeList.length; i++) {
+                    AbstractInsnNode abstractInsnNode = abstractInsnNodeList[i]
                     if (abstractInsnNode instanceof MethodInsnNode) {
-                        MethodInsnNode kk = (MethodInsnNode) abstractInsnNode
-                        if (DrawableMethodCreator.isDrawableMethodCreator(kk)) {
-                            DrawableEntity targetEntity = DrawableMethodCreator.getTargetDrawableEntity()
-                            kk.name = targetEntity.name
-                            kk.desc = targetEntity.desc
-                            kk.opcode = targetEntity.opcode
-                            kk.owner = targetEntity.owner
-                            isHook = true
+                        MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode
+                        if (DrawableMethodCreator.isDrawableMethodCreator(methodInsnNode)) {
+                            isDrawableMethodCreator = true
                         }
+                        MethodInsnNodeList.add(methodInsnNode)
+                    } else if (abstractInsnNode instanceof LineNumberNode) {
+                        if (!MethodInsnNodeList.isEmpty() && isDrawableMethodCreator) {
+                            isHook = true
+                            hookDrawable(MethodInsnNodeList, node.instructions)
+                        }
+                        isDrawableMethodCreator = false
+                        MethodInsnNodeList.clear()
                     }
+                }
+                if (!MethodInsnNodeList.isEmpty() && isDrawableMethodCreator) {
+                    isHook = true
+                    hookDrawable(MethodInsnNodeList, node.instructions)
+                    isDrawableMethodCreator = false
+                    MethodInsnNodeList.clear()
                 }
             }
             if (isHook) {
-                LogUtil.logI(TAG, "onHookCodeCreateDrawable fileName: $path")
+                LogUtil.logI(TAG, "onHookCodeCreateDrawable fileName: ${f.absolutePath}")
             }
             classNode.accept(classWriter)
             //覆盖自己
@@ -102,5 +121,29 @@ class AmsUtil {
         } catch (Exception e) {
             LogUtil.logI(TAG, "onHookCodeCreateDrawable ex: $e")
         }
+    }
+
+    private static void hookDrawable(List<MethodInsnNode> nodeList, InsnList instructions) {
+        if (nodeList == null || nodeList.size() < 2) {
+            return
+        }
+        List<DrawableEntity> targetDrawableEntityList = DrawableMethodCreator.getTargetDrawableEntityList()
+        //留下最后两个
+        for (int i = 0; i < nodeList.size() - 2; i++) {
+            MethodInsnNode methodInsnNode = nodeList.get(i)
+            instructions.remove(methodInsnNode)
+        }
+        MethodInsnNode lastMethodInsnNode = nodeList.get(nodeList.size() - 1)
+        MethodInsnNode firstMethodInsnNode = nodeList.get(nodeList.size() - 2)
+        firstMethodInsnNode.name = targetDrawableEntityList.get(0).name
+        firstMethodInsnNode.desc = targetDrawableEntityList.get(0).desc
+        firstMethodInsnNode.opcode = targetDrawableEntityList.get(0).opcode
+        firstMethodInsnNode.owner = targetDrawableEntityList.get(0).owner
+
+        lastMethodInsnNode.name = targetDrawableEntityList.get(1).name
+        lastMethodInsnNode.desc = targetDrawableEntityList.get(1).desc
+        lastMethodInsnNode.opcode = targetDrawableEntityList.get(1).opcode
+        lastMethodInsnNode.owner = targetDrawableEntityList.get(1).owner
+
     }
 }

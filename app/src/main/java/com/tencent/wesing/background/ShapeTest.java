@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
 
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
-import com.tencent.wesing.background.lib.drawable.TMEBackgroundDrawableFactory;
 
 import java.util.HashMap;
 
@@ -44,13 +43,17 @@ class ShapeTest {
 
 
     public void testDrawable() {
-        Drawable drawable = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher);
+        Drawable drawable = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher); int yy = 222;
+        int kk = 2;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            Drawable drawable1 = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher, TMEBackgroundContext.getContext().getTheme());
+            Drawable drawable1 = TMEBackgroundContext.getContext().getResources()
+                    .getDrawable(R.drawable.ic_launcher, TMEBackgroundContext.getContext().getTheme());
         }
-        Drawable drawable2 = ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.ic_launcher);
-
-        Drawable drawable3 = TMEBackgroundDrawableFactory.getInstance().createDrawableById(R.drawable.shape_text_2);
+        int k;
+        String hh;
+        String jj= "eyyeye";
+        String kk1 = "11223"; Drawable drawable2 = ContextCompat
+                .getDrawable(TMEBackgroundContext.getContext(), R.drawable.ic_launcher);
     }
 
 

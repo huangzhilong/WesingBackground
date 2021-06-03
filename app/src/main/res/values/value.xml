@@ -4,4 +4,6 @@
     <dimen name="top_height1">180dp</dimen>
     <bool name="yes">true</bool>
     <integer name="yyyy">22</integer>
+    <fraction name="hh">223%</fraction>
+    <fraction name="hhh">22%</fraction>
 </resources>

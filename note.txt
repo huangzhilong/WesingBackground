@@ -48,10 +48,7 @@ gradle 具体任务： TaskManager   子类： ApplicationTaskManager   LibraryT
 问题4： 删除了shape  xml文件后， xml布局中使用shape和代码中getDrawable中使用shape会编译不过。（要想想怎么减包）
 
 
-
 问题5： 不能换成别的xml文件，放在项目的layout目录不同名字代码中使用了找不到Id，不放在这个目录则编译不过，提示错误路径
-
-
 
 
 
@@ -82,11 +79,12 @@ gradle 具体任务： TaskManager   子类： ApplicationTaskManager   LibraryT
 
 
 
-问题：字节码替换有问题，安装app启动崩溃
-
+问题：字节码替换有问题，安装app启动崩溃。提示找不到方法，但是看字节码又是替换成功的
 
 
 问题： 因为有缓存，所以在编译的时候有缓存，不会再替换layout的属性为自己的background
+
+
 
 
 先单线程处理，后期再加入多线程！！！！

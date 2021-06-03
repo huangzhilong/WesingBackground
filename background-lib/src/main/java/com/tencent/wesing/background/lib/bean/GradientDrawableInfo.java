@@ -263,29 +263,17 @@ public class GradientDrawableInfo {
             }
             if (hasAttribute(attrValue, AttributeMask.centerXMask)) {
                 isId = isId(idValue, AttributeMask.centerXMask);
-                if (isId) {
-                    centerX = TMEBackgroundContext.getContext().getResources().getFraction((int) values[index], 1, 1);
-                } else {
-                    centerX = Float.parseFloat((String) values[index]);
-                }
+                centerX = getFloatOrFractionOrDimension(isId, String.valueOf(values[index]), 0.5f);
                 index++;
             }
             if (hasAttribute(attrValue, AttributeMask.centerYMask)) {
                 isId = isId(idValue, AttributeMask.centerYMask);
-                if (isId) {
-                    centerY = TMEBackgroundContext.getContext().getResources().getFraction((int) values[index], 1, 1);
-                } else {
-                    centerY = Float.parseFloat((String) values[index]);
-                }
+                centerY = getFloatOrFractionOrDimension(isId, String.valueOf(values[index]), 0.5f);
                 index++;
             }
             if (hasAttribute(attrValue, AttributeMask.gradientRadiusMask)) {
                 isId = isId(idValue, AttributeMask.gradientRadiusMask);
-                if (isId) {
-                    gradientRadius = TMEBackgroundContext.getContext().getResources().getInteger((int) values[index]);
-                } else {
-                    gradientRadius = (int) values[index];
-                }
+                gradientRadius = getFloatOrFractionOrDimension(isId, String.valueOf(values[index]), 0.5f);
                 index++;
             }
             if (hasAttribute(attrValue, AttributeMask.topMask)) {
@@ -442,6 +430,34 @@ public class GradientDrawableInfo {
         return Objects.hash(dither, shape, tint, radius, bottomLeftRadius, bottomRightRadius, topLeftRadius, topRightRadius, type, angle, centerColor, startColor, endColor, centerX, centerY, gradientRadius, top, left, bottom, right, height, width, solidColor, strokeColor, strokeWidth, dashGap, dashWidth);
     }
 
+
+    private float getFloatOrFractionOrDimension(boolean isId, String value, float defualt) {
+        float finalValue = defualt;
+        try {
+            if (isId) {
+                int id = Integer.parseInt(value);
+                String resTypeName = TMEBackgroundContext.getContext().getResources().getResourceTypeName(id);
+                if ("fraction".equals(resTypeName)) {
+                    finalValue = TMEBackgroundContext.getContext().getResources().getFraction(id, 1, 1);
+                } else if ("dimen".equals(resTypeName)) {
+                    finalValue = TMEBackgroundContext.getContext().getResources().getDimension(id);
+                } else {
+                    String centerXValue = TMEBackgroundContext.getContext().getResources().getString(id);
+                    finalValue = Float.parseFloat(centerXValue);
+                }
+            } else {
+                if (value.endsWith("%")) {
+                    finalValue = Float.parseFloat(value.substring(0, value.length() - 1)) / 100f;
+                } else if (value.endsWith("dp") || value.endsWith("sp") ||value.endsWith("px") || value.endsWith("pt") || value.endsWith("in") || value.endsWith("mm")) {
+                    finalValue = DimensionUtil.getDimensionPxByAttrValue(value);
+                } else {
+                    finalValue = Float.parseFloat(value);
+                }
+            }
+        } catch (Exception e) {
+        }
+        return finalValue;
+    }
 
     public void parseAttribute() {
         //圆角

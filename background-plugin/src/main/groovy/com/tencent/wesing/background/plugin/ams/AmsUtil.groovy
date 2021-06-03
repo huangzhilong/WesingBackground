@@ -60,6 +60,10 @@ class AmsUtil {
     }
 
     static void doHookCodeCreateDrawable(File f) {
+        if (f.name.contains("MainActivity")) {
+            LogUtil.logI("longpo", "is MainActivity path: ${f.absolutePath}")
+            return
+        }
         try {
             boolean isHook = false
             FileInputStream fis = new FileInputStream(f)

@@ -9,12 +9,6 @@
         android:topRightRadius="10dp"/>
     <solid android:color="@color/teal_200"/>
 
-    <gradient
-        android:angle="45"
-        android:gradientRadius="@dimen/top_height"
-        android:centerY="@fraction/hh"
-        android:centerX="60%"/>
-
     <padding
         android:right="10dp"
         android:left="10dp"

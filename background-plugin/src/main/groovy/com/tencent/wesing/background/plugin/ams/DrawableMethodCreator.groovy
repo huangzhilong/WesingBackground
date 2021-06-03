@@ -59,7 +59,7 @@ class DrawableMethodCreator {
             targetDrawable.opcode = Opcodes.INVOKEVIRTUAL
             targetDrawable.name = "createDrawableById"
             targetDrawable.owner = "com/tencent/wesing/background/lib/drawable/TMEBackgroundDrawableFactory"
-            targetDrawable.desc = "(I)Landroid/graphics/drawable/GradientDrawable;"
+            targetDrawable.desc = "(I)Landroid/graphics/drawable/Drawable;"
             TARGET_DRAWABLE_LIST.add(targetDrawable)
         }
         return TARGET_DRAWABLE_LIST

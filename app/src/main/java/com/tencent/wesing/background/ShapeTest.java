@@ -1,10 +1,12 @@
 package com.tencent.wesing.background;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import androidx.core.content.ContextCompat;
 
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
+import com.tencent.wesing.background.lib.drawable.TMEBackgroundDrawableFactory;
 
 import java.util.HashMap;
 
@@ -43,17 +45,20 @@ class ShapeTest {
 
 
     public void testDrawable() {
+        Context context = TMEBackgroundContext.getContext();
         Drawable drawable = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher); int yy = 222;
         int kk = 2;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             Drawable drawable1 = TMEBackgroundContext.getContext().getResources()
                     .getDrawable(R.drawable.ic_launcher, TMEBackgroundContext.getContext().getTheme());
+            Drawable ll = context.getDrawable(R.drawable.shape_ring);
         }
         int k;
         String hh;
         String jj= "eyyeye";
-        String kk1 = "11223"; Drawable drawable2 = ContextCompat
-                .getDrawable(TMEBackgroundContext.getContext(), R.drawable.ic_launcher);
+        String kk1 = "11223";
+        Drawable drawable2 = ContextCompat
+                .getDrawable(context, R.drawable.ic_launcher);
     }
 
 

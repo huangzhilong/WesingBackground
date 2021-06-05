@@ -20,7 +20,7 @@ class  MainActivity : AppCompatActivity() {
         Log.i("longpo", " no cache xmlDrawable cost time: " + (System.nanoTime() - startTime))
 
         startTime = System.nanoTime()
-        var codeDrawable = TMEBackgroundDrawableFactory.getInstance().createDrawableById(R.drawable.shape_text_2)
+        var codeDrawable = TMEBackgroundDrawableFactory.createDrawableById(R.drawable.shape_text_2)
         Log.i("longpo", " no cache codeDrawable cost time: " + (System.nanoTime() - startTime))
 
 
@@ -29,7 +29,7 @@ class  MainActivity : AppCompatActivity() {
         Log.i("longpo", " has cache codeDrawable cost time: " + (System.nanoTime() - startTime))
 
         startTime = System.nanoTime()
-        codeDrawable = TMEBackgroundDrawableFactory.getInstance().createDrawableById(R.drawable.shape_text_2)
+        codeDrawable = TMEBackgroundDrawableFactory.createDrawableById(R.drawable.shape_text_2)
         Log.i("longpo", " has cache codeDrawable cost time: " + (System.nanoTime() - startTime))
     }
 }

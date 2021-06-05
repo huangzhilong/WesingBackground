@@ -120,13 +120,13 @@ public class TMEBackgroundDrawableFactory {
         return null;
     }
 
-    public Drawable createDrawableById(int drawableId) {
+    public static Drawable createDrawableById(int drawableId) {
         GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
         if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
             return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
         }
         // 当前只解析GradientDrawable
-        GradientDrawable drawable = createDrawableByGradientInfo(gradientDrawableInfo);
+        GradientDrawable drawable = getInstance().createDrawableByGradientInfo(gradientDrawableInfo);
         if (drawable != null) {
             return drawable;
         } else {

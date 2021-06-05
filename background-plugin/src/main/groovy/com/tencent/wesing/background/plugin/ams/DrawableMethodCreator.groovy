@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.MethodInsnNode
 class DrawableMethodCreator {
 
     private static final List<DrawableEntity> DRAWABLE_LIST = new ArrayList<>()
-    private static final List<DrawableEntity> TARGET_DRAWABLE_LIST = new ArrayList<>()
+    private static DrawableEntity TARGET_DRAWABLE = null
 
     private static initDrawableList() {
         DrawableEntity resDrawableEntity = new DrawableEntity()
@@ -46,22 +46,15 @@ class DrawableMethodCreator {
     }
 
 
-    static List<DrawableEntity> getTargetDrawableEntityList() {
-        if (TARGET_DRAWABLE_LIST.isEmpty()) {
+    static DrawableEntity getTargetDrawableEntityList() {
+        if (TARGET_DRAWABLE == null) {
             DrawableEntity instanceDrawable = new DrawableEntity()
             instanceDrawable.opcode = Opcodes.INVOKESTATIC
-            instanceDrawable.name = "getInstance"
+            instanceDrawable.name = "createDrawableById"
             instanceDrawable.owner = "com/tencent/wesing/background/lib/drawable/TMEBackgroundDrawableFactory"
-            instanceDrawable.desc = "()Lcom/tencent/wesing/background/lib/drawable/TMEBackgroundDrawableFactory;"
-            TARGET_DRAWABLE_LIST.add(instanceDrawable)
-
-            DrawableEntity targetDrawable = new DrawableEntity()
-            targetDrawable.opcode = Opcodes.INVOKEVIRTUAL
-            targetDrawable.name = "createDrawableById"
-            targetDrawable.owner = "com/tencent/wesing/background/lib/drawable/TMEBackgroundDrawableFactory"
-            targetDrawable.desc = "(I)Landroid/graphics/drawable/Drawable;"
-            TARGET_DRAWABLE_LIST.add(targetDrawable)
+            instanceDrawable.desc = "(I)Landroid/graphics/drawable/Drawable;"
+            TARGET_DRAWABLE = instanceDrawable
         }
-        return TARGET_DRAWABLE_LIST
+        return TARGET_DRAWABLE
     }
 }

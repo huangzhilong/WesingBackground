@@ -124,26 +124,19 @@ class AmsUtil {
     }
 
     private static void hookDrawable(List<MethodInsnNode> nodeList, InsnList instructions) {
-        if (nodeList == null || nodeList.size() < 2) {
+        if (nodeList == null || nodeList.isEmpty()) {
             return
         }
-        List<DrawableEntity> targetDrawableEntityList = DrawableMethodCreator.getTargetDrawableEntityList()
-        //留下最后两个
-        for (int i = 0; i < nodeList.size() - 2; i++) {
+        DrawableEntity targetDrawableEntityList = DrawableMethodCreator.getTargetDrawableEntityList()
+        //留下最后一个
+        for (int i = 0; i < nodeList.size() - 1; i++) {
             MethodInsnNode methodInsnNode = nodeList.get(i)
             instructions.remove(methodInsnNode)
         }
         MethodInsnNode lastMethodInsnNode = nodeList.get(nodeList.size() - 1)
-        MethodInsnNode firstMethodInsnNode = nodeList.get(nodeList.size() - 2)
-        firstMethodInsnNode.name = targetDrawableEntityList.get(0).name
-        firstMethodInsnNode.desc = targetDrawableEntityList.get(0).desc
-        firstMethodInsnNode.opcode = targetDrawableEntityList.get(0).opcode
-        firstMethodInsnNode.owner = targetDrawableEntityList.get(0).owner
-
-        lastMethodInsnNode.name = targetDrawableEntityList.get(1).name
-        lastMethodInsnNode.desc = targetDrawableEntityList.get(1).desc
-        lastMethodInsnNode.opcode = targetDrawableEntityList.get(1).opcode
-        lastMethodInsnNode.owner = targetDrawableEntityList.get(1).owner
-
+        lastMethodInsnNode.name = targetDrawableEntityList.name
+        lastMethodInsnNode.desc = targetDrawableEntityList.desc
+        lastMethodInsnNode.opcode = targetDrawableEntityList.opcode
+        lastMethodInsnNode.owner = targetDrawableEntityList.owner
     }
 }

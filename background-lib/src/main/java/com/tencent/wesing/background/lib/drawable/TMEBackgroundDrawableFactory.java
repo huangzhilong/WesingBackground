@@ -121,6 +121,9 @@ public class TMEBackgroundDrawableFactory {
     }
 
     public static Drawable createDrawableById(int drawableId) {
+        if (TMEBackgroundMap.getBackgroundAttributeMap() == null) {
+            return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
+        }
         GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
         if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
             return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);

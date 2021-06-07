@@ -112,9 +112,11 @@ class ResourceTransform extends Transform {
                 processJarInput(jarInput, mOutputProvider, isIncremental)
             }
 
-            input.directoryInputs.each { DirectoryInput directoryInput ->
-                //处理源码文件
-                processDirectoryInputs(directoryInput, mOutputProvider, isIncremental)
+            //处理源码文件，一般就是app module，其他module会以jar文件。这里判断下app module是否支持插件
+            if (p.plugins.hasPlugin("com.tencent.wesing.background") && p.backgroundPluginConfig.isOpen) {
+                input.directoryInputs.each { DirectoryInput directoryInput ->
+                    processDirectoryInputs(directoryInput, mOutputProvider, isIncremental)
+                }
             }
         }
     }
@@ -179,6 +181,7 @@ class ResourceTransform extends Transform {
         File dest = outputProvider.getContentLocation(directoryInput.getName(),
                 directoryInput.getContentTypes(), directoryInput.getScopes(),
                 Format.DIRECTORY)
+        LogUtil.logI(TAG, "processDirectoryInputs name: ${directoryInput.name}  ${directoryInput.file.name}")
         //建立文件夹
         FileUtils.mkdirs(dest)
         if (isIncremental) {

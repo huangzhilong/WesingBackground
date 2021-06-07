@@ -37,16 +37,22 @@ class ResourceTransform extends Transform {
 
     void setProject(Project project) {
         mProject = project
-        //获取项目的所有module name
+    }
+
+    private void generateProjectList() {
+        //获取项目的所有支持该插件的module name
         Iterator<Project> iterator = mProject.rootProject.allprojects.iterator()
         while (iterator.hasNext()) {
             Project p = iterator.next()
-            if (p.name == project.rootProject.name) {
+            if (p.name == p.rootProject.name) {
+                continue
+            }
+            if (!p.plugins.hasPlugin("com.tencent.wesing.background") || !p.backgroundPluginConfig.isOpen) {
                 continue
             }
             mProjectNameList.add(p.name)
         }
-        LogUtil.logI(TAG, "setProject list: ${mProjectNameList} ")
+        LogUtil.logI(TAG, "generateProjectList list: ${mProjectNameList} ")
     }
 
     private boolean isSubProjectLib(String jarInputName) {
@@ -83,6 +89,7 @@ class ResourceTransform extends Transform {
 
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
+        generateProjectList()
         LogUtil.logI(TAG, "start doTransform  isIncremental: ${transformInvocation.isIncremental()}")
         doTransform(transformInvocation)
         afterTransform(transformInvocation)

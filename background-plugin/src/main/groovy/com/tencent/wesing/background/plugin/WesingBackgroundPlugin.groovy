@@ -27,13 +27,12 @@ class WesingBackgroundPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        LogUtil.logI(TAG, "apply WesingBackgroundPlugin  projectName: ${project.name} ")
+        project.extensions.create("backgroundPluginConfig", WesingExtensionContainer)
+        LogUtil.logI(TAG, "apply WesingBackgroundPlugin  projectName: ${project.name}")
         def shapeScanTask = null
-
         def variants
         if (project.plugins.hasPlugin("com.android.application")) {
             variants = (project.property("android") as AppExtension).applicationVariants
-
             //app module 注册transform
             def android = project.extensions.getByType(AppExtension)
             ResourceTransform transform = new ResourceTransform()
@@ -58,6 +57,10 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                     preBuildTask.dependsOn(shapeScanTask)
                 }
 
+                if (!project.backgroundPluginConfig.isOpen) {
+                    LogUtil.logI(TAG, "backgroundPluginConfig not Open!! projectName: ${project.name}")
+                    return
+                }
                 //hook 编译资处理
                 if (project.plugins.hasPlugin("com.android.application")) {
                     MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()

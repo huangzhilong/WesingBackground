@@ -44,3 +44,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 apply plugin: 'com.tencent.wesing.background'
+backgroundPluginConfig {
+    isOpen false
+}

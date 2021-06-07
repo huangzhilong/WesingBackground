@@ -54,6 +54,9 @@ class ShapeScanTask extends DefaultTask {
             if (p.name == project.rootProject.name) {
                 continue
             }
+            if (!p.plugins.hasPlugin("com.tencent.wesing.background") || !p.backgroundPluginConfig.isOpen) {
+                continue
+            }
             if (p.plugins.hasPlugin(AppPlugin)) {
                 getSourcesDirsWithVariant((DomainObjectCollection<BaseVariant>) p.android.applicationVariants, p.name)
             } else if (p.plugins.hasPlugin(LibraryPlugin)) {

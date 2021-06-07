@@ -59,6 +59,7 @@ class ShapeTest {
         String kk1 = "11223";
         Drawable drawable2 = ContextCompat
                 .getDrawable(context, R.drawable.ic_launcher);
+        Drawable drawable3 = ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.shape_ring);
     }
 
 

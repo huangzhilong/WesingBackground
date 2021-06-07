@@ -46,3 +46,6 @@ dependencies {
 }
 
 apply plugin: 'com.tencent.wesing.background'
+backgroundPluginConfig {
+    isOpen false
+}

@@ -113,7 +113,8 @@ class ResourceTransform extends Transform {
             }
 
             //处理源码文件，一般就是app module，其他module会以jar文件。这里判断下app module是否支持插件
-            if (p.plugins.hasPlugin("com.tencent.wesing.background") && p.backgroundPluginConfig.isOpen) {
+            LogUtil.logI(TAG, "mProject hasPlugin: ${mProject.plugins.hasPlugin("com.tencent.wesing.background")}  isOpen: ${mProject.hasProperty("backgroundPluginConfig") ?  mProject.backgroundPluginConfig.isOpen : false}")
+            if (mProject.plugins.hasPlugin("com.tencent.wesing.background") && mProject.backgroundPluginConfig.isOpen) {
                 input.directoryInputs.each { DirectoryInput directoryInput ->
                     processDirectoryInputs(directoryInput, mOutputProvider, isIncremental)
                 }

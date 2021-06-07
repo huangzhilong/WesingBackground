@@ -1,5 +1,10 @@
 package com.tencent.wesing.background.lib.bean;
+import android.os.Build;
+import android.os.Looper;
+import android.os.MessageQueue;
 import android.util.Log;
+
+import com.tencent.wesing.background.lib.R;
 
 import java.util.HashMap;
 
@@ -30,8 +35,17 @@ public class TMEBackgroundMap {
      */
     public static void startParseAttribute() {
         isDisable = true;
-        initGradientDrawable();
-        isDisable = false;
+        Looper.myQueue().addIdleHandler(() -> {
+            //主线程空闲时解析attribute
+            new Thread(() -> {
+                Log.i(TAG, "start init initGradientDrawable");
+                long startTime = System.currentTimeMillis();
+                initGradientDrawable();
+                Log.i(TAG, "end init initGradientDrawable costTime: " + (System.currentTimeMillis() - startTime) + "  mapSize: " + mBackgroundAttributeMap.size());
+                isDisable = false;
+            }).start();
+            return false;
+        });
     }
 
 

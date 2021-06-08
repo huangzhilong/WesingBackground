@@ -21,6 +21,7 @@ class MyWorkerExecutor implements WorkerExecutor {
 
     private static final BACKGROUND_TAG = "android:background"
     private static final DRAWABLE_TAG = "@drawable/"
+    private static final CUSTOM_APP_TAG = "wesingBackground"
 
     private WorkerExecutor mWorkerExecutor
     private Project mProject
@@ -161,12 +162,7 @@ class MyWorkerExecutor implements WorkerExecutor {
 
     private void hookAndroidBackground(CompileResourceRequest request) {
         boolean needCheckInclude = true  //检查是否需要添加头
-        String customTag = ""
-        File file = new File(mResDir)
-        if (!file.exists()) {
-            file.mkdirs()
-        }
-        File tempLayout = new File(mResDir + File.separator + request.inputFile.name)
+        boolean needHookFile = false
         byte[] contentByte = request.inputFile.readBytes()
         if (contentByte == null || contentByte.size() == 0) {
             LogUtil.logI(TAG, "hookAndroidBackground ${request.inputFile.path} contentByte is empty!!")
@@ -176,6 +172,7 @@ class MyWorkerExecutor implements WorkerExecutor {
         int index = 0
         // 查找android:background属性
         while ((index = content.indexOf(BACKGROUND_TAG, index)) > 0) {
+            needHookFile = true
             //往后面找两个"号，就是完整的一句background属性啦
             int endIndex = index + BACKGROUND_TAG.length()
             int count = 0
@@ -194,39 +191,28 @@ class MyWorkerExecutor implements WorkerExecutor {
                     break
                 }
             }
-            //是drawable的background且已经解析到了的shape
+            //是drawable的background
             if (!BackgroundUtil.isEmpty(value) && !BackgroundUtil.isEmpty(attribute) && value.contains(DRAWABLE_TAG)) {
                 String drawableName = value.substring(value.indexOf(DRAWABLE_TAG) + DRAWABLE_TAG.length())
                 if (needCheckInclude) {
                     needCheckInclude = false
-                    //查找有没有 xmlns:app="http://schemas.android.com/apk/res-auto"
-                    int autoIndex = content.indexOf("http://schemas.android.com/apk/res-auto")
-                    if (autoIndex > 0) {
-                        //有，把tag拿出来
-                        String startTag = "xmlns:"
-                        int startTagIndex = content.lastIndexOf(startTag, autoIndex)
-                        int equalsTagIndex = content.lastIndexOf("=", autoIndex)
-                        if (startTagIndex > 0 && equalsTagIndex > 0 && equalsTagIndex > startTagIndex) {
-                            customTag = content.substring(startTagIndex, equalsTagIndex - 1).replaceAll(" ", "")
-                        } else {
-                            //解析失败需要自己添加
-                            customTag = "app1"
-                            content = addCustomTagToXml(content, customTag)
-                        }
-                    } else {
-                        //没有需要自己添加
-                        customTag = "app1"
-                        content = addCustomTagToXml(content, customTag)
-                    }
+                    content = addCustomTagToXml(content, CUSTOM_APP_TAG)
                 }
-                String newAttribute = "$customTag:tme_background=\"@drawable/$drawableName\""
+                String newAttribute = "$CUSTOM_APP_TAG:tme_background=\"@drawable/$drawableName\""
                 LogUtil.logI(TAG, "hookAndroidBackground inputName: ${request.inputFile.name}  attribute: $attribute  value: $value  newAttribute: $newAttribute ")
                 content = content.replaceAll(attribute, newAttribute)
             }
             index++ //加一查找下一个
         }
+        if (!needHookFile) {
+            return
+        }
+        File file = new File(mResDir)
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+        File tempLayout = new File(mResDir + File.separator + request.inputFile.name)
         tempLayout.write(content)
-
 
         //反射修改成修改后的文件
         try {

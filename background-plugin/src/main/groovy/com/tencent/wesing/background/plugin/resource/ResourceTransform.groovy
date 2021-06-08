@@ -34,6 +34,7 @@ class ResourceTransform extends Transform {
     private List<String> mProjectNameList = new ArrayList<>()
     private Project mProject
     private JarInput mBackgroundLibJar
+    private boolean appModuleSupportPlugin = false  //application module是否支持该插件
 
     void setProject(Project project) {
         mProject = project
@@ -47,7 +48,7 @@ class ResourceTransform extends Transform {
             if (p.name == p.rootProject.name) {
                 continue
             }
-            if (!p.plugins.hasPlugin("com.tencent.wesing.background") || !p.backgroundPluginConfig.isOpen) {
+            if (!isSupportPlugin(p)) {
                 continue
             }
             mProjectNameList.add(p.name)
@@ -65,6 +66,12 @@ class ResourceTransform extends Transform {
         return false
     }
 
+    private boolean isSupportPlugin(Project p) {
+        if (p.plugins.hasPlugin("com.tencent.wesing.background") && p.backgroundPluginConfig.isOpen) {
+            return true
+        }
+        return false
+    }
 
     @Override
     String getName() {
@@ -90,7 +97,8 @@ class ResourceTransform extends Transform {
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         generateProjectList()
-        LogUtil.logI(TAG, "start doTransform  isIncremental: ${transformInvocation.isIncremental()}")
+        appModuleSupportPlugin = isSupportPlugin(mProject)
+        LogUtil.logI(TAG, "start doTransform  appModuleSupportPlugin: $appModuleSupportPlugin  isIncremental: ${transformInvocation.isIncremental()}")
         doTransform(transformInvocation)
         afterTransform(transformInvocation)
     }
@@ -113,11 +121,8 @@ class ResourceTransform extends Transform {
             }
 
             //处理源码文件，一般就是app module，其他module会以jar文件。这里判断下app module是否支持插件
-            LogUtil.logI(TAG, "mProject hasPlugin: ${mProject.plugins.hasPlugin("com.tencent.wesing.background")}  isOpen: ${mProject.hasProperty("backgroundPluginConfig") ?  mProject.backgroundPluginConfig.isOpen : false}")
-            if (mProject.plugins.hasPlugin("com.tencent.wesing.background") && mProject.backgroundPluginConfig.isOpen) {
-                input.directoryInputs.each { DirectoryInput directoryInput ->
-                    processDirectoryInputs(directoryInput, mOutputProvider, isIncremental)
-                }
+            input.directoryInputs.each { DirectoryInput directoryInput ->
+                processDirectoryInputs(directoryInput, mOutputProvider, isIncremental)
             }
         }
     }
@@ -169,7 +174,7 @@ class ResourceTransform extends Transform {
             JarZipUtils.unzipJarZip(jarInput.file.absolutePath, unzipTmp)
             File f = new File(unzipTmp)
 
-            eachFileToDirectory(jarInput.name, f)
+            eachFileToDirectory(jarInput.name, f, true)
 
             //修改完再压缩生成jar再copy到输出目录
             JarZipUtils.zipJarZip(unzipTmp, dest.absolutePath)
@@ -208,7 +213,7 @@ class ResourceTransform extends Transform {
                     case Status.ADDED:
                     case Status.CHANGED:
                         //操作修改对输入file，然后copy到输出目录
-                        onHandleDirectoryEachFile(directoryInput.name, file)
+                        onHandleDirectoryEachFile(directoryInput.name, file, false)
                         FileUtils.copyFile(file, destFile)
                         break
                     default:
@@ -217,12 +222,12 @@ class ResourceTransform extends Transform {
             }
         } else {
             //遍历操作每个文件再进行copy的输出目录
-            eachFileToDirectory(directoryInput.name, directoryInput.file)
+            eachFileToDirectory(directoryInput.name, directoryInput.file, false)
             FileUtils.copyDirectory(directoryInput.file, dest)
         }
     }
 
-    private void eachFileToDirectory(String name, File file) {
+    private void eachFileToDirectory(String name, File file, boolean isJarInput) {
         if (file == null || !file.exists()) {
             return
         }
@@ -231,18 +236,18 @@ class ResourceTransform extends Transform {
             for (int i = 0; i < fileList.length; i++) {
                 File subFile = fileList[i]
                 if (subFile.isDirectory()) {
-                    eachFileToDirectory(name, subFile)
+                    eachFileToDirectory(name, subFile, isJarInput)
                 } else {
-                    onHandleDirectoryEachFile(name, subFile)
+                    onHandleDirectoryEachFile(name, subFile, isJarInput)
                 }
             }
         } else {
-            onHandleDirectoryEachFile(name, file)
+            onHandleDirectoryEachFile(name, file, isJarInput)
         }
     }
 
 
-    private void onHandleDirectoryEachFile(String name, File file) {
+    private void onHandleDirectoryEachFile(String name, File file, boolean isJarInput) {
         String fileName = file.name
         if (!fileName.endsWith(".class") || fileName.endsWith("R.class") || fileName.endsWith("BuildConfig.class")
                 || fileName.contains("R\$")) {
@@ -263,8 +268,8 @@ class ResourceTransform extends Transform {
             //插入
             handleInsertBackgroundLibMap(file)
         } else {
-            //不是mBackgroundLibJar的进行hook
-            if (mBackgroundLibJar == null || name != mBackgroundLibJar.name) {
+            // 项目module（除app其他module会以jar :BModule  classes.jar 形式 且支持该插件的 或  主app module支持该插件（主app插件是以文件夹）
+            if ((isJarInput && isSubProjectLib(name)) || (!isJarInput && appModuleSupportPlugin)) {
                 AmsUtil.doHookCodeCreateDrawable(file)
             }
         }

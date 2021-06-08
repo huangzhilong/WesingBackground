@@ -28,7 +28,7 @@ class ResourceTransform extends Transform {
 
 
     private final static String TAG = "ResourceTransform"
-    private final static String TME_BACKGROUND_LIB_NAME = "background-lib" //属性map的值
+    private final static String TME_BACKGROUND_LIB_NAME = "com.tencent.wesing:wesingBackgroundLib" //属性map的值
 
     private List<AttributeInfo> mParseShapeXmlAttributeList = new ArrayList<>()
     private List<String> mProjectNameList = new ArrayList<>()

@@ -487,7 +487,7 @@ public class GradientDrawableInfo {
         //默认值
         mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
         if (angle >= 0) {
-            angle %= 360;
+            angle = ((angle % 360) + 360) % 360;
             // 取整
             switch (angle) {
                 case 0:

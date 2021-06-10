@@ -26,7 +26,7 @@ class JarZipUtils {
             AntBuilder antBuilder = new AntBuilder()
             antBuilder.unzip(src: zipFilePath, dest: tmpDir, overwrite: true)
         } catch (Exception e) {
-            LogUtil.log(TAG, "unzipJarZip error: %s", zipFilePath)
+            LogUtil.logI(TAG, "unzipJarZip path: $zipFilePath  ex: $e")
         } finally {
             if (file != null) {
                 file.close()

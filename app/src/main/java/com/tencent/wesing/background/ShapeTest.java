@@ -2,11 +2,14 @@ package com.tencent.wesing.background;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
 
 import androidx.core.content.ContextCompat;
 
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
+import com.tencent.wesing.background.lib.bean.GradientDrawableInfo;
 import com.tencent.wesing.background.lib.drawable.TMEBackgroundDrawableFactory;
+import com.tencent.wesing.test.library.AppInfo;
 
 import java.util.HashMap;
 
@@ -16,60 +19,44 @@ import java.util.HashMap;
 
 class ShapeTest {
 
+    private GradientDrawableInfo info = new GradientDrawableInfo();
+    private AppInfo appInfo = new AppInfo();
 
-    private final static HashMap<Integer, Object> mBackgroundAttributeMap = new HashMap<>();
-
-
-    public static final Object[] param1  = { 1, 2, 3, 4, 6, 7, "shape_text_2.xml", "dither", R.bool.yes};
-
-
+    private Context mContext = TMEBackgroundContext.getContext();
     public Drawable drawable = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher);
+    public Drawable drawableA = mContext.getResources().getDrawable(R.drawable.ic_launcher);
 
 
-    public static final Object[] param2  = { 24444, "shape_text_3.xml", "shape"};
-    public static final Object[] param4  = { 24444, "shape_text_3.xml", "shape",222};
-    public static final Object[] param3  = { 24444, "shape_text_3.xml", "shape", 111, 555};
-    public static final Object[] param6  = { 24444, "shape_text_3.xml", "shape", 111, 555, 233344};
-    public static final Object[] param7  = { 24444, "shape_text_3.xml", "shape", 111, 555,4444, 5555};
+    public Drawable drawable1 = ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.ic_launcher);
+    public Drawable drawable1A = ContextCompat.getDrawable(mContext, R.drawable.ic_launcher);
 
-
-    public static final Object[] test = {"ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk", "ffhfh", R.id.btn_send_gift, "kfkfk","ffhfh", R.id.btn_send_gift, "kfkfk"};
-
-
-    public static void  initData() {
-        Integer id = 2113456777;
-        Object[] param888  = { 24444, "shape_text_3.xml", "shape", 111, 555,4444, 5555};
-        mBackgroundAttributeMap.put(id, param888);
-        mBackgroundAttributeMap.put(66666666, param888);
-    }
+    private ImageView imageView = new ImageView(mContext);
 
 
     public void testDrawable() {
-        Context context = TMEBackgroundContext.getContext();
-        Drawable drawable = TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.ic_launcher); int yy = 222;
-        int kk = 2;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             Drawable drawable1 = TMEBackgroundContext.getContext().getResources()
                     .getDrawable(R.drawable.ic_launcher, TMEBackgroundContext.getContext().getTheme());
-            Drawable ll = context.getDrawable(R.drawable.shape_ring);
+            Drawable test1 = mContext.getDrawable(R.drawable.shape_ring);
+            Drawable test1A = TMEBackgroundContext.getContext().getDrawable(R.drawable.shape_ring);
         }
-        int k;
-        String hh;
-        String jj= "eyyeye";
-        String kk1 = "11223";
+        Drawable drawable1k = TMEBackgroundContext.getContext()
+                .getResources()
+                .getDrawable(R.drawable.ic_launcher);
         Drawable drawable2 = ContextCompat
-                .getDrawable(context, R.drawable.ic_launcher);
+                .getDrawable(mContext, R.drawable.ic_launcher);
         Drawable drawable3 = ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.shape_ring);
+
+        imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.shape_ring));
+        imageView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.shape_ring));
+        imageView.setImageDrawable(ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.shape_ring));
     }
 
-
-    private final static HashMap<Integer, GradientDrawableInfo> mGradientDrawableMap = new HashMap<>();
-
-
-    public static void initGradientDrawable() {
-        Object[] param888  = { 24444, "shape_text_3.xml", "shape", 111, 555,4444, 5555};
-        mGradientDrawableMap.put(2535336, new GradientDrawableInfo(param888));
-    }
-
+    //不支持的：
+    /**  java.lang.ArrayIndexOutOfBoundsException: 0
+     *   holder?.avatarView?.setImageDrawable(ContextCompat.getDrawable(Global.getContext(), R.drawable.party_pictureframe_empty))
+     *   holder.avatarView?.setImageDrawable(Global.getResources().getDrawable(R.drawable.party_emptystate_participants))
+     *   context.getDrawable(R.drawable.shape_ring)
+     */
 
 }

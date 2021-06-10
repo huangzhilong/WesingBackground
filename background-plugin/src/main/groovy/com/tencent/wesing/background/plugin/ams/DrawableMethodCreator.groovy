@@ -10,51 +10,61 @@ import org.objectweb.asm.tree.MethodInsnNode
 
 class DrawableMethodCreator {
 
-    private static final List<DrawableEntity> DRAWABLE_LIST = new ArrayList<>()
-    private static DrawableEntity TARGET_DRAWABLE = null
+    private static DrawableEntity CONTEXT_COMPAT_DRAWABLE
+    private static DrawableEntity RESOURCE_DRAWABLE
 
-    private static initDrawableList() {
-        DrawableEntity resDrawableEntity = new DrawableEntity()
-        resDrawableEntity.opcode = Opcodes.INVOKEVIRTUAL
-        resDrawableEntity.owner = "android/content/res/Resources"
-        resDrawableEntity.name = "getDrawable"
-        resDrawableEntity.desc = "(I)Landroid/graphics/drawable/Drawable;"
-        DRAWABLE_LIST.add(resDrawableEntity)
+    static {
+        //用于替换ContextCompat.getDrawable
+        CONTEXT_COMPAT_DRAWABLE = new DrawableEntity()
+        CONTEXT_COMPAT_DRAWABLE.name = "createDrawableById"
+        CONTEXT_COMPAT_DRAWABLE.opcode = Opcodes.INVOKESTATIC
+        CONTEXT_COMPAT_DRAWABLE.owner = "com/tencent/wesing/background/lib/drawable/TMEBackgroundDrawableFactory"
+        CONTEXT_COMPAT_DRAWABLE.desc = "(Landroid/content/Context;I)Landroid/graphics/drawable/Drawable;"
 
-        DrawableEntity compatDrawableEntity = new DrawableEntity()
-        compatDrawableEntity.opcode = Opcodes.INVOKESTATIC
-        compatDrawableEntity.owner = "androidx/core/content/ContextCompat"
-        compatDrawableEntity.name = "getDrawable"
-        compatDrawableEntity.desc = "(Landroid/content/Context;I)Landroid/graphics/drawable/Drawable;"
-        DRAWABLE_LIST.add(compatDrawableEntity)
+        //用于替换 mContext.getResources().getDrawable   mContext.getDrawable
+        RESOURCE_DRAWABLE = new DrawableEntity()
+        RESOURCE_DRAWABLE.name = "createDrawableById"
+        RESOURCE_DRAWABLE.opcode = Opcodes.INVOKESTATIC
+        RESOURCE_DRAWABLE.owner = "com/tencent/wesing/background/lib/drawable/TMEBackgroundDrawableFactory"
+        RESOURCE_DRAWABLE.desc = "(I)Landroid/graphics/drawable/Drawable;"
     }
 
-    static boolean isDrawableMethodCreator(MethodInsnNode node) {
+    static DrawableEntity getContextCompatDrawable() {
+        return CONTEXT_COMPAT_DRAWABLE
+    }
+
+    static DrawableEntity getResourceDrawable() {
+        return RESOURCE_DRAWABLE
+    }
+
+    static boolean isContextCompatDrawable(MethodInsnNode node) {
         if (node == null) {
             return false
         }
-        if (DRAWABLE_LIST.isEmpty()) {
-            initDrawableList()
-        }
-        for (int i = 0; i < DRAWABLE_LIST.size(); i++) {
-            DrawableEntity entity = DRAWABLE_LIST.get(i)
-            if (node.opcode == entity.opcode && node.name == entity.name && node.owner == entity.owner && node.desc == entity.desc) {
-                return true
-            }
+        if (Opcodes.INVOKESTATIC == node.opcode && "getDrawable" == node.name && "androidx/core/content/ContextCompat" == node.owner && "(Landroid/content/Context;I)Landroid/graphics/drawable/Drawable;" == node.desc) {
+            return true
         }
         return false
     }
 
 
-    static DrawableEntity getTargetDrawableEntityList() {
-        if (TARGET_DRAWABLE == null) {
-            DrawableEntity instanceDrawable = new DrawableEntity()
-            instanceDrawable.opcode = Opcodes.INVOKESTATIC
-            instanceDrawable.name = "createDrawableById"
-            instanceDrawable.owner = "com/tencent/wesing/background/lib/drawable/TMEBackgroundDrawableFactory"
-            instanceDrawable.desc = "(I)Landroid/graphics/drawable/Drawable;"
-            TARGET_DRAWABLE = instanceDrawable
+    static boolean isResourceDrawable(MethodInsnNode node) {
+        if (node == null) {
+            return false
         }
-        return TARGET_DRAWABLE
+        if (Opcodes.INVOKEVIRTUAL == node.opcode && "getDrawable" == node.name && "android/content/res/Resources" == node.owner && "(I)Landroid/graphics/drawable/Drawable;" == node.desc) {
+            return true
+        }
+        return false
+    }
+
+    static boolean isContextDrawable(MethodInsnNode node) {
+        if (node == null) {
+            return false
+        }
+        if (Opcodes.INVOKEVIRTUAL == node.opcode && "getDrawable" == node.name && "android/content/Context" == node.owner && "(I)Landroid/graphics/drawable/Drawable;" == node.desc) {
+            return true
+        }
+        return false
     }
 }

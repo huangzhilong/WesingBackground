@@ -62,6 +62,7 @@ class AmsUtil {
     static void doHookCodeCreateDrawable(File f) {
         try {
             boolean isHook = false
+            LogUtil.logI(TAG, "onHookCodeCreateDrawable111 fileName: ${f.absolutePath}")
             FileInputStream fis = new FileInputStream(f)
             ClassReader classReader = new ClassReader(fis)
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
@@ -73,38 +74,36 @@ class AmsUtil {
                 if (node == null || node.instructions == null || node.instructions.iterator() == null) {
                     continue
                 }
+                List<AbstractInsnNode> mLineList = new ArrayList<>()
                 AbstractInsnNode[] abstractInsnNodeList = node.instructions.toArray()
-                //需要用行数来区分getDrawable方法，如 TMEBackgroundContext.getContext().getResources().getDrawable(2131165295);
-                // 会有3个MethodInsnNode
-                // getContext  com/tencent/wesing/background/lib/TMEBackgroundContext  ()Landroid/content/Context;   5
-                // getResources  android/content/Context  ()Landroid/content/res/Resources;   5
-                // getDrawable  android/content/res/Resources  (I)Landroid/graphics/drawable/Drawable;   5
-
-                List<MethodInsnNode> MethodInsnNodeList = new ArrayList<>()
-                boolean isDrawableMethodCreator = false
-
                 for (int i = 0; i < abstractInsnNodeList.length; i++) {
                     AbstractInsnNode abstractInsnNode = abstractInsnNodeList[i]
+                    mLineList.add(abstractInsnNode)
                     if (abstractInsnNode instanceof MethodInsnNode) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode
-                        if (DrawableMethodCreator.isDrawableMethodCreator(methodInsnNode)) {
-                            isDrawableMethodCreator = true
-                        }
-                        MethodInsnNodeList.add(methodInsnNode)
-                    } else if (abstractInsnNode instanceof LineNumberNode) {
-                        if (!MethodInsnNodeList.isEmpty() && isDrawableMethodCreator) {
+                        // hook ContextCompatDrawable
+                        if (DrawableMethodCreator.isContextCompatDrawable(methodInsnNode)) {
+                            DrawableEntity compatDrawableEntity = DrawableMethodCreator.getContextCompatDrawable()
+                            methodInsnNode.opcode = compatDrawableEntity.opcode
+                            methodInsnNode.desc = compatDrawableEntity.desc
+                            methodInsnNode.name = compatDrawableEntity.name
+                            methodInsnNode.owner = compatDrawableEntity.owner
                             isHook = true
-                            hookDrawable(MethodInsnNodeList, node.instructions)
                         }
-                        isDrawableMethodCreator = false
-                        MethodInsnNodeList.clear()
+                    } else if (abstractInsnNode instanceof LineNumberNode)  {
+                        if (!mLineList.isEmpty()) {
+                            if (onHandleLineListNode(mLineList, node.instructions)) {
+                                isHook = true
+                            }
+                        }
+                        mLineList.clear()
                     }
                 }
-                if (!MethodInsnNodeList.isEmpty() && isDrawableMethodCreator) {
-                    isHook = true
-                    hookDrawable(MethodInsnNodeList, node.instructions)
-                    isDrawableMethodCreator = false
-                    MethodInsnNodeList.clear()
+                if (!mLineList.isEmpty()) {
+                    if(onHandleLineListNode(mLineList, node.instructions)) {
+                        isHook = true
+                    }
+                    mLineList.clear()
                 }
             }
             if (isHook) {
@@ -123,20 +122,40 @@ class AmsUtil {
         }
     }
 
-    private static void hookDrawable(List<MethodInsnNode> nodeList, InsnList instructions) {
-        if (nodeList == null || nodeList.isEmpty()) {
-            return
+    private static boolean onHandleLineListNode(List<AbstractInsnNode> mLineList, InsnList instructions) {
+        if (mLineList.isEmpty()) {
+            return false
         }
-        DrawableEntity targetDrawableEntityList = DrawableMethodCreator.getTargetDrawableEntityList()
-        //留下最后一个
-        for (int i = 0; i < nodeList.size() - 1; i++) {
-            MethodInsnNode methodInsnNode = nodeList.get(i)
-            instructions.remove(methodInsnNode)
+        int getDrawableIndex = -1
+        for (int i = 0; i < mLineList.size(); i++) {
+            AbstractInsnNode abstractInsnNode = mLineList.get(i)
+            if (abstractInsnNode instanceof MethodInsnNode) {
+                MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode
+                if (DrawableMethodCreator.isResourceDrawable(methodInsnNode)) {
+                    getDrawableIndex = i
+                    break
+                }
+            }
         }
-        MethodInsnNode lastMethodInsnNode = nodeList.get(nodeList.size() - 1)
-        lastMethodInsnNode.name = targetDrawableEntityList.name
-        lastMethodInsnNode.desc = targetDrawableEntityList.desc
-        lastMethodInsnNode.opcode = targetDrawableEntityList.opcode
-        lastMethodInsnNode.owner = targetDrawableEntityList.owner
+        //把getDrawable上面的getResource以及getContext去除(使用变量的不会有),再把getDrawable替换成自己的
+        if (getDrawableIndex > 0) {
+            MethodInsnNode drawableInsnNode = (MethodInsnNode) mLineList.get(getDrawableIndex)
+            DrawableEntity drawableEntity = DrawableMethodCreator.getResourceDrawable()
+            drawableInsnNode.opcode = drawableEntity.opcode
+            drawableInsnNode.name = drawableEntity.name
+            drawableInsnNode.owner = drawableEntity.owner
+            drawableInsnNode.desc = drawableEntity.desc
+            for (int i = 0; i < getDrawableIndex; i++) {
+                AbstractInsnNode abstractInsnNode = mLineList.get(i)
+                if (abstractInsnNode instanceof MethodInsnNode) {
+                    MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode
+                    if (methodInsnNode.desc == "()Landroid/content/res/Resources;" || methodInsnNode.desc == "()Landroid/content/Context;") {
+                        instructions.remove(methodInsnNode)
+                    }
+                }
+            }
+            return true
+        }
+        return false
     }
 }

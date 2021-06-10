@@ -1,5 +1,6 @@
 package com.tencent.wesing.background.lib.drawable;
 
+import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -136,6 +137,13 @@ public class TMEBackgroundDrawableFactory {
             // 找不到字节码属性用系统获取
             return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
         }
+    }
+
+    /**
+     * 别删除， hook字节码使用得到
+     */
+    public static Drawable createDrawableById(Context context, int drawableId) {
+        return createDrawableById(drawableId);
     }
 
 

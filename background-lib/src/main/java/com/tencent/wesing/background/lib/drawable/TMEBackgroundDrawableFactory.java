@@ -39,7 +39,8 @@ public class TMEBackgroundDrawableFactory {
         return SingleHolder.mFactory;
     }
 
-    private LruCache<Integer, Drawable> mCacheDrawable = new LruCache<>(20);
+    private LruCache<Integer, Drawable> mCacheDrawable = new LruCache<>(10);
+    private LruCache<GradientDrawableInfo, Drawable> mAttributeDrawableMap = new LruCache<>(10);
 
     public Drawable getNeedGradientDrawable(TypedArray ta) {
         //优先使用drawableId
@@ -115,8 +116,16 @@ public class TMEBackgroundDrawableFactory {
                     gradientDrawableInfo.dashGap = ta.getDimension(attr, 0);
                 }
             }
+            Drawable cacheDrawable = mAttributeDrawableMap.get(gradientDrawableInfo);
+            if (cacheDrawable != null) {
+                return cacheDrawable;
+            }
             gradientDrawableInfo.parseAttribute();
-            return createDrawableByGradientInfo(gradientDrawableInfo);
+            cacheDrawable = createDrawableByGradientInfo(gradientDrawableInfo);
+            if (cacheDrawable != null) {
+                mAttributeDrawableMap.put(gradientDrawableInfo, cacheDrawable);
+            }
+            return cacheDrawable;
         }
         return null;
     }

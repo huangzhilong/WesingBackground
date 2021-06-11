@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SecondActivity!!!!!"/>
+
+    <TextView
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        app:tme_solid_color="#333333"
+        app:tme_shape="rectangle"
+        app:tme_corners_radius="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World22222222!"/>
+
+
+    <TextView
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        app:tme_solid_color="#333333"
+        app:tme_corners_radius="6dp"
+        android:layout_height="wrap_content"
+        android:text="Hello World33333333"/>
+
+    <TextView
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        app:tme_solid_color="@color/test_color"
+        app:tme_shape="rectangle"
+        app:tme_corners_radius="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World444444444"/>
+
+
+    <TextView
+        app:tme_solid_color="@color/test_color"
+        app:tme_shape="rectangle"
+        app:tme_corners_radius="6dp"
+        app:tme_padding_left="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World55555555"/>
+
+</LinearLayout>

@@ -55,7 +55,7 @@ class TMEBackgroundFactory implements LayoutInflater.Factory2 {
             return view;
         }
         Drawable drawable = TMEBackgroundDrawableFactory.getInstance().getNeedGradientDrawable(ta);
-        if (drawable != null) {
+        if (drawable != null && view != null) {
             view.setBackground(drawable);
         }
         ta.recycle();

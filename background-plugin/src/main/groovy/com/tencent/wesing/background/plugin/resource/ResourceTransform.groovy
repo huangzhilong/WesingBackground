@@ -167,7 +167,7 @@ class ResourceTransform extends Transform {
     private void doTransformJar(JarInput jarInput, File dest) {
         // 只处理本项目的project
         if (isSubProjectLib(jarInput.name) || jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
-            LogUtil.logI(TAG, "start doTransformJar jar: ${jarInput.name}")
+            LogUtil.logI(TAG, "start doTransformJar support jar: ${jarInput.name}")
             String unzipTmp = "${mProject.getBuildDir().absolutePath}${File.separator}tmp${File.separator}" + getName()
             unzipTmp = "${unzipTmp}${File.separator}${jarInput.name.replace(':', '')}"
 
@@ -293,6 +293,8 @@ class ResourceTransform extends Transform {
                     mBackgroundLibJar.getScopes(),
                     Format.JAR)
             doTransformJar(mBackgroundLibJar, dest)
+        } else {
+            LogUtil.logI(TAG, "afterTransform not find mBackgroundLibJar!!")
         }
     }
 }

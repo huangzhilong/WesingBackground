@@ -15,7 +15,11 @@ class  MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.tv_btn).setOnClickListener {
             jump()
         }
-        test()
+        window.decorView.postDelayed(object : Runnable {
+            override fun run() {
+                test()
+            }
+        }, 5000)
     }
 
     private fun jump() {
@@ -32,13 +36,5 @@ class  MainActivity : AppCompatActivity() {
         var codeDrawable = TMEBackgroundDrawableFactory.createDrawableById(R.drawable.shape_text_2)
         Log.i("longpo", " no cache codeDrawable cost time: " + (System.nanoTime() - startTime))
 
-
-        startTime = System.nanoTime()
-        xmlDrawable = resources.getDrawable(R.drawable.shape_text_2)
-        Log.i("longpo", " has cache codeDrawable cost time: " + (System.nanoTime() - startTime))
-
-        startTime = System.nanoTime()
-        codeDrawable = TMEBackgroundDrawableFactory.createDrawableById(R.drawable.shape_text_2)
-        Log.i("longpo", " has cache codeDrawable cost time: " + (System.nanoTime() - startTime))
     }
 }

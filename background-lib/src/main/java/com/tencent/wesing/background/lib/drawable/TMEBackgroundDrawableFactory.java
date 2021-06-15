@@ -40,22 +40,15 @@ public class TMEBackgroundDrawableFactory {
     }
 
     private LruCache<Integer, Drawable> mCacheDrawable = new LruCache<>(10);
-    private LruCache<GradientDrawableInfo, Drawable> mAttributeDrawableMap = new LruCache<>(10);
+    private LruCache<GradientDrawableInfo, Drawable> mAttributeDrawableCacheMap = new LruCache<>(10);
 
+    // xml属性解析过来的
     public Drawable getNeedGradientDrawable(TypedArray ta) {
         //优先使用drawableId
         if (ta.hasValue(R.styleable.TMEBackground_tme_background)) {
             int drawableId = ta.getResourceId(R.styleable.TMEBackground_tme_background, View.NO_ID);
             if (drawableId > 0) {
-                Drawable cache = mCacheDrawable.get(drawableId);
-                if (cache != null) {
-                    return cache;
-                }
-                Drawable drawable = createDrawableById(drawableId);
-                if (drawable != null) {
-                    mCacheDrawable.put(drawableId, drawable);
-                }
-                return drawable;
+                return createDrawableById(drawableId);
             }
         } else  {
             //使用自定义属性
@@ -116,21 +109,28 @@ public class TMEBackgroundDrawableFactory {
                     gradientDrawableInfo.dashGap = ta.getDimension(attr, 0);
                 }
             }
-            Drawable cacheDrawable = mAttributeDrawableMap.get(gradientDrawableInfo);
+            Drawable cacheDrawable = mAttributeDrawableCacheMap.get(gradientDrawableInfo);
             if (cacheDrawable != null) {
                 return cacheDrawable;
             }
             gradientDrawableInfo.parseAttribute();
             cacheDrawable = createDrawableByGradientInfo(gradientDrawableInfo);
             if (cacheDrawable != null) {
-                mAttributeDrawableMap.put(gradientDrawableInfo, cacheDrawable);
+                mAttributeDrawableCacheMap.put(gradientDrawableInfo, cacheDrawable);
             }
             return cacheDrawable;
         }
         return null;
     }
 
+    /**
+     *  代码中使用，通过Id。用户字节码替换代码的drawable获取
+     */
     public static Drawable createDrawableById(int drawableId) {
+        Drawable cache = getInstance().mCacheDrawable.get(drawableId);
+        if (cache != null) {
+            return cache;
+        }
         if (TMEBackgroundMap.getBackgroundAttributeMap() == null) {
             return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
         }
@@ -141,6 +141,7 @@ public class TMEBackgroundDrawableFactory {
         // 当前只解析GradientDrawable
         GradientDrawable drawable = getInstance().createDrawableByGradientInfo(gradientDrawableInfo);
         if (drawable != null) {
+            getInstance().mCacheDrawable.put(drawableId, drawable);
             return drawable;
         } else {
             // 找不到字节码属性用系统获取

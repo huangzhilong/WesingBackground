@@ -43,20 +43,11 @@ class ShapeTest {
         Drawable drawable1k = TMEBackgroundContext.getContext()
                 .getResources()
                 .getDrawable(R.drawable.ic_launcher);
-        Drawable drawable2 = ContextCompat
-                .getDrawable(mContext, R.drawable.ic_launcher);
+        Drawable drawable2 = ContextCompat.getDrawable(mContext, R.drawable.ic_launcher);
         Drawable drawable3 = ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.shape_ring);
 
         imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.shape_ring));
         imageView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.shape_ring));
         imageView.setImageDrawable(ContextCompat.getDrawable(TMEBackgroundContext.getContext(), R.drawable.shape_ring));
     }
-
-    //不支持的：
-    /**  java.lang.ArrayIndexOutOfBoundsException: 0
-     *   holder?.avatarView?.setImageDrawable(ContextCompat.getDrawable(Global.getContext(), R.drawable.party_pictureframe_empty))
-     *   holder.avatarView?.setImageDrawable(Global.getResources().getDrawable(R.drawable.party_emptystate_participants))
-     *   context.getDrawable(R.drawable.shape_ring)
-     */
-
 }

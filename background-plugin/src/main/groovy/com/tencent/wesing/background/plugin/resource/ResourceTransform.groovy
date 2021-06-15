@@ -20,6 +20,14 @@ import com.tencent.wesing.background.plugin.util.JarZipUtils
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Project
 
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.compress.utils.IOUtils
+
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+import java.util.jar.JarOutputStream
+import java.util.zip.ZipEntry
+
 /**
  * create by zlonghuang on 2021/4/21
  **/
@@ -91,7 +99,7 @@ class ResourceTransform extends Transform {
 
     @Override
     boolean isIncremental() {
-        return false
+        return true
     }
 
     @Override
@@ -149,7 +157,7 @@ class ResourceTransform extends Transform {
                     if (jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
                         mBackgroundLibJar = jarInput
                     } else {
-                        doTransformJar(jarInput, dest)
+                        doTransformJar(jarInput, dest, outputProvider)
                     }
                     break
                 default:
@@ -159,25 +167,54 @@ class ResourceTransform extends Transform {
             if (jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
                 mBackgroundLibJar = jarInput
             } else {
-                doTransformJar(jarInput, dest)
+                doTransformJar(jarInput, dest, outputProvider)
             }
         }
     }
 
-    private void doTransformJar(JarInput jarInput, File dest) {
-        // 只处理本项目的project
+    private void doTransformJar(JarInput jarInput, File dest, TransformOutputProvider outputProvider) {
+        // 只处理本项目的project以及 用于插入xml 属性的lib库
         if (isSubProjectLib(jarInput.name) || jarInput.name.contains(TME_BACKGROUND_LIB_NAME)) {
             LogUtil.logI(TAG, "start doTransformJar support jar: ${jarInput.name}")
-            String unzipTmp = "${mProject.getBuildDir().absolutePath}${File.separator}tmp${File.separator}" + getName()
-            unzipTmp = "${unzipTmp}${File.separator}${jarInput.name.replace(':', '')}"
-
-            JarZipUtils.unzipJarZip(jarInput.file.absolutePath, unzipTmp)
-            File f = new File(unzipTmp)
-
-            eachFileToDirectory(jarInput.name, f, true)
-
-            //修改完再压缩生成jar再copy到输出目录
-            JarZipUtils.zipJarZip(unzipTmp, dest.absolutePath)
+            //重命名输出文件，避免同名覆盖
+            String jarName = jarInput.name
+            String md5Name = DigestUtils.md5Hex(jarInput.file.absolutePath)
+            if (jarName.endsWith(".jar")) {
+                jarName = jarName.substring(0, jarName.length - 4)
+            }
+            JarFile jarFile = new JarFile(jarInput.file)
+            Enumeration<JarEntry> enumeration = jarFile.entries()
+            File tmpFile = new File(jarInput.file.parent + File.separator + "class_tmp.jar")
+            if (tmpFile.exists()) {
+                tmpFile.delete()
+            }
+            JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(tmpFile))
+            //保存
+            while (enumeration.hasMoreElements()) {
+                JarEntry jarEntry = (JarEntry) enumeration.nextElement()
+                String entryName = jarEntry.name
+                ZipEntry zipEntry = new ZipEntry(entryName)
+                InputStream inputStream = jarFile.getInputStream(jarEntry)
+                //插装
+                if (needTransform(entryName)) {
+                    jarOutputStream.putNextEntry(zipEntry)
+                    byte [] newCodeByte = onHandleEachClass(true, inputStream, entryName, entryName)
+                    if (newCodeByte == null || newCodeByte.length == 0) {
+                        jarOutputStream.write(IOUtils.toByteArray(inputStream))
+                    } else {
+                        jarOutputStream.write(newCodeByte)
+                    }
+                } else {
+                    jarOutputStream.putNextEntry(zipEntry)
+                    jarOutputStream.write(IOUtils.toByteArray(inputStream))
+                }
+                jarOutputStream.closeEntry()
+            }
+            jarOutputStream.close()
+            jarFile.close()
+            dest = outputProvider.getContentLocation(jarName + md5Name, jarInput.contentTypes, jarInput.scopes, Format.JAR)
+            FileUtils.copyFile(tmpFile, dest)
+            tmpFile.delete()
         } else {
             FileUtils.copyFile(jarInput.getFile(), dest)
         }
@@ -249,12 +286,10 @@ class ResourceTransform extends Transform {
 
     private void onHandleDirectoryEachFile(String name, File file, boolean isJarInput) {
         String fileName = file.name
-        if (!fileName.endsWith(".class") || fileName.endsWith("R.class") || fileName.endsWith("BuildConfig.class")
-                || fileName.contains("R\$")) {
+        if (!needTransform(fileName)) {
             return
         }
-
-        // 找到shape xml生成属性的class文件
+        // 读取生成的属性，列表存起来，用于插入到lib去。找到shape xml生成属性的class文件, 因为属性都是生成在application module，所以是文件夹遍历
         if (file.name.contains(GenerateShapeConfigUtil.JAVA_NAME + ".class")) {
             LogUtil.logI(TAG, "start getParseXmlAttributeInfoByClass name: $name fileName: ${fileName}")
             AmsUtil.getParseXmlAttributeInfoByClass(file, new ClassShapeXmlAdapterVisitor.IVisitListener() {
@@ -264,22 +299,39 @@ class ResourceTransform extends Transform {
                     mParseShapeXmlAttributeList.addAll(list)
                 }
             })
-        } else if (fileName.contains("TMEBackgroundMap.class")) {
-            //插入
-            handleInsertBackgroundLibMap(file)
-        } else {
-            // 项目module（除app其他module会以jar :BModule  classes.jar 形式 且支持该插件的 或  主app module支持该插件（主app插件是以文件夹）
-            if ((isJarInput && isSubProjectLib(name)) || (!isJarInput && appModuleSupportPlugin)) {
-                AmsUtil.doHookCodeCreateDrawable(file)
+            return
+        }
+        // 项目module（除app其他module会以jar :BModule  classes.jar 形式) 主app module才会以文件夹的形式，当主module支持该插件时进行getDrawable hook
+        if (appModuleSupportPlugin) {
+            try {
+                FileInputStream fis = new FileInputStream(file)
+                byte [] newCodeByte = onHandleEachClass(false, fis, file.name, file.absolutePath)
+                FileOutputStream fos = new FileOutputStream(file)
+                //覆盖自己
+                if (newCodeByte != null && newCodeByte.length > 0) {
+                    fos.write(newCodeByte)
+                }
+                fos.close()
+                fis.close()
+            } catch (Exception e) {
+                LogUtil.logI(TAG, "onHandleDirectoryEachFile onHandleEachClass f: ${file.absolutePath}  ex: $e")
             }
         }
     }
 
-    private void handleInsertBackgroundLibMap(File f) {
-        LogUtil.logI(TAG, "handleInsertBackgroundLibMap: ${f.name}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
-        if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {
-            AmsUtil.InsertTMEBackgroundMapClassAttribute(f, mParseShapeXmlAttributeList)
+    private byte[] onHandleEachClass(boolean isJarInput, InputStream inputStream, String fileName,String path) {
+        byte [] newCodeByte = null
+        LogUtil.logI(TAG, "onHandleEachClass isJarInput: $isJarInput  fileName: $fileName")
+        if (fileName.contains("TMEBackgroundMap.class")) {
+            LogUtil.logI(TAG, "handleInsertBackgroundLibMap: ${path}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
+            if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {
+                newCodeByte = AmsUtil.InsertTMEBackgroundMapClassAttribute(inputStream, path, mParseShapeXmlAttributeList)
+            }
+        } else {
+            // hook 代码中的getDrawable
+            newCodeByte = AmsUtil.doHookCodeCreateDrawable(inputStream, path)
         }
+        return newCodeByte
     }
 
     private void afterTransform(TransformInvocation transformInvocation) {
@@ -292,9 +344,18 @@ class ResourceTransform extends Transform {
                     mBackgroundLibJar.getContentTypes(),
                     mBackgroundLibJar.getScopes(),
                     Format.JAR)
-            doTransformJar(mBackgroundLibJar, dest)
+            doTransformJar(mBackgroundLibJar, dest, mOutputProvider)
         } else {
             LogUtil.logI(TAG, "afterTransform not find mBackgroundLibJar!!")
         }
     }
+
+    private boolean needTransform(String fileName) {
+        if (BackgroundUtil.isEmpty(fileName) || !fileName.endsWith(".class") || fileName.endsWith("R.class") || fileName.endsWith("BuildConfig.class")
+                || fileName.contains("R\$")) {
+            return false
+        }
+        return true
+    }
+
 }

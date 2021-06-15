@@ -38,33 +38,26 @@ class AmsUtil {
         }
     }
 
-    static void InsertTMEBackgroundMapClassAttribute(File f, List<AttributeInfo> attributeInfoList) {
+    static byte[] InsertTMEBackgroundMapClassAttribute(InputStream inputStream, String path, List<AttributeInfo> attributeInfoList) {
         try {
-            FileInputStream fis = new FileInputStream(f)
-            ClassReader classReader = new ClassReader(fis)
+            ClassReader classReader = new ClassReader(inputStream)
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
             InsertBackgroundAttributeClassAdapterVisitor insertBackgroundAttributeClassAdapterVisitor = new InsertBackgroundAttributeClassAdapterVisitor(classWriter, attributeInfoList)
             //分析，处理结果写入cw EXPAND_FRAMES：栈图以扩展格式进行访问
-            classReader.accept(insertBackgroundAttributeClassAdapterVisitor, ClassReader.EXPAND_FRAMES);
+            classReader.accept(insertBackgroundAttributeClassAdapterVisitor, ClassReader.EXPAND_FRAMES)
 
-            //覆盖自己
             byte [] newClassByte = classWriter.toByteArray()
-            FileOutputStream fos = new FileOutputStream(f)
-            fos.write(newClassByte)
-            fos.close()
-
-            fis.close()
+            return newClassByte
         } catch (Exception e) {
-            LogUtil.logI(TAG, "InsertTMEBackgroundMapClassAttribute ex: $e")
+            LogUtil.logI(TAG, "InsertTMEBackgroundMapClassAttribute fileName: $path  ex: $e")
         }
+        return null
     }
 
-    static void doHookCodeCreateDrawable(File f) {
+    static byte[] doHookCodeCreateDrawable(InputStream inputStream, String path) {
         try {
             boolean isHook = false
-            LogUtil.logI(TAG, "onHookCodeCreateDrawable111 fileName: ${f.absolutePath}")
-            FileInputStream fis = new FileInputStream(f)
-            ClassReader classReader = new ClassReader(fis)
+            ClassReader classReader = new ClassReader(inputStream)
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
             ClassNode classNode = new ClassNode(Opcodes.ASM7)
             classReader.accept(classNode, 0)
@@ -107,19 +100,16 @@ class AmsUtil {
                 }
             }
             if (isHook) {
-                LogUtil.logI(TAG, "onHookCodeCreateDrawable fileName: ${f.absolutePath}")
+                LogUtil.logI(TAG, "success onHookCodeCreateDrawable fileName: ${path}")
             }
             classNode.accept(classWriter)
             //覆盖自己
             byte [] newClassByte = classWriter.toByteArray()
-            FileOutputStream fos = new FileOutputStream(f)
-            fos.write(newClassByte)
-            fos.close()
-
-            fis.close()
+            return newClassByte
         } catch (Exception e) {
-            LogUtil.logI(TAG, "onHookCodeCreateDrawable ex: $e")
+            LogUtil.logI(TAG, "onHookCodeCreateDrawable path: $path  ex: $e")
         }
+        return null
     }
 
     private static boolean onHandleLineListNode(List<AbstractInsnNode> mLineList, InsnList instructions) {

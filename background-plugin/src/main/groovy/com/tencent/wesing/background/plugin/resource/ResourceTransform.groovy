@@ -13,10 +13,10 @@ import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.api.transform.Format
 import com.android.utils.FileUtils
 import com.tencent.wesing.background.plugin.ams.AmsUtil
+import com.tencent.wesing.background.plugin.ams.AsmClassHelper
 import com.tencent.wesing.background.plugin.ams.ClassShapeXmlAdapterVisitor
 import com.tencent.wesing.background.plugin.ams.bean.AttributeInfo
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
-import com.tencent.wesing.background.plugin.util.JarZipUtils
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Project
 
@@ -46,6 +46,7 @@ class ResourceTransform extends Transform {
 
     void setProject(Project project) {
         mProject = project
+        AsmClassHelper.instance.initPool(mProject)
     }
 
     private void generateProjectList() {
@@ -109,6 +110,8 @@ class ResourceTransform extends Transform {
         LogUtil.logI(TAG, "start doTransform  appModuleSupportPlugin: $appModuleSupportPlugin  isIncremental: ${transformInvocation.isIncremental()}")
         doTransform(transformInvocation)
         afterTransform(transformInvocation)
+
+        AsmClassHelper.getInstance().releaseClassPool()
     }
 
     private void doTransform(TransformInvocation transformInvocation) {
@@ -124,12 +127,14 @@ class ResourceTransform extends Transform {
         }
         transformInvocation.inputs.each { TransformInput input ->
             input.jarInputs.each { JarInput jarInput ->
+                AsmClassHelper.getInstance().addClassPath(jarInput.file.absolutePath)
                 //处理Jar
                 processJarInput(jarInput, mOutputProvider, isIncremental)
             }
 
             //处理源码文件，一般就是app module，其他module会以jar文件。这里判断下app module是否支持插件
             input.directoryInputs.each { DirectoryInput directoryInput ->
+                AsmClassHelper.getInstance().addClassPath(directoryInput.file.absolutePath)
                 processDirectoryInputs(directoryInput, mOutputProvider, isIncremental)
             }
         }
@@ -199,11 +204,7 @@ class ResourceTransform extends Transform {
                 if (needTransform(entryName)) {
                     jarOutputStream.putNextEntry(zipEntry)
                     byte [] newCodeByte = onHandleEachClass(true, inputStream, entryName, entryName)
-                    if (newCodeByte == null || newCodeByte.length == 0) {
-                        jarOutputStream.write(IOUtils.toByteArray(inputStream))
-                    } else {
-                        jarOutputStream.write(newCodeByte)
-                    }
+                    jarOutputStream.write(newCodeByte)
                 } else {
                     jarOutputStream.putNextEntry(zipEntry)
                     jarOutputStream.write(IOUtils.toByteArray(inputStream))
@@ -250,7 +251,7 @@ class ResourceTransform extends Transform {
                     case Status.ADDED:
                     case Status.CHANGED:
                         //操作修改对输入file，然后copy到输出目录
-                        onHandleDirectoryEachFile(directoryInput.name, file, false)
+                        onHandleDirectoryEachFile(directoryInput.name, file)
                         FileUtils.copyFile(file, destFile)
                         break
                     default:
@@ -259,12 +260,12 @@ class ResourceTransform extends Transform {
             }
         } else {
             //遍历操作每个文件再进行copy的输出目录
-            eachFileToDirectory(directoryInput.name, directoryInput.file, false)
+            eachFileToDirectory(directoryInput.name, directoryInput.file)
             FileUtils.copyDirectory(directoryInput.file, dest)
         }
     }
 
-    private void eachFileToDirectory(String name, File file, boolean isJarInput) {
+    private void eachFileToDirectory(String name, File file) {
         if (file == null || !file.exists()) {
             return
         }
@@ -273,18 +274,18 @@ class ResourceTransform extends Transform {
             for (int i = 0; i < fileList.length; i++) {
                 File subFile = fileList[i]
                 if (subFile.isDirectory()) {
-                    eachFileToDirectory(name, subFile, isJarInput)
+                    eachFileToDirectory(name, subFile)
                 } else {
-                    onHandleDirectoryEachFile(name, subFile, isJarInput)
+                    onHandleDirectoryEachFile(name, subFile)
                 }
             }
         } else {
-            onHandleDirectoryEachFile(name, file, isJarInput)
+            onHandleDirectoryEachFile(name, file)
         }
     }
 
 
-    private void onHandleDirectoryEachFile(String name, File file, boolean isJarInput) {
+    private void onHandleDirectoryEachFile(String name, File file) {
         String fileName = file.name
         if (!needTransform(fileName)) {
             return
@@ -306,12 +307,12 @@ class ResourceTransform extends Transform {
             try {
                 FileInputStream fis = new FileInputStream(file)
                 byte [] newCodeByte = onHandleEachClass(false, fis, file.name, file.absolutePath)
-                FileOutputStream fos = new FileOutputStream(file)
                 //覆盖自己
                 if (newCodeByte != null && newCodeByte.length > 0) {
+                    FileOutputStream fos = new FileOutputStream(file)
                     fos.write(newCodeByte)
+                    fos.close()
                 }
-                fos.close()
                 fis.close()
             } catch (Exception e) {
                 LogUtil.logI(TAG, "onHandleDirectoryEachFile onHandleEachClass f: ${file.absolutePath}  ex: $e")
@@ -319,9 +320,8 @@ class ResourceTransform extends Transform {
         }
     }
 
-    private byte[] onHandleEachClass(boolean isJarInput, InputStream inputStream, String fileName,String path) {
+    private byte[] onHandleEachClass(boolean isJarInput, InputStream inputStream, String fileName, String path) {
         byte [] newCodeByte = null
-        LogUtil.logI(TAG, "onHandleEachClass isJarInput: $isJarInput  fileName: $fileName")
         if (fileName.contains("TMEBackgroundMap.class")) {
             LogUtil.logI(TAG, "handleInsertBackgroundLibMap: ${path}  attribute Size: ${BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList)}")
             if (BackgroundUtil.getCollectSize(mParseShapeXmlAttributeList) > 0) {

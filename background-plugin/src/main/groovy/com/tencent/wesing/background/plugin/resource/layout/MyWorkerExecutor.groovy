@@ -172,7 +172,6 @@ class MyWorkerExecutor implements WorkerExecutor {
         int index = 0
         // 查找android:background属性
         while ((index = content.indexOf(BACKGROUND_TAG, index)) > 0) {
-            needHookFile = true
             //往后面找两个"号，就是完整的一句background属性啦
             int endIndex = index + BACKGROUND_TAG.length()
             int count = 0
@@ -201,6 +200,7 @@ class MyWorkerExecutor implements WorkerExecutor {
                 String newAttribute = "$CUSTOM_APP_TAG:tme_background=\"@drawable/$drawableName\""
                 LogUtil.logI(TAG, "hookAndroidBackground inputName: ${request.inputFile.name}  attribute: $attribute  value: $value  newAttribute: $newAttribute ")
                 content = content.replaceAll(attribute, newAttribute)
+                needHookFile = true
             }
             index++ //加一查找下一个
         }

@@ -14,7 +14,7 @@ class GenerateShapeConfigUtil {
     static final String TAG = "GenerateShapeConfigUtil"
 
     static final String JAVA_NAME = "TMEBackgroundShapeConfig"
-    static final String JAVA_VALUE_TEMPLATE = "public static final String %s_background_param%s = %s;"
+    static final String JAVA_VALUE_TEMPLATE = "public static final String %s_background_%s = %s;"
 
     private static File initGenerateConfigJavaFile(String javaPath, String javaClassName) {
         File file = new File(javaPath + File.separator + javaClassName + ".java")
@@ -42,7 +42,7 @@ class GenerateShapeConfigUtil {
         }
         List<String> codeList = new ArrayList<>()
         for (int i = 0; i < shapeInfoList.size(); i++) {
-            String codeJava = genJavaProperties(i + 1, shapeInfoList[i], projectName)
+            String codeJava = genJavaProperties(shapeInfoList[i], projectName)
             codeList.add(codeJava)
             LogUtil.logI(TAG, "generateConfigJavaCode value: $codeJava")
         }
@@ -64,10 +64,10 @@ class GenerateShapeConfigUtil {
      * @return 生成的代码String
      *
      * 如：
-     * public static final String param3 = R.drawable.shape_test_4 + "23546447"(未运算，严格按照Attribute定义属性顺序） + " 123(使用Id的属性（严格按照Attribute定义属性顺序）" + "xxxx,xxxxx"(id的话用+R.color.red)
+     * public static final String app_param_kk = R.drawable.shape_test_4 + "23546447"(位运算，严格按照Attribute定义属性顺序） + " 123(使用Id的属性（严格按照Attribute定义属性顺序）" + "xxxx,xxxxx"(id的话用+R.color.red)
      *
      */
-    private static String genJavaProperties(int id, AttributeValueInfo info, String projectName) {
+    private static String genJavaProperties(AttributeValueInfo info, String projectName) {
         String fileName = info.fileName.substring(0, info.fileName.size() - 4) // 去除.xml后缀
         String keyValue = "R.drawable." + fileName
         int attrValue = 0
@@ -297,7 +297,7 @@ class GenerateShapeConfigUtil {
             .append(idValue)
             .append("+").append("\",\"").append("+")
             .append(stringValue.toString().substring(0, stringValue.length() - 5)) //减去后面多与的加号逗号
-        return String.format(JAVA_VALUE_TEMPLATE, projectName, id, value.toString())
+        return String.format(JAVA_VALUE_TEMPLATE, projectName, fileName, value.toString())
     }
 
     private static void appendAttrValue(String value, boolean isId, StringBuilder stringBuilder) {

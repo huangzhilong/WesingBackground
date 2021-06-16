@@ -13,7 +13,6 @@ import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.api.transform.Format
 import com.android.utils.FileUtils
 import com.tencent.wesing.background.plugin.ams.AmsUtil
-import com.tencent.wesing.background.plugin.ams.AsmClassHelper
 import com.tencent.wesing.background.plugin.ams.ClassShapeXmlAdapterVisitor
 import com.tencent.wesing.background.plugin.ams.bean.AttributeInfo
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
@@ -46,7 +45,6 @@ class ResourceTransform extends Transform {
 
     void setProject(Project project) {
         mProject = project
-        AsmClassHelper.instance.initPool(mProject)
     }
 
     private void generateProjectList() {
@@ -110,8 +108,6 @@ class ResourceTransform extends Transform {
         LogUtil.logI(TAG, "start doTransform  appModuleSupportPlugin: $appModuleSupportPlugin  isIncremental: ${transformInvocation.isIncremental()}")
         doTransform(transformInvocation)
         afterTransform(transformInvocation)
-
-        AsmClassHelper.getInstance().releaseClassPool()
     }
 
     private void doTransform(TransformInvocation transformInvocation) {
@@ -127,14 +123,12 @@ class ResourceTransform extends Transform {
         }
         transformInvocation.inputs.each { TransformInput input ->
             input.jarInputs.each { JarInput jarInput ->
-                AsmClassHelper.getInstance().addClassPath(jarInput.file.absolutePath)
                 //处理Jar
                 processJarInput(jarInput, mOutputProvider, isIncremental)
             }
 
             //处理源码文件，一般就是app module，其他module会以jar文件。这里判断下app module是否支持插件
             input.directoryInputs.each { DirectoryInput directoryInput ->
-                AsmClassHelper.getInstance().addClassPath(directoryInput.file.absolutePath)
                 processDirectoryInputs(directoryInput, mOutputProvider, isIncremental)
             }
         }

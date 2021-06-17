@@ -64,7 +64,7 @@ class AmsUtil {
             byte [] classByteData = Arrays.copyOf(sourceByteCode, sourceByteCode.length)
             boolean isHook = false
             ClassReader classReader = new ClassReader(classByteData)
-            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
+            ClassWriter classWriter = new SafeClassWriter(ClassWriter.COMPUTE_FRAMES)
             ClassNode classNode = new ClassNode(Opcodes.ASM7)
             classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
             Iterator<MethodNode> iterator = classNode.methods.iterator()

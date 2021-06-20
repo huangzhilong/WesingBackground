@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-class TMEActivityLifecycleRegister implements Application.ActivityLifecycleCallbacks {
+class TMEBackgroundActivityLifecycleRegister implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         TMEBackgroundLibrary.inject(activity);

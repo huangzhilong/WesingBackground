@@ -22,6 +22,16 @@
         android:text="跳转到第二个页面"/>
 
     <TextView
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/tv_btn_test"
+        android:background="@drawable/shape_text_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="测试速度"/>
+
+    <TextView
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

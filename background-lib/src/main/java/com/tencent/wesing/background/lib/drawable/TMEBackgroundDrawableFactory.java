@@ -132,11 +132,11 @@ public class TMEBackgroundDrawableFactory {
             return cache;
         }
         if (TMEBackgroundMap.getBackgroundAttributeMap() == null) {
-            return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
+            return TMEBackgroundContext.getDrawable(drawableId);
         }
         GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
         if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
-            return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
+            return TMEBackgroundContext.getDrawable(drawableId);
         }
         // 当前只解析GradientDrawable
         GradientDrawable drawable = getInstance().createDrawableByGradientInfo(gradientDrawableInfo);
@@ -145,15 +145,8 @@ public class TMEBackgroundDrawableFactory {
             return drawable;
         } else {
             // 找不到字节码属性用系统获取
-            return TMEBackgroundContext.getContext().getResources().getDrawable(drawableId);
+            return TMEBackgroundContext.getDrawable(drawableId);
         }
-    }
-
-    /**
-     * 别删除， hook字节码使用得到
-     */
-    public static Drawable createDrawableById(Context context, int drawableId) {
-        return createDrawableById(drawableId);
     }
 
 

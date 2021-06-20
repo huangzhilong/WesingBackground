@@ -3,7 +3,6 @@ package com.tencent.wesing.background.lib;
 import android.app.Application;
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -19,7 +18,7 @@ public class TMEBackgroundContentProvider extends ContentProvider {
             TMEBackgroundLibrary.inject(getContext());
             TMEBackgroundContext.setApplicationContext(getContext());
             TMEBackgroundMap.startParseAttribute();
-            ((Application) getContext()).registerActivityLifecycleCallbacks(new TMEActivityLifecycleRegister());
+            ((Application) getContext()).registerActivityLifecycleCallbacks(new TMEBackgroundActivityLifecycleRegister());
         }
         return true;
     }

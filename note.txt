@@ -84,7 +84,7 @@ gradle 具体任务： TaskManager   子类： ApplicationTaskManager   LibraryT
 
 问题： 因为有缓存，所以在编译的时候有缓存，不会再替换layout的属性为自己的background
 
-
+问题： ASM替换找不到类getCommonSuperClass错误
 
 
 先单线程处理，后期再加入多线程！！！！

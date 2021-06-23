@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.tencent.wesing.background.lib.res.TMEBackgroundHookResourcesUtil;
+
 class TMEBackgroundActivityLifecycleRegister implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         TMEBackgroundLibrary.inject(activity);
+        //hook activity
+        TMEBackgroundHookResourcesUtil.hookSystemResources(activity);
     }
 
     @Override

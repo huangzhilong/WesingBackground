@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import com.tencent.wesing.background.lib.TMEBackgroundContext
 import com.tencent.wesing.background.lib.drawable.TMEBackgroundDrawableFactory
 
 
@@ -23,8 +24,8 @@ class  MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.tv_btn_test).setOnClickListener {
             test()
         }
-
-        resources
+        resources.getDrawable(R.drawable.shape_text_1)
+        TMEBackgroundContext.getContext().resources.getDrawable(R.drawable.shape_text_1)
     }
 
     private fun jump() {
@@ -42,9 +43,4 @@ class  MainActivity : AppCompatActivity() {
         Log.i(TAG, " no cache codeDrawable cost time: " + (System.nanoTime() - startTime))
 
     }
-
-    override fun getResources(): Resources {
-        return super.getResources()
-    }
-
 }

@@ -1,12 +1,15 @@
 package com.tencent.wesing.background.lib.res;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
-
 import java.lang.reflect.Field;
 
 /**
@@ -17,37 +20,48 @@ public class TMEBackgroundHookResourcesUtil {
 
     private static final String TAG = "TMEBackgroundHookResourcesUtil";
 
-    private static volatile boolean isHook = false;
-
 
     @SuppressLint("LongLogTag")
     public static void hookSystemResources(Context context) {
-        if (isHook) {
-            return;
-        }
-
+        long startTime = System.currentTimeMillis();
+        Log.i(TAG, "start hookSystemResources!!");
         try {
             Resources resources = context.getResources();
             TMEBackgroundResources tmeBackgroundResources = new TMEBackgroundResources(resources);
 
-            //替换成自己的resource
-            Class classA = context.getClass();
-            Field field = classA.getDeclaredField("mResources");
-            field.setAccessible(true);
-            field.set(context, tmeBackgroundResources);
+            // 替换activity 的 mResources
+            if (context instanceof Activity) {
+                // AppCompatActivity 内部有个mResources也hook住
+                if (context instanceof AppCompatActivity) {
+                    Class classA = AppCompatActivity.class;
+                    Field field = classA.getDeclaredField("mResources");
+                    field.setAccessible(true);
+                    field.set(context, tmeBackgroundResources);
+                }
 
-            Field mLoadApkField = classA.getDeclaredField("mPackageInfo");
-            mLoadApkField.setAccessible(true);
-            Object mLoadApk = mLoadApkField.get(context);
-            Field resField = mLoadApk.getClass().getDeclaredField("mResources");
-            resField.setAccessible(true);
-            resField.set(mLoadApk, tmeBackgroundResources);
+                Class ContextThemeWrapperField = ContextThemeWrapper.class;
+                Field field1 = ContextThemeWrapperField.getDeclaredField("mResources");
+                field1.setAccessible(true);
+                field1.set(context, tmeBackgroundResources);
+
+                Log.i(TAG, "hookSystemResources Activity mResources success");
+                context = ((Activity) context).getBaseContext();
+            }
+
+            //ContextWrapper的mBase（ContextImpl）替换成自己的resource
+            Class classA = context.getClass();
+            if (classA.getName().contains("ContextImpl")) {
+                Field field = classA.getDeclaredField("mResources");
+                field.setAccessible(true);
+                field.set(context, tmeBackgroundResources);
+            }
 
             TMEBackgroundContext.setTmeBackgroundResources(tmeBackgroundResources);
-            isHook = true;
-            Log.i("TMEBackgroundHookResourcesUtil", "hookSystemResources success");
+            Log.i(TAG, "hookSystemResources success");
         } catch (Exception e) {
-            Log.i("TMEBackgroundHookResourcesUtil", "hookSystemResources happen ex", e);
+            Log.e(TAG, "hookSystemResources happen ex", e);
         }
+        Log.i(TAG, "hookSystemResources costTime: " + (System.currentTimeMillis() - startTime));
+
     }
 }

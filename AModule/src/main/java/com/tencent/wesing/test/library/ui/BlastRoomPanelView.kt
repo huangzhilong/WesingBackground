@@ -16,5 +16,9 @@ class BlastRoomPanelView @JvmOverloads constructor(context: Context, val attrs: 
         LayoutInflater.from(context).inflate(R.layout.layout_blast_room_detail_panel, this)
         orientation = VERTICAL
         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        resources.getDrawable(R.drawable.test_text_1)
+        context.resources.getDrawable(R.drawable.test_text_1)
+
     }
 }

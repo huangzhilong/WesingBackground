@@ -10,7 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
+import com.tencent.wesing.background.lib.res.TMEBackgroundHookResourcesUtil;
 
+//ContentProvider初始化（onCreate）是在Application生命周期方法attachBaseContext之后、onCreate之前
 public class TMEBackgroundContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
@@ -18,6 +20,7 @@ public class TMEBackgroundContentProvider extends ContentProvider {
             TMEBackgroundLibrary.inject(getContext());
             TMEBackgroundContext.setApplicationContext(getContext());
             TMEBackgroundMap.startParseAttribute();
+            TMEBackgroundHookResourcesUtil.hookSystemResources(((Application) getContext()).getBaseContext());
             ((Application) getContext()).registerActivityLifecycleCallbacks(new TMEBackgroundActivityLifecycleRegister());
         }
         return true;

@@ -1,5 +1,6 @@
 package com.tencent.wesing.background;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,7 +11,7 @@ import com.tencent.wesing.background.lib.TMEBackgroundContext;
 /**
  * create by zlonghuang on 2021/6/11
  **/
-public class SecondActivity extends AppCompatActivity {
+public class SecondActivity extends Activity {
 
 
     @Override
@@ -18,11 +19,10 @@ public class SecondActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.second_main);
 
-        //这个不行
+
         getResources().getDrawable(R.drawable.shape_text_1);
 
 
-        //这个可以
         TMEBackgroundContext.getContext().getResources().getDrawable(R.drawable.shape_text_1);
     }
 }

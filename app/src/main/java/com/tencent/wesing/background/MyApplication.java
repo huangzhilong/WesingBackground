@@ -3,7 +3,6 @@ package com.tencent.wesing.background;
 import android.app.Application;
 import android.content.Context;
 
-import com.tencent.wesing.background.lib.res.TMEBackgroundHookResourcesUtil;
 
 /**
  * create by zlonghuang on 2021/6/20
@@ -13,6 +12,5 @@ public class MyApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        TMEBackgroundHookResourcesUtil.hookSystemResources(base);
     }
 }

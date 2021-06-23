@@ -20,6 +20,7 @@ public class TMEBackgroundContentProvider extends ContentProvider {
             TMEBackgroundLibrary.inject(getContext());
             TMEBackgroundContext.setApplicationContext(getContext());
             TMEBackgroundMap.startParseAttribute();
+            //hook application
             TMEBackgroundHookResourcesUtil.hookSystemResources(((Application) getContext()).getBaseContext());
             ((Application) getContext()).registerActivityLifecycleCallbacks(new TMEBackgroundActivityLifecycleRegister());
         }

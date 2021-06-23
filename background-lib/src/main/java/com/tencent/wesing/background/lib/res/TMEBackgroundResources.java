@@ -38,17 +38,9 @@ public class TMEBackgroundResources extends Resources {
         mSystemResources = resources;
     }
 
-    /**
-     *  TMEBackgroundDrawableFactory.createDrawableById获取失败时要调用 系统本来的getDrawable，
-     *  因为系统的getDrawable被重写为了TMEBackgroundDrawableFactory.createDrawableById(id);，避免死循环，调用此方法
-     */
-    public Drawable getSuperDrawable(int id) throws NotFoundException {
-        return mSystemResources.getDrawable(id);
-    }
-
     @Override
     public Drawable getDrawable(int id) throws NotFoundException {
-        Log.i(TAG, "getDrawable id: " + id);
+        Log.i(TAG, "TMEBackgroundDrawableFactory.createDrawableById getDrawable id: " + id);
         return TMEBackgroundDrawableFactory.createDrawableById(id);
     }
 

@@ -1,6 +1,7 @@
 package com.tencent.wesing.background.lib;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
 import com.tencent.wesing.background.lib.res.TMEBackgroundResources;
@@ -13,10 +14,13 @@ public class TMEBackgroundContext {
 
     private static Context mContext;
 
+    private static Resources mSystemResource; //存储一个系统的Resource，hook后getResource得到的是TMEBackgroundResources
+
     private static TMEBackgroundResources tmeBackgroundResources;
 
     public static void setApplicationContext(Context context) {
         mContext = context;
+        mSystemResource = context.getResources();
     }
 
     public static Context getContext() {
@@ -29,10 +33,7 @@ public class TMEBackgroundContext {
     }
 
     public static Drawable getDrawable(int drawableId) {
-        //已经hook了，使用自己的
-        if (tmeBackgroundResources != null) {
-            return tmeBackgroundResources.getSuperDrawable(drawableId);
-        }
-        return getContext().getResources().getDrawable(drawableId);
+        //return getContext().getResources().getDrawable(drawableId); hook后会死循环，不能这样写
+        return mSystemResource.getDrawable(drawableId);
     }
 }

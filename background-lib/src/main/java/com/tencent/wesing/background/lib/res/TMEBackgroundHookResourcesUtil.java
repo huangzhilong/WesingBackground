@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
 import java.lang.reflect.Field;
 
@@ -23,12 +21,12 @@ public class TMEBackgroundHookResourcesUtil {
 
     @SuppressLint("LongLogTag")
     public static void hookSystemResources(Context context) {
+        Log.i(TAG, "start hookSystemResources  isActivity: " + (context instanceof Activity));
         long startTime = System.currentTimeMillis();
-        Log.i(TAG, "start hookSystemResources!!");
+        Resources resources = context.getResources();
+        TMEBackgroundResources tmeBackgroundResources = new TMEBackgroundResources(resources);
+        TMEBackgroundContext.setTmeBackgroundResources(tmeBackgroundResources);
         try {
-            Resources resources = context.getResources();
-            TMEBackgroundResources tmeBackgroundResources = new TMEBackgroundResources(resources);
-
             // 替换activity 的 mResources
             if (context instanceof Activity) {
                 // AppCompatActivity 内部有个mResources也hook住
@@ -43,8 +41,6 @@ public class TMEBackgroundHookResourcesUtil {
                 Field field1 = ContextThemeWrapperField.getDeclaredField("mResources");
                 field1.setAccessible(true);
                 field1.set(context, tmeBackgroundResources);
-
-                Log.i(TAG, "hookSystemResources Activity mResources success");
                 context = ((Activity) context).getBaseContext();
             }
 
@@ -60,6 +56,7 @@ public class TMEBackgroundHookResourcesUtil {
             Log.i(TAG, "hookSystemResources success");
         } catch (Exception e) {
             Log.e(TAG, "hookSystemResources happen ex", e);
+            TMEBackgroundContext.setTmeBackgroundResources(null);
         }
         Log.i(TAG, "hookSystemResources costTime: " + (System.currentTimeMillis() - startTime));
 

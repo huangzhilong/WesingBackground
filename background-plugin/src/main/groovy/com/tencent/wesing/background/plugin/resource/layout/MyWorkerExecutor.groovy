@@ -150,14 +150,18 @@ class MyWorkerExecutor implements WorkerExecutor {
         }
     }
 
-    private String addCustomTagToXml(String content, String customTag) {
+    private LayoutInfo addCustomTagToXml(String content, String customTag) {
+        LayoutInfo layoutInfo = new LayoutInfo()
         String customTxt = "\nxmlns:$customTag=\"http://schemas.android.com/apk/res-auto\""
         if (content.indexOf("http://schemas.android.com/apk/res/android\"") > 0) {
             content = content.replace("http://schemas.android.com/apk/res/android\"", "http://schemas.android.com/apk/res/android\"$customTxt")
+            layoutInfo.content = content
+            layoutInfo.result = true
         } else {
-            LogUtil.logI(TAG, "add customTag failed!!!!")
+            layoutInfo.content = content
+            layoutInfo.result = false
         }
-        return content
+        return layoutInfo
     }
 
     private void hookAndroidBackground(CompileResourceRequest request) {
@@ -195,7 +199,12 @@ class MyWorkerExecutor implements WorkerExecutor {
                 String drawableName = value.substring(value.indexOf(DRAWABLE_TAG) + DRAWABLE_TAG.length())
                 if (needCheckInclude) {
                     needCheckInclude = false
-                    content = addCustomTagToXml(content, CUSTOM_APP_TAG)
+                    LayoutInfo layoutInfo = addCustomTagToXml(content, CUSTOM_APP_TAG)
+                    content = layoutInfo.content
+                    if (!layoutInfo.result) {
+                        LogUtil.logI(TAG, "hookAndroidBackground failed add customTag inputName:  ${request.inputFile.name}")
+                        return
+                    }
                 }
                 String newAttribute = "$CUSTOM_APP_TAG:tme_background=\"@drawable/$drawableName\""
                 LogUtil.logI(TAG, "hookAndroidBackground inputName: ${request.inputFile.name}  attribute: $attribute  value: $value  newAttribute: $newAttribute ")

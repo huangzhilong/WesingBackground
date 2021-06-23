@@ -40,7 +40,7 @@ public class TMEBackgroundResources extends Resources {
 
     @Override
     public Drawable getDrawable(int id) throws NotFoundException {
-        Log.i(TAG, "TMEBackgroundDrawableFactory.createDrawableById getDrawable id: " + id);
+        Log.i(TAG, "TMEBackgroundDrawableFactory createDrawableById : " + id);
         return TMEBackgroundDrawableFactory.createDrawableById(id);
     }
 

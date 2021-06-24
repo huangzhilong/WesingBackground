@@ -44,6 +44,7 @@ class ShapeScanTask extends DefaultTask {
         if (!isRunning) {
             isRunning = true
             getSourcesDirs()
+            LogUtil.logI(TAG, "get shapeContainer size: ${BackgroundUtil.getCollectSize(project.rootProject.gradle.ext.shapeContainer)}")
         }
     }
 
@@ -148,6 +149,9 @@ class ShapeScanTask extends DefaultTask {
                 AttributeValueInfo info = collectShapeXml(drawableNodeXmlList.get(i), projectName)
                 if (info != null) {
                     shapeInfoList.add(info)
+
+                    String fileName = info.fileName.substring(0, info.fileName.size() - 4) // 去除.xml后缀
+                    project.rootProject.gradle.ext.shapeContainer.add(fileName)
                 }
             }
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {

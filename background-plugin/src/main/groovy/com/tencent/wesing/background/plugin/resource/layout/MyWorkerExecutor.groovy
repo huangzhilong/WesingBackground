@@ -197,19 +197,23 @@ class MyWorkerExecutor implements WorkerExecutor {
             //是drawable的background
             if (!BackgroundUtil.isEmpty(value) && !BackgroundUtil.isEmpty(attribute) && value.contains(DRAWABLE_TAG)) {
                 String drawableName = value.substring(value.indexOf(DRAWABLE_TAG) + DRAWABLE_TAG.length())
-                if (needCheckInclude) {
-                    needCheckInclude = false
-                    LayoutInfo layoutInfo = addCustomTagToXml(content, CUSTOM_APP_TAG)
-                    content = layoutInfo.content
-                    if (!layoutInfo.result) {
-                        LogUtil.logI(TAG, "hookAndroidBackground failed add customTag inputName:  ${request.inputFile.name}")
-                        return
+
+                //是需要hook的drawable
+                if (isContainsTargetDrawable(drawableName)) {
+                    if (needCheckInclude) {
+                        needCheckInclude = false
+                        LayoutInfo layoutInfo = addCustomTagToXml(content, CUSTOM_APP_TAG)
+                        content = layoutInfo.content
+                        if (!layoutInfo.result) {
+                            LogUtil.logI(TAG, "hookAndroidBackground failed add customTag inputName:  ${request.inputFile.name}")
+                            return
+                        }
                     }
+                    String newAttribute = "$CUSTOM_APP_TAG:tme_background=\"@drawable/$drawableName\""
+                    LogUtil.logI(TAG, "hookAndroidBackground inputName: ${request.inputFile.name}  attribute: $attribute  value: $value  newAttribute: $newAttribute   drawableName: $drawableName")
+                    content = content.replaceAll(attribute, newAttribute)
+                    needHookFile = true
                 }
-                String newAttribute = "$CUSTOM_APP_TAG:tme_background=\"@drawable/$drawableName\""
-                LogUtil.logI(TAG, "hookAndroidBackground inputName: ${request.inputFile.name}  attribute: $attribute  value: $value  newAttribute: $newAttribute ")
-                content = content.replaceAll(attribute, newAttribute)
-                needHookFile = true
             }
             index++ //加一查找下一个
         }
@@ -234,5 +238,15 @@ class MyWorkerExecutor implements WorkerExecutor {
         } catch (Exception e) {
             LogUtil.logI(TAG, "hookAndroidBackground ex: $e")
         }
+    }
+
+    private boolean isContainsTargetDrawable(String drawableName) {
+        for (int i = 0; i < mProject.rootProject.gradle.ext.shapeContainer.size(); i++) {
+            String name = mProject.rootProject.gradle.ext.shapeContainer.get(i)
+            if (name == drawableName) {
+                return true
+            }
+        }
+        return false
     }
 }

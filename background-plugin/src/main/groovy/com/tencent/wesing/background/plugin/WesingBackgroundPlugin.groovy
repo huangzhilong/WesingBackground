@@ -29,6 +29,10 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.create("backgroundPluginConfig", WesingExtensionContainer)
         LogUtil.logI(TAG, "apply WesingBackgroundPlugin  projectName: ${project.name}")
+        if (!project.rootProject.hasProperty("shapeContainer")) {
+            LogUtil.logI(TAG, "create shapeContainer Property!!")
+            project.rootProject.gradle.ext.shapeContainer = new ArrayList<String>()
+        }
         def shapeScanTask = null
         def variants
         if (project.plugins.hasPlugin("com.android.application")) {

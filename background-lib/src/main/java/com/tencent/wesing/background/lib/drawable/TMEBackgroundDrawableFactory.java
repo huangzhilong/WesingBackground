@@ -1,6 +1,5 @@
 package com.tencent.wesing.background.lib.drawable;
 
-import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -14,7 +13,6 @@ import com.tencent.wesing.background.lib.TMEBackgroundContext;
 import com.tencent.wesing.background.lib.bean.GradientDrawableInfo;
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
 import com.tencent.wesing.background.lib.util.DimensionUtil;
-
 import java.lang.reflect.Field;
 
 

@@ -75,7 +75,12 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                         recoveryAndroidVariantTask(mergeResourcesTask)
                     }
                 } else {
-                    def resourcesTask = project.getTasksByName("compileDebugLibraryResources", true)
+                    boolean isDebug = false
+                    if (mStartParams != null) {
+                        isDebug = mStartParams.debug
+                    }
+                    def resTaskName = "compile${isDebug? "Debug" : "Release"}LibraryResources"
+                    def resourcesTask = project.getTasksByName(resTaskName, true)
                     resourcesTask[0].doFirst {
                         hookAndroidVariantTask(resourcesTask[0], project)
                     }

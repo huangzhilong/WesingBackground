@@ -34,13 +34,6 @@ class  MainActivity : AppCompatActivity() {
     }
 
     private fun test() {
-        var startTime = System.nanoTime()
-        var xmlDrawable = resources.getDrawable(R.drawable.shape_text_2)
-        Log.i(TAG, " no cache xmlDrawable cost time: " + (System.nanoTime() - startTime))
-
-        startTime = System.nanoTime()
-        var codeDrawable = TMEBackgroundDrawableFactory.createDrawableById(R.drawable.shape_text_2)
-        Log.i(TAG, " no cache codeDrawable cost time: " + (System.nanoTime() - startTime))
 
     }
 }

@@ -101,6 +101,43 @@ mergeResources 调用栈
 MergedResourceWriter.addItem
 
 
+2021-06-24 12:49:56.186 5305-5376/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 12:49:56.188 5305-5376/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 2  mapSize: 10
+2021-06-24 12:50:00.731 5305-5305/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 235209
+2021-06-24 12:50:00.731 5305-5305/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 42709
+2021-06-24 12:50:09.576 5410-5459/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 12:50:09.578 5410-5459/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 2  mapSize: 10
+2021-06-24 12:50:13.480 5410-5410/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 241303
+2021-06-24 12:50:13.480 5410-5410/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 49323
+2021-06-24 12:50:31.051 5493-5551/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 12:50:31.052 5493-5551/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 1  mapSize: 10
+2021-06-24 12:50:34.270 5493-5493/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 241823
+2021-06-24 12:50:34.270 5493-5493/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 51146
+2021-06-24 12:50:43.729 5581-5628/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 12:50:43.730 5581-5628/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 1  mapSize: 10
+2021-06-24 12:50:49.243 5581-5581/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 261823
+2021-06-24 12:50:49.244 5581-5581/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 51875
+
+
+
+华为测试机
+2021-06-24 17:59:13.960 13155-13479/? I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 17:59:13.965 13155-13479/? I/TMEBackgroundMap: end init initGradientDrawable costTime: 5  mapSize: 10
+2021-06-24 17:59:17.478 13155-13155/? I/TMEBackgroundMap:  no cache xmlDrawable cost time: 867187
+2021-06-24 17:59:17.478 13155-13155/? I/TMEBackgroundMap:  no cache codeDrawable cost time: 172917
+2021-06-24 19:13:19.467 18111-18176/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 19:13:19.471 18111-18176/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 4  mapSize: 10
+2021-06-24 19:13:23.415 18111-18111/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 939583
+2021-06-24 19:13:23.416 18111-18111/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 182292
+2021-06-24 19:13:36.836 18229-18283/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 19:13:36.840 18229-18283/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 4  mapSize: 10
+2021-06-24 19:13:41.061 18229-18229/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 722396
+2021-06-24 19:13:41.062 18229-18229/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 157292
+2021-06-24 19:14:01.353 18321-18377/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
+2021-06-24 19:14:01.357 18321-18377/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 4  mapSize: 10
+2021-06-24 19:14:03.853 18321-18321/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 751042
+2021-06-24 19:14:03.854 18321-18321/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 157292
+
 at com.tencent.wesing.background.plugin.layout.MyWorkerExecutor.submit(MyWorkerExecutor.groovy:33)
 	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:173)
 	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:146)

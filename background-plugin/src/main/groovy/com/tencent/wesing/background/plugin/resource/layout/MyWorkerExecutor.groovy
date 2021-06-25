@@ -33,13 +33,14 @@ class MyWorkerExecutor implements WorkerExecutor {
     }
 
     void setWorkerExecutor(WorkerExecutor workerExecutor) {
-        LogUtil.logI(TAG, "setWorkerExecutor ${workerExecutor} ")
+        LogUtil.logI(TAG, "setWorkerExecutor ${workerExecutor}  projectName: ${mProject.name}")
         mWorkerExecutor = workerExecutor
     }
 
     @Override
     void submit(Class<? extends Runnable> aClass, Action<? super WorkerConfiguration> action) {
         if (mWorkerExecutor != null) {
+            long startTime = System.currentTimeMillis()
             //获取params
             MyWorkerConfiguration configuration = new MyWorkerConfiguration()
             action.execute(configuration)
@@ -91,6 +92,9 @@ class MyWorkerExecutor implements WorkerExecutor {
                 }
                 mWorkerExecutor.submit(aClass, action)
             }
+            long costTime = System.currentTimeMillis() - startTime
+            mProject.rootProject.gradle.ext.pluginCostTime = mProject.rootProject.gradle.ext.pluginCostTime + costTime
+            LogUtil.logI(TAG, "xml hookAndroidBackground projectName: ${mProject.name}  costTime: $costTime  pluginCost: ${mProject.rootProject.gradle.ext.pluginCostTime}")
         }
     }
 

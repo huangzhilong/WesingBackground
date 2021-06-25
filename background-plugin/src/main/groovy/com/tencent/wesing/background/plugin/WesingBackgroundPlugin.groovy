@@ -29,10 +29,23 @@ class WesingBackgroundPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.create("backgroundPluginConfig", WesingExtensionContainer)
         LogUtil.logI(TAG, "apply WesingBackgroundPlugin  projectName: ${project.name}")
-        if (!project.rootProject.hasProperty("shapeContainer")) {
+
+        //定义些参数
+        if (!project.rootProject.ext.hasProperty("shapeContainer")) {
             LogUtil.logI(TAG, "create shapeContainer Property!!")
             project.rootProject.gradle.ext.shapeContainer = new ArrayList<String>()
         }
+        if (!project.rootProject.ext.hasProperty("isDebugType")) {
+            project.rootProject.gradle.ext.isDebugType = false
+            StartParams startParams = new StartParams(project.gradle.getStartParameter())
+            project.rootProject.gradle.ext.isDebugType = startParams.debug
+            LogUtil.logI(TAG, "isDebugType: ${project.rootProject.gradle.ext.isDebugType}")
+        }
+        if (!project.rootProject.ext.hasProperty("pluginCostTime")) {
+            LogUtil.logI(TAG, "init pluginCostTime")
+            project.rootProject.gradle.ext.pluginCostTime = 0
+        }
+
         def shapeScanTask = null
         def variants
         if (project.plugins.hasPlugin("com.android.application")) {
@@ -75,11 +88,8 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                         recoveryAndroidVariantTask(mergeResourcesTask)
                     }
                 } else {
-                    boolean isDebug = false
-                    if (mStartParams != null) {
-                        isDebug = mStartParams.debug
-                    }
-                    def resTaskName = "compile${isDebug? "Debug" : "Release"}LibraryResources"
+                    def typeName = project.rootProject.gradle.ext.isDebugType ? "Debug" : "Release"
+                    def resTaskName = "compile" + typeName + "LibraryResources"
                     def resourcesTask = project.getTasksByName(resTaskName, true)
                     resourcesTask[0].doFirst {
                         hookAndroidVariantTask(resourcesTask[0], project)

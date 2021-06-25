@@ -43,8 +43,12 @@ class ShapeScanTask extends DefaultTask {
         //避免调用多次
         if (!isRunning) {
             isRunning = true
+            project.rootProject.gradle.ext.pluginCostTime = 0
+            long startTime = System.currentTimeMillis()
             getSourcesDirs()
-            LogUtil.logI(TAG, "get shapeContainer size: ${BackgroundUtil.getCollectSize(project.rootProject.gradle.ext.shapeContainer)}")
+            long costTime = System.currentTimeMillis() - startTime
+            project.rootProject.gradle.ext.pluginCostTime = project.rootProject.gradle.ext.pluginCostTime + costTime
+            LogUtil.logI(TAG, "get shapeContainer size: ${BackgroundUtil.getCollectSize(project.rootProject.gradle.ext.shapeContainer)}  costTime: $costTime  pluginCostTime: ${project.rootProject.gradle.ext.pluginCostTime}")
         }
     }
 

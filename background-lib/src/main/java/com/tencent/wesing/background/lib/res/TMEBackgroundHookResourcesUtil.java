@@ -25,7 +25,6 @@ public class TMEBackgroundHookResourcesUtil {
         long startTime = System.currentTimeMillis();
         Resources resources = context.getResources();
         TMEBackgroundResources tmeBackgroundResources = new TMEBackgroundResources(resources);
-        TMEBackgroundContext.setTmeBackgroundResources(tmeBackgroundResources);
         try {
             // 替换activity 的 mResources
             if (context instanceof Activity) {
@@ -51,12 +50,9 @@ public class TMEBackgroundHookResourcesUtil {
                 field.setAccessible(true);
                 field.set(context, tmeBackgroundResources);
             }
-
-            TMEBackgroundContext.setTmeBackgroundResources(tmeBackgroundResources);
             Log.i(TAG, "hookSystemResources success");
         } catch (Exception e) {
             Log.e(TAG, "hookSystemResources happen ex", e);
-            TMEBackgroundContext.setTmeBackgroundResources(null);
         }
         Log.i(TAG, "hookSystemResources costTime: " + (System.currentTimeMillis() - startTime));
 

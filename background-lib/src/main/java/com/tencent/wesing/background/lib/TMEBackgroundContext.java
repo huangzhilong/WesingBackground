@@ -16,8 +16,6 @@ public class TMEBackgroundContext {
 
     private static Resources mSystemResource; //存储一个系统的Resource，hook后getResource得到的是TMEBackgroundResources
 
-    private static TMEBackgroundResources tmeBackgroundResources;
-
     public static void setApplicationContext(Context context) {
         mContext = context;
         mSystemResource = context.getResources();
@@ -27,10 +25,6 @@ public class TMEBackgroundContext {
         return mContext;
     }
 
-
-    public static void setTmeBackgroundResources(TMEBackgroundResources tmeBackgroundResources) {
-        TMEBackgroundContext.tmeBackgroundResources = tmeBackgroundResources;
-    }
 
     public static Drawable getDrawable(int drawableId) {
         //return getContext().getResources().getDrawable(drawableId); hook后会死循环，不能这样写

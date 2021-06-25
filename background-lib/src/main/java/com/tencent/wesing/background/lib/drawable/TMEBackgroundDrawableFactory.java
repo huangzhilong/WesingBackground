@@ -108,8 +108,8 @@ public class TMEBackgroundDrawableFactory {
                 }
             }
             Drawable cacheDrawable = mAttributeDrawableCacheMap.get(gradientDrawableInfo);
-            if (cacheDrawable != null) {
-                return cacheDrawable;
+            if (cacheDrawable != null && cacheDrawable.getConstantState() != null) {
+                return cacheDrawable.getConstantState().newDrawable(); //源码也是这个，它创建了新的实例（newDrawble方法). 但是复用了ConstantState
             }
             gradientDrawableInfo.parseAttribute();
             cacheDrawable = createDrawableByGradientInfo(gradientDrawableInfo);
@@ -126,8 +126,8 @@ public class TMEBackgroundDrawableFactory {
      */
     public static Drawable createDrawableById(int drawableId) {
         Drawable cache = getInstance().mCacheDrawable.get(drawableId);
-        if (cache != null) {
-            return cache;
+        if (cache != null && cache.getConstantState() != null) {
+            return cache.getConstantState().newDrawable();
         }
         if (TMEBackgroundMap.getBackgroundAttributeMap() == null) {
             return TMEBackgroundContext.getDrawable(drawableId);

@@ -15,6 +15,7 @@ class GenerateShapeConfigUtil {
 
     static final String JAVA_NAME = "TMEBackgroundShapeConfig"
     static final String JAVA_VALUE_TEMPLATE = "public static final String %s_background_%s = %s;"
+    static final String INVAILID_ATTR_VALUE = "@null"
 
     private static File initGenerateConfigJavaFile(String javaPath, String javaClassName) {
         File file = new File(javaPath + File.separator + javaClassName + ".java")
@@ -153,7 +154,7 @@ class GenerateShapeConfigUtil {
             }
             appendAttrValue(info.angle, isId, stringValue)
         }
-        if (!BackgroundUtil.isEmpty(info.centerColor)) {
+        if (!BackgroundUtil.isEmpty(info.centerColor) && INVAILID_ATTR_VALUE != info.centerColor) {
             attrValue = attrValue | AttributeMask.centerColorMask
             boolean isId = BackgroundUtil.isIdValue(info.centerColor)
             if (isId) {
@@ -161,7 +162,7 @@ class GenerateShapeConfigUtil {
             }
             appendAttrValue(info.centerColor, isId, stringValue)
         }
-        if (!BackgroundUtil.isEmpty(info.startColor)) {
+        if (!BackgroundUtil.isEmpty(info.startColor) && INVAILID_ATTR_VALUE != info.startColor) {
             attrValue = attrValue | AttributeMask.startColorMask
             boolean isId = BackgroundUtil.isIdValue(info.startColor)
             if (isId) {
@@ -169,7 +170,7 @@ class GenerateShapeConfigUtil {
             }
             appendAttrValue(info.startColor, isId, stringValue)
         }
-        if (!BackgroundUtil.isEmpty(info.endColor)) {
+        if (!BackgroundUtil.isEmpty(info.endColor) && INVAILID_ATTR_VALUE != info.endColor) {
             attrValue = attrValue | AttributeMask.endColorMask
             boolean isId = BackgroundUtil.isIdValue(info.endColor)
             if (isId) {
@@ -249,7 +250,7 @@ class GenerateShapeConfigUtil {
             }
             appendAttrValue(info.width, isId, stringValue)
         }
-        if (!BackgroundUtil.isEmpty(info.solidColor)) {
+        if (!BackgroundUtil.isEmpty(info.solidColor) && INVAILID_ATTR_VALUE != info.solidColor) {
             attrValue = attrValue | AttributeMask.solidColorMask
             boolean isId = BackgroundUtil.isIdValue(info.solidColor)
             if (isId) {
@@ -257,7 +258,7 @@ class GenerateShapeConfigUtil {
             }
             appendAttrValue(info.solidColor, isId, stringValue)
         }
-        if (!BackgroundUtil.isEmpty(info.strokeColor)) {
+        if (!BackgroundUtil.isEmpty(info.strokeColor) && INVAILID_ATTR_VALUE != info.strokeColor) {
             attrValue = attrValue | AttributeMask.strokeColorMask
             boolean isId = BackgroundUtil.isIdValue(info.strokeColor)
             if (isId) {

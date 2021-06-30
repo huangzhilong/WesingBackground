@@ -138,6 +138,12 @@ MergedResourceWriter.addItem
 2021-06-24 19:14:03.853 18321-18321/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 751042
 2021-06-24 19:14:03.854 18321-18321/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 157292
 
+
+
+fancy手机
+2021-06-29 17:02:44.653 630-630/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 2049270
+2021-06-29 17:02:44.654 630-630/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 401823
+
 at com.tencent.wesing.background.plugin.layout.MyWorkerExecutor.submit(MyWorkerExecutor.groovy:33)
 	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:173)
 	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:146)

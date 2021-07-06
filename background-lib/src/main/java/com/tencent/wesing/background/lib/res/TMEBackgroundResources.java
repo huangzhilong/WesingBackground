@@ -44,7 +44,6 @@ public class TMEBackgroundResources extends Resources {
         if (TMEBackgroundMap.getBackgroundAttributeMap() == null || !TMEBackgroundMap.getBackgroundAttributeMap().containsKey(id)) {
             return mSystemResources.getDrawable(id);
         }
-        Log.i(TAG, "TMEBackgroundDrawableFactory createDrawableById : " + id);
         return TMEBackgroundDrawableFactory.createDrawableById(id);
     }
 

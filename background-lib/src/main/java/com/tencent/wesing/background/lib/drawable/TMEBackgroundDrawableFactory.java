@@ -125,17 +125,18 @@ public class TMEBackgroundDrawableFactory {
      *  代码中使用，通过Id。用户字节码替换代码的drawable获取
      */
     public static Drawable createDrawableById(int drawableId) {
+        //校验是否有可用的drawableInfo
         if (TMEBackgroundMap.getBackgroundAttributeMap() == null) {
+            return TMEBackgroundContext.getDrawable(drawableId);
+        }
+        GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
+        if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
             return TMEBackgroundContext.getDrawable(drawableId);
         }
         Log.d(TAG, "createDrawableById drawableId: " + drawableId);
         Drawable cache = getInstance().mCacheDrawable.get(drawableId);
         if (cache != null && cache.getConstantState() != null) {
             return cache.getConstantState().newDrawable();
-        }
-        GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
-        if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
-            return TMEBackgroundContext.getDrawable(drawableId);
         }
         // 当前只解析GradientDrawable
         GradientDrawable drawable = getInstance().createDrawableByGradientInfo(gradientDrawableInfo);

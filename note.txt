@@ -5,7 +5,8 @@
 3、 编译layout。xml的background熟悉，根据文件名去hashMap中找，找到了说明已经生成了Java属性代码，可以用自己的定义的属性进行替换了（必须去hashMap里找，因为background不止
     支持shape属性。这样就可以每个模块生成了）
 
-
+4、 通过transform把属性插入Lib的map中
+5、 hook Resource的getDrawable 进入我们的GradientDrawable创建
 
 
 依赖关系

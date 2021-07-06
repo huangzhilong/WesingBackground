@@ -24,7 +24,7 @@ import java.lang.reflect.Field;
 
 public class TMEBackgroundDrawableFactory {
 
-    private static final String TAG = "GradientDrawableFactory";
+    private static final String TAG = "TMEBackgroundDrawableFactory";
 
     private TMEBackgroundDrawableFactory() {
     }

@@ -42,7 +42,7 @@ dependencies {
 gradle.ext.localMaven = [:]
 gradle.ext.localMaven.groupIdName = 'com.tencent.wesing'
 gradle.ext.localMaven.artifactIdName = 'wesingBackgroundLib'
-gradle.ext.localMaven.versionName = "1.2.5"
+gradle.ext.localMaven.versionName = "1.2.6"
 
 // 发布到本地maven仓库 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> upload -> uploadArchives
 apply from: "../script/localMaven.gradle"

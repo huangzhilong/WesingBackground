@@ -15,6 +15,7 @@ import android.util.TypedValue;
 
 import androidx.annotation.RequiresApi;
 
+import com.tencent.wesing.background.lib.TMEBackgroundContext;
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
 import com.tencent.wesing.background.lib.drawable.TMEBackgroundDrawableFactory;
 
@@ -41,7 +42,7 @@ public class TMEBackgroundResources extends Resources {
 
     @Override
     public Drawable getDrawable(int id) throws NotFoundException {
-        if (TMEBackgroundMap.getBackgroundAttributeMap() == null || !TMEBackgroundMap.getBackgroundAttributeMap().containsKey(id)) {
+        if (!TMEBackgroundContext.isAvailable() || TMEBackgroundMap.getBackgroundAttributeMap() == null || !TMEBackgroundMap.getBackgroundAttributeMap().containsKey(id)) {
             return mSystemResources.getDrawable(id);
         }
         return TMEBackgroundDrawableFactory.createDrawableById(id);

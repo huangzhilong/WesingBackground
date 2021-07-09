@@ -8,152 +8,86 @@
 4、 通过transform把属性插入Lib的map中
 5、 hook Resource的getDrawable 进入我们的GradientDrawable创建
 
+数据：
 
-依赖关系
-App 依赖 AModule
-AModule 依赖 BModule
+三星 Galaxy Note 10+ 5g：
+2021-07-07 20:31:14.810 19437-19437/? I/TMEBackgroundMap:  no cache xmlDrawable cost time: 336875
+2021-07-07 20:31:14.810 19437-19437/? I/TMEBackgroundMap:  no cache codeDrawable cost time: 63698
 
+2021-07-07 20:31:23.846 19627-19627/? I/TMEBackgroundMap:  no cache xmlDrawable cost time: 328125
+2021-07-07 20:31:23.846 19627-19627/? I/TMEBackgroundMap:  no cache codeDrawable cost time: 67240
 
-gradle 具体任务： TaskManager   子类： ApplicationTaskManager   LibraryTaskManager
+2021-07-07 20:31:46.698 19776-19776/? I/TMEBackgroundMap:  no cache xmlDrawable cost time: 357656
+2021-07-07 20:31:46.698 19776-19776/? I/TMEBackgroundMap:  no cache codeDrawable cost time: 77917
 
+2021-07-07 20:32:01.868 19852-19852/? I/TMEBackgroundMap:  no cache xmlDrawable cost time: 323958
+2021-07-07 20:32:01.868 19852-19852/? I/TMEBackgroundMap:  no cache codeDrawable cost time: 72343
 
+2021-07-07 20:32:53.700 20207-20207/? I/TMEBackgroundMap:  no cache xmlDrawable cost time: 338437
+2021-07-07 20:32:53.700 20207-20207/? I/TMEBackgroundMap:  no cache codeDrawable cost time: 69636
 
+336875 + 328125 + 357656 + 323958 + 338437 = 1685051 / 5 = 337010.2
+63698 + 67240 + 77917 + 72343 + 69636 = 350834 / 5 = 70166.8
+提速： 337010.2 / 70166.8 = 4.8倍
 
-问题1: shape存在多个drawable文件夹中该怎么代码记录（根据设备获取对应的shape的xml）
+华为荣耀10
+2021-07-07 20:43:03.967 27669-27669/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 906250
+2021-07-07 20:43:03.967 27669-27669/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 179167
 
-	这种情况比较少，判断存在的就不处理了，继续使用原来的drawable xml方式
+2021-07-07 20:43:14.024 27973-27973/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 789583
+2021-07-07 20:43:14.024 27973-27973/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 175000
 
+2021-07-07 20:43:28.771 28092-28092/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 669271
+2021-07-07 20:43:28.771 28092-28092/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 158854
 
-问题2: 不同module存在相同名字的drawable xml的怎么处理，该使用哪个
+2021-07-07 20:43:38.819 28169-28169/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 777604
+2021-07-07 20:43:38.819 28169-28169/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 183854
 
-	不同module存在相同的名字的drawable.xml本来就是问题，可使用开源项目 CheckResourceConflict来扫描！！，假设这两个模块的功能都使用同名的xml，
-	在编译时会进行覆盖只会保留一份（保留主工程的）。会造成UI不一致，甚至crash（比如findById查找失败）
-
-
-问题3: xml的值使用定义在value的Id怎么处理
-
-    https://blog.csdn.net/wjj1996825/article/details/103406881
-
-	这里要生成Java（不能生成json，不参与编译），需要参与编译。让Id在编译期变成准确的int值。生成code时候标记是准确数值还是Id，Id的话把Id记录下来。在生成drawable的时候再通过Id代码获取对应的值
-	（所以扫描时要再自己的module里生成对应的java文件，编译的时候会自动替换成对应的ID值）
-
-    获取ID：
-
-    android ID：
-    context.getResources().getDimension(android.R.dimen.app_icon_size)
-
-    App ID：
-    context.getResources().getDimension(R.dimen.app_icon_size)
-
-
-问题4： 删除了shape  xml文件后， xml布局中使用shape和代码中getDrawable中使用shape会编译不过。（要想想怎么减包）
-
-
-问题5： 不能换成别的xml文件，放在项目的layout目录不同名字代码中使用了找不到Id，不放在这个目录则编译不过，提示错误路径
+2021-07-07 20:44:27.356 28506-28506/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 783333
+2021-07-07 20:44:27.357 28506-28506/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 173438
+906250 + 789583 + 669271 + 777604 + 783333 = 3926041 / 5 = 785208.2
+179167 + 175000 + 158854 + 183854 + 173438 = 870313 / 5 = 174062.6
+提速： 785208.2 / 174062.6 = 4.5倍
 
 
+华为麦芒4
+07-08 15:43:24.037 19609-19609/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1131979
+07-08 15:43:24.037 19609-19609/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 102343
 
-问题6：注册transform需要在App module！！！
+07-08 15:44:06.107 20169-20169/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1210312
+07-08 15:44:06.107 20169-20169/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 114479
 
-    def android = project.extensions.getByType(AppExtension)
-    android.registerTransform(new ResourceTransform())
+07-08 15:51:55.617 24668-24668/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1327500
+07-08 15:51:55.617 24668-24668/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 135312
 
+07-08 15:52:17.007 24898-24898/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1037084
+07-08 15:52:17.007 24898-24898/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 145261
 
+07-08 15:51:32.457 24446-24446/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1066198
+07-08 15:51:32.457 24446-24446/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 145937
 
-问题7：hook layout只能拿到app module的layout xml
-
-
-问题8：生成的class都在app moduel，对呀的import 的R的class当app模块没依赖时会编译不了
-
-
-问题9：字节码操作到map的时候各个modlue的属性都是相同的，会覆盖，入A module有parma1 B也有Parma1
-
-
-问题：现在把解析放在了初始化，会不会影响启动？
-使用闲时载入，未载入时因为都已经hook成调用自己的方法，此时没有属性会调用系统的，也可以把对呀的id和drawable存起来
-
-
-
-问题：
-生成属性的java文件，在非app module中时不会被编译成整数Id，而是使用了R文件的引用，此时编译出来的class文件的属性值是在static代码块中赋值的，需要
-加载class才实现赋值。所以字节码无法获取到string的属性值
+1131979 + 1210312 + 1327500 + 1037084 + 1066198 = 5773073 / 5 = 1154614.6
+102343 + 114479 + 135312 + 145261 + 145937 = 643332 / 5 = 128666.4
+提速： 1154614.6 / 128666.4 = 8.97
 
 
+Galaxy S7 edge：
+2021-07-07 20:54:45.826 21385-21385/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1606458
+2021-07-07 20:54:45.827 21385-21385/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 419583
 
-问题：字节码替换有问题，安装app启动崩溃。提示找不到方法，但是看字节码又是替换成功的
+2021-07-07 20:55:02.360 21454-21454/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1862604
+2021-07-07 20:55:02.360 21454-21454/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 486041
 
+2021-07-07 20:55:31.704 21535-21535/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1564167
+2021-07-07 20:55:31.705 21535-21535/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 417761
 
-问题： 因为有缓存，所以在编译的时候有缓存，不会再替换layout的属性为自己的background
+2021-07-07 20:56:36.374 21742-21742/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 2178229
+2021-07-07 20:56:36.375 21742-21742/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 495782
 
-问题： ASM替换找不到类getCommonSuperClass错误
+2021-07-07 20:59:02.924 21945-21945/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 1902657
+2021-07-07 20:59:02.925 21945-21945/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 445937
 
-
-先单线程处理，后期再加入多线程！！！！
-
-
-$project.android.compileSdkVersion 可获取project android下的属性
-
-
-CompileSourceSetResources : IncrementalTask()
-
-mergeResources 调用栈
-
-
-MergedResourceWriter.addItem
-
-
-2021-06-24 12:49:56.186 5305-5376/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 12:49:56.188 5305-5376/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 2  mapSize: 10
-2021-06-24 12:50:00.731 5305-5305/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 235209
-2021-06-24 12:50:00.731 5305-5305/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 42709
-2021-06-24 12:50:09.576 5410-5459/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 12:50:09.578 5410-5459/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 2  mapSize: 10
-2021-06-24 12:50:13.480 5410-5410/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 241303
-2021-06-24 12:50:13.480 5410-5410/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 49323
-2021-06-24 12:50:31.051 5493-5551/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 12:50:31.052 5493-5551/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 1  mapSize: 10
-2021-06-24 12:50:34.270 5493-5493/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 241823
-2021-06-24 12:50:34.270 5493-5493/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 51146
-2021-06-24 12:50:43.729 5581-5628/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 12:50:43.730 5581-5628/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 1  mapSize: 10
-2021-06-24 12:50:49.243 5581-5581/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 261823
-2021-06-24 12:50:49.244 5581-5581/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 51875
-
-
-
-华为测试机
-2021-06-24 17:59:13.960 13155-13479/? I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 17:59:13.965 13155-13479/? I/TMEBackgroundMap: end init initGradientDrawable costTime: 5  mapSize: 10
-2021-06-24 17:59:17.478 13155-13155/? I/TMEBackgroundMap:  no cache xmlDrawable cost time: 867187
-2021-06-24 17:59:17.478 13155-13155/? I/TMEBackgroundMap:  no cache codeDrawable cost time: 172917
-2021-06-24 19:13:19.467 18111-18176/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 19:13:19.471 18111-18176/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 4  mapSize: 10
-2021-06-24 19:13:23.415 18111-18111/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 939583
-2021-06-24 19:13:23.416 18111-18111/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 182292
-2021-06-24 19:13:36.836 18229-18283/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 19:13:36.840 18229-18283/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 4  mapSize: 10
-2021-06-24 19:13:41.061 18229-18229/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 722396
-2021-06-24 19:13:41.062 18229-18229/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 157292
-2021-06-24 19:14:01.353 18321-18377/com.tencent.wesing.background I/TMEBackgroundMap: start init initGradientDrawable
-2021-06-24 19:14:01.357 18321-18377/com.tencent.wesing.background I/TMEBackgroundMap: end init initGradientDrawable costTime: 4  mapSize: 10
-2021-06-24 19:14:03.853 18321-18321/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 751042
-2021-06-24 19:14:03.854 18321-18321/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 157292
-
-
-
-fancy手机
-2021-06-29 17:02:44.653 630-630/com.tencent.wesing.background I/TMEBackgroundMap:  no cache xmlDrawable cost time: 2049270
-2021-06-29 17:02:44.654 630-630/com.tencent.wesing.background I/TMEBackgroundMap:  no cache codeDrawable cost time: 401823
-
-at com.tencent.wesing.background.plugin.layout.MyWorkerExecutor.submit(MyWorkerExecutor.groovy:33)
-	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:173)
-	at com.android.build.gradle.internal.tasks.Workers$WorkerExecutorAdapter.submit(Workers.kt:146)
-	at com.android.ide.common.resources.MergedResourceWriter.addItem(MergedResourceWriter.java:377)
-	at com.android.ide.common.resources.MergedResourceWriter.addItem(MergedResourceWriter.java:70)
-	at com.android.ide.common.resources.DataMerger.mergeData(DataMerger.java:280)
-	at com.android.ide.common.resources.ResourceMerger.mergeData(ResourceMerger.java:385)
-	at com.android.build.gradle.tasks.MergeResources.lambda$doFullTaskAction$1(MergeResources.java:319)
-	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:58)
-	at com.android.build.gradle.tasks.MergeResources.doFullTaskAction(MergeResources.java:315)
-
+1606458 + 1862604 + 1564167 + 2178229 + 1902657 = 9114115 / 5 = 1822823
+419583 + 486041 + 417761 + 495782 + 445937 = 2265104 / 5 = 453020.8
+提速： 1822823 / 453020 = 4.1
 

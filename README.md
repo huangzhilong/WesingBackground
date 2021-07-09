@@ -1,2 +1,2 @@
 # WesingBackground
-优化app加载drawable shape标签背景的速度，加载效率提升在5倍以上 。解析项目中定义的shape标签，生成代码记录shape的对应属性值，使用时直接创建shape背景，避免解析xml的耗时操作
+优化app加载drawable shape标签背景的速度，加载效率提升在4倍以上 。解析项目中定义的shape标签，生成代码记录shape的对应属性值，使用时直接创建shape背景，避免解析xml的耗时操作

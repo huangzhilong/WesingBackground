@@ -1,7 +1,7 @@
 package com.tencent.wesing.background.lib.drawable;
 
 import android.content.res.TypedArray;
-import android.graphics.RectF;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -46,7 +46,12 @@ public class TMEBackgroundDrawableFactory {
         if (ta.hasValue(R.styleable.TMEBackground_tme_background)) {
             int drawableId = ta.getResourceId(R.styleable.TMEBackground_tme_background, View.NO_ID);
             if (drawableId > 0) {
-                return createDrawableById(drawableId);
+                if (TMEBackgroundContext.isAvailable()) {
+                    return createDrawableById(drawableId);
+                } else {
+                    //插件禁用，使用系统原本的获取
+                    return TMEBackgroundContext.getDrawable(drawableId);
+                }
             }
         } else  {
             //使用自定义属性
@@ -193,13 +198,13 @@ public class TMEBackgroundDrawableFactory {
 
         //内边距
         if (gradientDrawableInfo.right > 0 || gradientDrawableInfo.left > 0 || gradientDrawableInfo.bottom > 0 || gradientDrawableInfo.top > 0) {
-            RectF padding = new RectF();
-            padding.left = gradientDrawableInfo.left;
-            padding.right = gradientDrawableInfo.right;
-            padding.top = gradientDrawableInfo.top;
-            padding.bottom = gradientDrawableInfo.bottom;
+            Rect padding = new Rect();
+            padding.left = (int) gradientDrawableInfo.left;
+            padding.right = (int) gradientDrawableInfo.right;
+            padding.top = (int) gradientDrawableInfo.top;
+            padding.bottom = (int) gradientDrawableInfo.bottom;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                gradientDrawable.setPadding((int) padding.left, (int) padding.top, (int) padding.right, (int) padding.bottom);
+                gradientDrawable.setPadding(padding.left, padding.top, padding.right, padding.bottom);
             } else {
                 try {
                     Field paddingField = gradientDrawable.getClass().getDeclaredField("mPadding");

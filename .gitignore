@@ -6,6 +6,7 @@
 .DS_Store
 /build
 /captures
+/script/maven-publish.gradle
 .externalNativeBuild
 gradlew
 gradlew.bat

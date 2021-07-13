@@ -1,13 +1,10 @@
 package com.tencent.wesing.background
 
 import android.content.Intent
-import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.tencent.wesing.background.lib.TMEBackgroundContext
-import com.tencent.wesing.background.lib.drawable.TMEBackgroundDrawableFactory
 
 
 class  MainActivity : AppCompatActivity() {

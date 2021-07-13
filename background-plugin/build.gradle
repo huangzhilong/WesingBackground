@@ -15,11 +15,17 @@ dependencies {
 
 //使用： classpath '${group}:${project.archivesBaseName}:${version}'
 // -------- 本地配置 --------
-gradle.ext.localMaven = [:]
-gradle.ext.localMaven.groupIdName = 'com.tencent.wesing'
-gradle.ext.localMaven.artifactIdName = 'wesingBackground'
-gradle.ext.localMaven.versionName = "1.2.6"
+gradle.ext.maven = [:]
+gradle.ext.maven.groupIdName = 'com.tme.wesing'
+gradle.ext.maven.artifactIdName = 'fastBackgroundPlugin'
 
-// 发布到本地maven仓库 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> upload -> uploadArchives
-apply from: "../script/localMaven.gradle"
+//----------------- 发布本地， 发布时注释掉下面的正式 -------------- //、
+gradle.ext.maven.versionName = localWesingBackgroundVersion
+apply from: "$rootDir/script/localMaven.gradle"
+//------------------------------------------------------------ //
 
+
+//----------------- 发布正式， 正式注释掉上面本地  -------------- //
+//gradle.ext.maven.versionName = wesingBackgroundVersion
+//apply from: "$rootDir/script/maven-publish.gradle"
+//------------------------------------------------------------ //

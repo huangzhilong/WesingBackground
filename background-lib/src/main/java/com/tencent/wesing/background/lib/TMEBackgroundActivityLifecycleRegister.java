@@ -9,12 +9,9 @@ import com.tencent.wesing.background.lib.res.TMEBackgroundHookResourcesUtil;
 class TMEBackgroundActivityLifecycleRegister implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        //插件可用时再hook
-        if (TMEBackgroundContext.isAvailable()) {
-            TMEBackgroundLibrary.inject(activity);
-            //hook activity
-            TMEBackgroundHookResourcesUtil.hookSystemResources(activity);
-        }
+        //因为xml文件打包时修改了，所以不能不处理inflater
+        TMEBackgroundLibrary.inject(activity);
+        TMEBackgroundHookResourcesUtil.hookSystemResources(activity);
     }
 
     @Override

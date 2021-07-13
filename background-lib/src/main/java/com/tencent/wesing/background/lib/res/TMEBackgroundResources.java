@@ -42,8 +42,13 @@ public class TMEBackgroundResources extends Resources {
 
     @Override
     public Drawable getDrawable(int id) throws NotFoundException {
+        long startTime = System.nanoTime();
         if (!TMEBackgroundContext.isAvailable() || TMEBackgroundMap.getBackgroundAttributeMap() == null || !TMEBackgroundMap.getBackgroundAttributeMap().containsKey(id)) {
-            return mSystemResources.getDrawable(id);
+            Drawable drawable = mSystemResources.getDrawable(id);
+            if (TMEBackgroundContext.getDrawableMonitor() != null) {
+                TMEBackgroundContext.getDrawableMonitor().onGetDrawable(true, System.nanoTime() - startTime, id);
+            }
+            return drawable;
         }
         return TMEBackgroundDrawableFactory.createDrawableById(id);
     }

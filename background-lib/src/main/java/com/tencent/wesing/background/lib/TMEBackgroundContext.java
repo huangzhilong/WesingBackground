@@ -5,7 +5,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
-import com.tencent.wesing.background.lib.res.TMEBackgroundResources;
+import com.tencent.wesing.background.lib.monitor.ICreateDrawableMonitor;
 
 /**
  * create by zlonghuang on 2021/5/9
@@ -47,5 +47,16 @@ public class TMEBackgroundContext {
 
     public static boolean isAvailable() {
         return isAvailable;
+    }
+
+
+    private static ICreateDrawableMonitor drawableMonitor = null;
+
+    private static void setBackgroundDrawableMonitor(ICreateDrawableMonitor monitorListener) {
+        drawableMonitor = monitorListener;
+    }
+
+    public static ICreateDrawableMonitor getDrawableMonitor() {
+        return drawableMonitor;
     }
 }

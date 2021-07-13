@@ -4,6 +4,7 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.tencent.wesing.background.plugin.StartParams
+import com.tencent.wesing.background.plugin.WesingBackgroundPlugin
 import com.tencent.wesing.background.plugin.resource.GenerateShapeConfigUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 import com.tencent.wesing.background.plugin.util.BackgroundUtil
@@ -59,7 +60,7 @@ class ShapeScanTask extends DefaultTask {
             if (p.name == project.rootProject.name) {
                 continue
             }
-            if (!p.plugins.hasPlugin("com.tencent.wesing.background") || !p.backgroundPluginConfig.isOpen) {
+            if (!p.plugins.hasPlugin(WesingBackgroundPlugin) || !p.backgroundPluginConfig.isOpen) {
                 continue
             }
             if (p.plugins.hasPlugin(AppPlugin)) {

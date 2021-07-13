@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tme.wesing</groupId>
-  <artifactId>fastBackgroundPlugin</artifactId>
+  <artifactId>fast_background_plugin</artifactId>
   <version>1.2.6</version>
   <dependencies>
     <dependency>

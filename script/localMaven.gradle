@@ -5,7 +5,11 @@ uploadArchives {
         mavenDeployer {
             // 本地Maven仓库
             repository(url: uri('../plugin'))
-
+// 本地不需要用户名
+//            authentication(
+//                    userName: userName,
+//                    password: password
+//            )
             // maven 配置  classpath "com.owm.component:register:1.0.5"
             pom.groupId = gradle.maven.groupIdName
             pom.artifactId = gradle.maven.artifactIdName

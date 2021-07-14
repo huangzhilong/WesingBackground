@@ -1,14 +1,11 @@
 package com.tencent.wesing.background.lib;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.tencent.wesing.background.lib.monitor.ICreateDrawableMonitor;
-
-import java.util.HashSet;
 
 /**
  * create by zlonghuang on 2021/5/9
@@ -61,21 +58,5 @@ public class TMEBackgroundContext {
 
     public static ICreateDrawableMonitor getDrawableMonitor() {
         return drawableMonitor;
-    }
-
-    private static HashSet<String> mActivityContainer = new HashSet<>();
-
-    public static void addNeedHookActivityName(String name) {
-        mActivityContainer.add(name);
-    }
-
-    public static boolean isContainsActivity(Activity activity) {
-        if (activity == null) {
-            return false;
-        }
-        if (mActivityContainer.contains(activity.getClass().getSimpleName())) {
-            return true;
-        }
-        return false;
     }
 }

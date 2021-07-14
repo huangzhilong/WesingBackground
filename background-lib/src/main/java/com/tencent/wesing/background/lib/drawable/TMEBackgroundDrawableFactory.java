@@ -150,6 +150,7 @@ public class TMEBackgroundDrawableFactory {
         }
         GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
         if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
+            Log.d(TAG, "not found useSystemCreateDrawable drawableId: " + drawableId);
             return useSystemCreateDrawable(drawableId);
         }
         Log.d(TAG, "createDrawableById drawableId: " + drawableId);
@@ -213,6 +214,7 @@ public class TMEBackgroundDrawableFactory {
 
             //内边距
             if (gradientDrawableInfo.right > 0 || gradientDrawableInfo.left > 0 || gradientDrawableInfo.bottom > 0 || gradientDrawableInfo.top > 0) {
+                Log.d(TAG, "has padding drawableId: " + drawableId);
                 Rect padding = new Rect();
                 padding.left = (int) gradientDrawableInfo.left;
                 padding.right = (int) gradientDrawableInfo.right;

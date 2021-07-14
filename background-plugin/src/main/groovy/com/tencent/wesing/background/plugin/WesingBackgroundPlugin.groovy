@@ -78,6 +78,10 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                     LogUtil.logI(TAG, "backgroundPluginConfig not Open!! projectName: ${project.name}")
                     return
                 }
+                if (project.backgroundPluginConfig.isOnlyAnalysisShape) {
+                    LogUtil.logI(TAG, "projectName: ${project.name} isOnlyAnalysisShape")
+                    return
+                }
                 //hook 编译资处理
                 if (project.plugins.hasPlugin("com.android.application")) {
                     MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()

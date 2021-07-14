@@ -45,3 +45,6 @@ dependencies {
 }
 
 apply plugin: 'com.tme.wesing.background'
+backgroundPluginConfig {
+    isOnlyAnalysisShape true
+}

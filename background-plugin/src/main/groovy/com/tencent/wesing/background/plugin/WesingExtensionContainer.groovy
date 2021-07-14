@@ -5,12 +5,19 @@ package com.tencent.wesing.background.plugin
  **/
 
 class WesingExtensionContainer {
+
     /**
      * 该模块是否开启插件，默认开启
      */
     boolean isOpen = true
 
-    public WesingExtensionContainer() {
+    /**
+     * 是否只解析shape属性，不hook 修改xml
+     */
+    boolean isOnlyAnalysisShape = false
+
+    WesingExtensionContainer() {
         isOpen = true
+        isOnlyAnalysisShape = false
     }
 }

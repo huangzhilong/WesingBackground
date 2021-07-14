@@ -14,6 +14,7 @@ class StartParams {
     private static final TAG = "StartParams"
     private static final String IDEA_SYNC_ACTIVE = "idea.sync.active"
     private static final String BUILD_ASSEMBLE_PREFIX = "assemble"
+    private static final String BUILD_BUNDLE_PREFIX = "bundle" //打aab时是 bundleRelease
 
     private Map<String, String> propertyMap
 
@@ -55,7 +56,7 @@ class StartParams {
             return false
         }
         for (arg in projectArgs) {
-            if (arg.contains(BUILD_ASSEMBLE_PREFIX) && (arg.contains("Debug") || arg.contains("debug"))) {
+            if ((arg.contains(BUILD_ASSEMBLE_PREFIX) || arg.contains(BUILD_BUNDLE_PREFIX)) && (arg.contains("Debug") || arg.contains("debug"))) {
                 return true
             }
         }

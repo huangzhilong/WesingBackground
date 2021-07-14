@@ -52,7 +52,7 @@ public class TMEBackgroundContext {
 
     private static ICreateDrawableMonitor drawableMonitor = null;
 
-    private static void setBackgroundDrawableMonitor(ICreateDrawableMonitor monitorListener) {
+    public static void setBackgroundDrawableMonitor(ICreateDrawableMonitor monitorListener) {
         drawableMonitor = monitorListener;
     }
 

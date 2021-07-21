@@ -45,7 +45,7 @@ public class TMEBackgroundResources extends Resources {
         long startTime = System.nanoTime();
         if (!TMEBackgroundContext.isAvailable()) {
             Drawable drawable = mSystemResources.getDrawable(id);
-            if (TMEBackgroundContext.getDrawableMonitor() != null) {
+            if (TMEBackgroundContext.getDrawableMonitor() != null && TMEBackgroundMap.isContainsDrawableId(id)) {
                 TMEBackgroundContext.getDrawableMonitor().onGetDrawable(true, System.nanoTime() - startTime, id);
             }
             return drawable;

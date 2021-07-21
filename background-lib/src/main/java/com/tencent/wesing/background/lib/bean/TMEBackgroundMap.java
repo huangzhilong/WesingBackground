@@ -49,6 +49,15 @@ public class TMEBackgroundMap {
     }
 
 
+    public static boolean isContainsDrawableId(int drawableId) {
+        if (isDisable) {
+            return false;
+        }
+        if (mBackgroundAttributeMap.containsKey(drawableId)) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 禁止删除

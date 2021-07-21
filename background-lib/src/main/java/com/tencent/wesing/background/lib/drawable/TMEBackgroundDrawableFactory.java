@@ -133,7 +133,7 @@ public class TMEBackgroundDrawableFactory {
             return null;
         }
         Drawable drawable = TMEBackgroundContext.getDrawable(drawableId);
-        if (TMEBackgroundContext.getDrawableMonitor() != null) {
+        if (TMEBackgroundContext.getDrawableMonitor() != null && TMEBackgroundMap.isContainsDrawableId(drawableId)) {
             TMEBackgroundContext.getDrawableMonitor().onGetDrawable(true, System.nanoTime() - startTime, drawableId);
         }
         return drawable;

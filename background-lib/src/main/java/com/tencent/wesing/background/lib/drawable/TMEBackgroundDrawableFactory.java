@@ -150,7 +150,6 @@ public class TMEBackgroundDrawableFactory {
         }
         GradientDrawableInfo gradientDrawableInfo = (TMEBackgroundMap.getBackgroundAttributeMap().get(drawableId));
         if (gradientDrawableInfo == null || gradientDrawableInfo.isDisable) {
-            Log.d(TAG, "not found useSystemCreateDrawable drawableId: " + drawableId);
             return useSystemCreateDrawable(drawableId);
         }
         Log.d(TAG, "createDrawableById drawableId: " + drawableId);
@@ -173,6 +172,11 @@ public class TMEBackgroundDrawableFactory {
 
     @SuppressLint("LongLogTag")
     private Drawable createDrawableByGradientInfo(GradientDrawableInfo gradientDrawableInfo, int drawableId) {
+        //避免反射
+        if ((gradientDrawableInfo.right > 0 || gradientDrawableInfo.left > 0 || gradientDrawableInfo.bottom > 0 || gradientDrawableInfo.top > 0)
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            return useSystemCreateDrawable(drawableId);
+        }
         try {
             long startTime = System.nanoTime();
             GradientDrawable gradientDrawable = new GradientDrawable();

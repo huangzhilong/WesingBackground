@@ -9,6 +9,9 @@ import com.tencent.wesing.background.lib.res.TMEBackgroundHookResourcesUtil;
  **/
 public class TMEBackgroundLib {
 
+    /**
+     * @param application
+     */
     public static void initBackgroundLib(Application application) {
         if (application == null) {
             return;

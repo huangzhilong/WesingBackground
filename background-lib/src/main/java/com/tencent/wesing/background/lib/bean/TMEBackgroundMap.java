@@ -35,19 +35,13 @@ public class TMEBackgroundMap {
      */
     public static void startParseAttribute() {
         isDisable = true;
-        Looper.myQueue().addIdleHandler(() -> {
-            //主线程空闲时解析attribute
-            new Thread(() -> {
-                Log.i(TAG, "start init initGradientDrawable");
-                long startTime = System.currentTimeMillis();
-                initGradientDrawable();
-                Log.i(TAG, "end init initGradientDrawable costTime: " + (System.currentTimeMillis() - startTime) + "  mapSize: " + mBackgroundAttributeMap.size());
-                isDisable = false;
-            }).start();
-            return false;
-        });
-    }
+        Log.i(TAG, "start init initGradientDrawable");
+        long startTime = System.currentTimeMillis();
+        initGradientDrawable();
+        Log.i(TAG, "end init initGradientDrawable costTime: " + (System.currentTimeMillis() - startTime) + "  mapSize: " + mBackgroundAttributeMap.size());
+        isDisable = false;
 
+    }
 
     public static boolean isContainsDrawableId(int drawableId) {
         if (isDisable) {

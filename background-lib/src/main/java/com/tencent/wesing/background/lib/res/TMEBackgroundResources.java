@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
@@ -173,7 +174,12 @@ public class TMEBackgroundResources extends Resources {
 
     @Override
     public int getInteger(int id) throws NotFoundException {
-        return mSystemResources.getInteger(id);
+        try {
+            return mSystemResources.getInteger(id);
+        } catch (Exception e) {
+            Log.i(TAG, "getInteger ex: " + e);
+        }
+        return 0;
     }
 
     @Override

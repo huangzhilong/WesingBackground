@@ -13,7 +13,7 @@ import androidx.core.view.LayoutInflaterCompat;
 
 import java.lang.reflect.Field;
 
-class TMEBackgroundLibrary {
+class TMEBackgroundInflater {
 
     public static LayoutInflater inject(Context context) {
         LayoutInflater inflater;

@@ -8,7 +8,7 @@ import com.tencent.wesing.background.lib.res.TMEBackgroundHookResourcesUtil;
 class TMEBackgroundActivityLifecycleRegister implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        TMEBackgroundInflater.inject(activity);
+        //TMEBackgroundInflater.inject(activity);
         TMEBackgroundHookResourcesUtil.hookSystemResources(activity);
     }
 

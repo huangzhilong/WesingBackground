@@ -4,7 +4,6 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.api.BaseVariantImpl
 import com.android.build.gradle.internal.tasks.AndroidVariantTask
-import com.android.build.gradle.tasks.MergeResources
 import com.tencent.wesing.background.plugin.resource.ResourceTransform
 import com.tencent.wesing.background.plugin.resource.layout.MyWorkerExecutor
 import com.tencent.wesing.background.plugin.resource.shape.ShapeScanTask
@@ -74,34 +73,34 @@ class WesingBackgroundPlugin implements Plugin<Project> {
                     preBuildTask.dependsOn(shapeScanTask)
                 }
 
-                if (!project.backgroundPluginConfig.isOpen) {
-                    LogUtil.logI(TAG, "backgroundPluginConfig not Open!! projectName: ${project.name}")
-                    return
-                }
-                if (project.backgroundPluginConfig.isOnlyAnalysisShape) {
-                    LogUtil.logI(TAG, "projectName: ${project.name} isOnlyAnalysisShape")
-                    return
-                }
-                //hook 编译资处理
-                if (project.plugins.hasPlugin("com.android.application")) {
-                    MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()
-                    mergeResourcesTask.doFirst {
-                        hookAndroidVariantTask(mergeResourcesTask, project)
-                    }
-                    mergeResourcesTask.doLast {
-                        recoveryAndroidVariantTask(mergeResourcesTask)
-                    }
-                } else {
-                    def typeName = project.rootProject.gradle.ext.isDebugType ? "Debug" : "Release"
-                    def resTaskName = "compile" + typeName + "LibraryResources"
-                    def resourcesTask = project.getTasksByName(resTaskName, true)
-                    resourcesTask[0].doFirst {
-                        hookAndroidVariantTask(resourcesTask[0], project)
-                    }
-                    resourcesTask[0].doLast {
-                        recoveryAndroidVariantTask(resourcesTask[0])
-                    }
-                }
+//                if (!project.backgroundPluginConfig.isOpen) {
+//                    LogUtil.logI(TAG, "backgroundPluginConfig not Open!! projectName: ${project.name}")
+//                    return
+//                }
+//                if (project.backgroundPluginConfig.isOnlyAnalysisShape) {
+//                    LogUtil.logI(TAG, "projectName: ${project.name} isOnlyAnalysisShape")
+//                    return
+//                }
+//                //hook 编译资处理
+//                if (project.plugins.hasPlugin("com.android.application")) {
+//                    MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()
+//                    mergeResourcesTask.doFirst {
+//                        hookAndroidVariantTask(mergeResourcesTask, project)
+//                    }
+//                    mergeResourcesTask.doLast {
+//                        recoveryAndroidVariantTask(mergeResourcesTask)
+//                    }
+//                } else {
+//                    def typeName = project.rootProject.gradle.ext.isDebugType ? "Debug" : "Release"
+//                    def resTaskName = "compile" + typeName + "LibraryResources"
+//                    def resourcesTask = project.getTasksByName(resTaskName, true)
+//                    resourcesTask[0].doFirst {
+//                        hookAndroidVariantTask(resourcesTask[0], project)
+//                    }
+//                    resourcesTask[0].doLast {
+//                        recoveryAndroidVariantTask(resourcesTask[0])
+//                    }
+//                }
             }
         }
     }

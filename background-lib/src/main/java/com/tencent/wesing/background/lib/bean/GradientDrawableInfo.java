@@ -485,38 +485,36 @@ public class GradientDrawableInfo {
         }
 
         //默认值
-        mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
-        if (angle >= 0) {
-            angle = ((angle % 360) + 360) % 360;
-            // 取整
-            switch (angle) {
-                case 0:
-                    mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;
-                    break;
-                case 45:
-                    mOrientation = GradientDrawable.Orientation.BL_TR;
-                    break;
-                case 90:
-                    mOrientation = GradientDrawable.Orientation.BOTTOM_TOP;
-                    break;
-                case 135:
-                    mOrientation = GradientDrawable.Orientation.BR_TL;
-                    break;
-                case 180:
-                    mOrientation = GradientDrawable.Orientation.RIGHT_LEFT;
-                    break;
-                case 225:
-                    mOrientation = GradientDrawable.Orientation.TR_BL;
-                    break;
-                case 270:
-                    mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
-                    break;
-                case 315:
-                    mOrientation = GradientDrawable.Orientation.TL_BR;
-                    break;
-            }
+        mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;
+        if (angle < 0) {
+            angle = ((angle % 360) + 360) % 360; // offset negative angle measures
+        } else {
+            angle = angle % 360;
         }
-
+        // 取整
+        switch (angle) {
+            case 45:
+                mOrientation = GradientDrawable.Orientation.BL_TR;
+                break;
+            case 90:
+                mOrientation = GradientDrawable.Orientation.BOTTOM_TOP;
+                break;
+            case 135:
+                mOrientation = GradientDrawable.Orientation.BR_TL;
+                break;
+            case 180:
+                mOrientation = GradientDrawable.Orientation.RIGHT_LEFT;
+                break;
+            case 225:
+                mOrientation = GradientDrawable.Orientation.TR_BL;
+                break;
+            case 270:
+                mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
+                break;
+            case 315:
+                mOrientation = GradientDrawable.Orientation.TL_BR;
+                break;
+        }
         if (startColor != 0 && endColor != 0) {
             if (centerColor != 0) {
                 colorArray = new int[]{startColor, centerColor, endColor};

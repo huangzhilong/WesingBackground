@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import androidx.appcompat.app.AppCompatActivity;
-import com.tencent.wesing.background.lib.TMEBackgroundContext;
 import java.lang.reflect.Field;
 
 /**
@@ -41,6 +40,21 @@ public class TMEBackgroundHookResourcesUtil {
                 field1.setAccessible(true);
                 field1.set(context, tmeBackgroundResources);
                 context = ((Activity) context).getBaseContext();
+            }
+
+            //处理activity重写attachBaseContext 再次设置为 ContextThemeWrapper
+            if (context instanceof ContextThemeWrapper) {
+                Class ContextThemeWrapperField = ContextThemeWrapper.class;
+                Field field1 = ContextThemeWrapperField.getDeclaredField("mResources");
+                field1.setAccessible(true);
+                field1.set(context, tmeBackgroundResources);
+                context = ((ContextThemeWrapper) context).getBaseContext();
+            } else if (context instanceof androidx.appcompat.view.ContextThemeWrapper) {
+                Class ContextThemeWrapperField = androidx.appcompat.view.ContextThemeWrapper.class;
+                Field field1 = ContextThemeWrapperField.getDeclaredField("mResources");
+                field1.setAccessible(true);
+                field1.set(context, tmeBackgroundResources);
+                context = ((androidx.appcompat.view.ContextThemeWrapper) context).getBaseContext();
             }
 
             //ContextWrapper的mBase（ContextImpl）替换成自己的resource

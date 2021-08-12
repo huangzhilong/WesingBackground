@@ -16,7 +16,7 @@ public class TMEBackgroundLib {
         if (application == null) {
             return;
         }
-        //TMEBackgroundInflater.inject(application);
+        TMEBackgroundInflater.inject(application);
         TMEBackgroundContext.setApplicationContext(application);
         TMEBackgroundMap.startParseAttribute();
         //hook application

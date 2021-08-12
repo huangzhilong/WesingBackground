@@ -59,4 +59,12 @@ public class TMEBackgroundContext {
     public static ICreateDrawableMonitor getDrawableMonitor() {
         return drawableMonitor;
     }
+
+
+    public static void reportError(int drawableId, int errorCode, String msg) {
+        if (drawableMonitor == null) {
+            return;
+        }
+        drawableMonitor.onGetDrawableError(drawableId, errorCode, msg);
+    }
 }

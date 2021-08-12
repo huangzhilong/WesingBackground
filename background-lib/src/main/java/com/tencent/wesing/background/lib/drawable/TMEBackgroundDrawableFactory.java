@@ -11,6 +11,7 @@ import android.util.LruCache;
 import android.view.View;
 import com.tencent.wesing.background.lib.R;
 import com.tencent.wesing.background.lib.TMEBackgroundContext;
+import com.tencent.wesing.background.lib.bean.FastErrorCode;
 import com.tencent.wesing.background.lib.bean.GradientDrawableInfo;
 import com.tencent.wesing.background.lib.bean.TMEBackgroundMap;
 import com.tencent.wesing.background.lib.util.DimensionUtil;
@@ -31,15 +32,14 @@ public class TMEBackgroundDrawableFactory {
     }
 
     private static class SingleHolder {
-        private static TMEBackgroundDrawableFactory mFactory = new TMEBackgroundDrawableFactory();
+        private static final TMEBackgroundDrawableFactory mFactory = new TMEBackgroundDrawableFactory();
     }
 
     public static TMEBackgroundDrawableFactory getInstance() {
         return SingleHolder.mFactory;
     }
 
-    private LruCache<Integer, Drawable> mCacheDrawable = new LruCache<>(10);
-    private LruCache<GradientDrawableInfo, Drawable> mAttributeDrawableCacheMap = new LruCache<>(10);
+    private final LruCache<Integer, Drawable> mCacheDrawable = new LruCache<>(10);
 
     // xml属性解析过来的
     public Drawable getNeedGradientDrawable(TypedArray ta) {
@@ -53,75 +53,8 @@ public class TMEBackgroundDrawableFactory {
                     //插件禁用，使用系统原本的获取
                     return useSystemCreateDrawable(drawableId);
                 }
-            } else  {
-                //使用自定义属性
-                GradientDrawableInfo gradientDrawableInfo = new GradientDrawableInfo();
-                for (int i = 0; i < ta.getIndexCount(); i++) {
-                    int attr = ta.getIndex(i);
-                    if (attr == R.styleable.TMEBackground_tme_shape) {
-                        gradientDrawableInfo.shape = ta.getInt(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_solid_color) {
-                        gradientDrawableInfo.solidColor = ta.getColor(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_corners_radius) {
-                        gradientDrawableInfo.radius = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_corners_bottomLeftRadius) {
-                        gradientDrawableInfo.bottomLeftRadius = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_corners_bottomRightRadius) {
-                        gradientDrawableInfo.bottomRightRadius = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_corners_topLeftRadius) {
-                        gradientDrawableInfo.topLeftRadius = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_corners_topRightRadius) {
-                        gradientDrawableInfo.topRightRadius = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_angle) {
-                        gradientDrawableInfo.angle = (int) ta.getFloat(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_centerX) {
-                        gradientDrawableInfo.centerX = DimensionUtil.getFloatOrFractionOrDimension(ta, attr, 0.5f);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_centerY) {
-                        gradientDrawableInfo.centerY = DimensionUtil.getFloatOrFractionOrDimension(ta, attr, 0.5f);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_centerColor) {
-                        gradientDrawableInfo.centerColor = ta.getColor(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_endColor) {
-                        gradientDrawableInfo.endColor = ta.getColor(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_startColor) {
-                        gradientDrawableInfo.startColor = ta.getColor(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_gradientRadius) {
-                        gradientDrawableInfo.gradientRadius = DimensionUtil.getFloatOrFractionOrDimension(ta, attr, 0.5f);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_type) {
-                        gradientDrawableInfo.type = ta.getInt(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_gradient_useLevel) {
-                        //暂时没支持实现
-                    } else if (attr == R.styleable.TMEBackground_tme_padding_left) {
-                        gradientDrawableInfo.left = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_padding_right) {
-                        gradientDrawableInfo.right = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_padding_top) {
-                        gradientDrawableInfo.top = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_padding_bottom) {
-                        gradientDrawableInfo.bottom = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_size_height) {
-                        gradientDrawableInfo.height = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_size_width) {
-                        gradientDrawableInfo.width = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_stroke_width) {
-                        gradientDrawableInfo.strokeWidth = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_stroke_color) {
-                        gradientDrawableInfo.strokeColor = ta.getColor(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_stroke_dashWidth) {
-                        gradientDrawableInfo.dashWidth = ta.getDimension(attr, 0);
-                    } else if (attr == R.styleable.TMEBackground_tme_stroke_dashGap) {
-                        gradientDrawableInfo.dashGap = ta.getDimension(attr, 0);
-                    }
-                }
-                Drawable cacheDrawable = mAttributeDrawableCacheMap.get(gradientDrawableInfo);
-                if (cacheDrawable != null && cacheDrawable.getConstantState() != null) {
-                    return cacheDrawable.getConstantState().newDrawable(); //源码也是这个，它创建了新的实例（newDrawble方法). 但是复用了ConstantState
-                }
-                gradientDrawableInfo.parseAttribute();
-                cacheDrawable = createDrawableByGradientInfo(gradientDrawableInfo, View.NO_ID);
-                if (cacheDrawable != null) {
-                    mAttributeDrawableCacheMap.put(gradientDrawableInfo, cacheDrawable);
-                }
-                return cacheDrawable;
+            } else {
+                TMEBackgroundContext.reportError(drawableId, FastErrorCode.GET_LAYOUT_DRAWABLE_ERROR, "get layout background Id < 0 !!");
             }
         }
         return null;
@@ -247,7 +180,7 @@ public class TMEBackgroundDrawableFactory {
         } catch (Exception e) {
             Log.i(TAG, "createDrawableByGradientInfo happend ex: " + e);
             if (TMEBackgroundContext.getDrawableMonitor() != null) {
-                TMEBackgroundContext.getDrawableMonitor().onGetDrawableError(drawableId, e.getMessage());
+                TMEBackgroundContext.getDrawableMonitor().onGetDrawableError(drawableId, FastErrorCode.CREATE_DRAWABLE_FAILED_ERROR, e.getMessage());
             }
         }
         return useSystemCreateDrawable(drawableId);

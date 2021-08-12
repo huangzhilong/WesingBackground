@@ -20,5 +20,7 @@ public interface ICreateDrawableMonitor {
      * @param drawableId  drawableId
      * @param errorMsg   错误信息
      */
-    void onGetDrawableError(int drawableId, String errorMsg);
+    void onGetDrawableError(int drawableId, int errorCode, String errorMsg);
 }
+
+

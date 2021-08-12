@@ -3,6 +3,8 @@ package com.tencent.wesing.background;
 import android.app.Application;
 import android.content.Context;
 
+import com.tencent.wesing.background.lib.TMEBackgroundLib;
+
 
 /**
  * create by zlonghuang on 2021/6/20
@@ -17,6 +19,6 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        TMEBackgroundLib.initBackgroundLib(this);
     }
 }

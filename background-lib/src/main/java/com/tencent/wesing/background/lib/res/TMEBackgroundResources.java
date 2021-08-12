@@ -34,15 +34,20 @@ public class TMEBackgroundResources extends Resources {
 
     private final static String TAG = "TMEBackgroundResources";
 
-    private Resources mSystemResources;
+    private final Resources mSystemResources;
 
     TMEBackgroundResources(Resources resources) {
         super(resources.getAssets(), resources.getDisplayMetrics(), resources.getConfiguration());
         mSystemResources = resources;
     }
 
+    public Resources getSystemResources() {
+        return mSystemResources;
+    }
+
     @Override
     public Drawable getDrawable(int id) throws NotFoundException {
+        Log.i(TAG, "getDrawable id: " + id);
         long startTime = System.nanoTime();
         if (!TMEBackgroundContext.isAvailable()) {
             Drawable drawable = mSystemResources.getDrawable(id);

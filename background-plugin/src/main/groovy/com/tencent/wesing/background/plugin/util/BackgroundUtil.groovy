@@ -1,5 +1,8 @@
 package com.tencent.wesing.background.plugin.util
 
+import com.android.build.gradle.AppPlugin
+import org.gradle.api.Project
+
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -41,5 +44,22 @@ class BackgroundUtil {
             return false
         }
         return true
+    }
+
+    /**
+     * 获取app project
+     */
+    static Project getAppProject(Project project) {
+        if (project == null) {
+            return null
+        }
+        Iterator<Project> iterator = project.rootProject.allprojects.iterator()
+        while (iterator.hasNext()) {
+            Project p = iterator.next()
+            if (p.plugins.hasPlugin(AppPlugin)) {
+                return p
+            }
+        }
+        return null
     }
 }

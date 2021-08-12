@@ -40,7 +40,6 @@ class MyWorkerExecutor implements WorkerExecutor {
     @Override
     void submit(Class<? extends Runnable> aClass, Action<? super WorkerConfiguration> action) {
         if (mWorkerExecutor != null) {
-            long startTime = System.currentTimeMillis()
             //获取params
             MyWorkerConfiguration configuration = new MyWorkerConfiguration()
             action.execute(configuration)
@@ -92,9 +91,6 @@ class MyWorkerExecutor implements WorkerExecutor {
                 }
                 mWorkerExecutor.submit(aClass, action)
             }
-            long costTime = System.currentTimeMillis() - startTime
-            mProject.rootProject.gradle.ext.pluginCostTime = mProject.rootProject.gradle.ext.pluginCostTime + costTime
-            LogUtil.logI(TAG, "xml hookAndroidBackground projectName: ${mProject.name}  costTime: $costTime  pluginCost: ${mProject.rootProject.gradle.ext.pluginCostTime}")
         }
     }
 
@@ -245,8 +241,13 @@ class MyWorkerExecutor implements WorkerExecutor {
     }
 
     private boolean isContainsTargetDrawable(String drawableName) {
-        for (int i = 0; i < mProject.rootProject.gradle.ext.shapeContainer.size(); i++) {
-            String name = mProject.rootProject.gradle.ext.shapeContainer.get(i)
+        Project appProject = BackgroundUtil.getAppProject(mProject)
+        if (appProject == null) {
+            LogUtil.logI(TAG, "error isContainsTargetDrawable not found App project!!!!")
+            return false;
+        }
+        for (int i = 0; i < appProject.gradle.ext.shapeContainer.size(); i++) {
+            String name = appProject.gradle.ext.shapeContainer.get(i)
             if (name == drawableName) {
                 return true
             }

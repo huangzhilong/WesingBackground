@@ -71,12 +71,8 @@ class ResourceTransform extends Transform {
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         LogUtil.logI(TAG, "start ResourceTransform doTransform isIncremental: ${transformInvocation.isIncremental()}")
-        long startTime = System.currentTimeMillis()
         doTransform(transformInvocation)
         afterTransform(transformInvocation)
-        long costTime = System.currentTimeMillis() -  startTime
-        mProject.rootProject.gradle.ext.pluginCostTime = mProject.rootProject.gradle.ext.pluginCostTime + costTime
-        LogUtil.logI(TAG, "transform costTime: $costTime  pluginCostTime: ${mProject.rootProject.gradle.ext.pluginCostTime}")
     }
 
     private void doTransform(TransformInvocation transformInvocation) {

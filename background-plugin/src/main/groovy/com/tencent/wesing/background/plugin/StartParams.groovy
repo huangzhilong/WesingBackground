@@ -62,4 +62,19 @@ class StartParams {
         }
         return false
     }
+
+    /**
+     * 是否是构建apk或者aab
+     */
+    boolean isBuildApk() {
+        if (BackgroundUtil.getCollectSize(projectArgs) <= 0) {
+            return false
+        }
+        for (arg in projectArgs) {
+            if ((arg.contains(BUILD_ASSEMBLE_PREFIX) || arg.contains(BUILD_BUNDLE_PREFIX)) && (arg.endsWith("Debug") || arg.endsWith("Release"))) {
+                return true
+            }
+        }
+        return false
+    }
 }

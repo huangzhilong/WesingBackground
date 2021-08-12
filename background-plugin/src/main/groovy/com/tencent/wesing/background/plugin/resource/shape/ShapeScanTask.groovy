@@ -26,17 +26,17 @@ class ShapeScanTask extends DefaultTask {
     static final String SHAPE_TAG = "shape"
 
     private volatile boolean isRunning = false
-    private StartParams mStartParams
     private String mJavaFilePath
+    private boolean isDebugType
 
     ShapeScanTask() {
         LogUtil.logI(TAG, "projectName: ${project.name} create ShapeScanTask!!")
         isRunning = false
     }
 
-    void setShapeScanTaskParams(StartParams param, String javaPath) {
-        mStartParams = param
+    void setJavaPath(String javaPath, boolean isDebug) {
         mJavaFilePath = javaPath
+        isDebugType = isDebug
     }
 
     @TaskAction
@@ -44,12 +44,8 @@ class ShapeScanTask extends DefaultTask {
         //避免调用多次
         if (!isRunning) {
             isRunning = true
-            project.rootProject.gradle.ext.pluginCostTime = 0
-            long startTime = System.currentTimeMillis()
             getSourcesDirs()
-            long costTime = System.currentTimeMillis() - startTime
-            project.rootProject.gradle.ext.pluginCostTime = project.rootProject.gradle.ext.pluginCostTime + costTime
-            LogUtil.logI(TAG, "get shapeContainer size: ${BackgroundUtil.getCollectSize(project.rootProject.gradle.ext.shapeContainer)}  costTime: $costTime  pluginCostTime: ${project.rootProject.gradle.ext.pluginCostTime}")
+            LogUtil.logI(TAG, "get shapeContainer size: ${BackgroundUtil.getCollectSize(project.gradle.ext.shapeContainer)}")
         }
     }
 
@@ -74,10 +70,7 @@ class ShapeScanTask extends DefaultTask {
     def getSourcesDirsWithVariant(DomainObjectCollection<BaseVariant> collection, String projectName) {
         List<XmlNodeInfo> drawableNodeXmlList = new ArrayList<>()
         String packageName  // 包名
-        boolean isDebug = false
-        if (mStartParams != null) {
-            isDebug = mStartParams.debug
-        }
+        boolean isDebug = isDebugType
         String variantName = isDebug ? "debug" : "release"
         collection.all { variant ->
             //有debug和release两种情况
@@ -156,7 +149,7 @@ class ShapeScanTask extends DefaultTask {
                     shapeInfoList.add(info)
 
                     String fileName = info.fileName.substring(0, info.fileName.size() - 4) // 去除.xml后缀
-                    project.rootProject.gradle.ext.shapeContainer.add(fileName)
+                    project.gradle.ext.shapeContainer.add(fileName)
                 }
             }
             if (BackgroundUtil.getCollectSize(shapeInfoList) > 0) {

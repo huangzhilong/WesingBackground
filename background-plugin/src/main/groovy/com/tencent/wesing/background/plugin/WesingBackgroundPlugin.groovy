@@ -4,9 +4,11 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.api.BaseVariantImpl
 import com.android.build.gradle.internal.tasks.AndroidVariantTask
+import com.android.build.gradle.tasks.MergeResources
 import com.tencent.wesing.background.plugin.resource.ResourceTransform
 import com.tencent.wesing.background.plugin.resource.layout.MyWorkerExecutor
 import com.tencent.wesing.background.plugin.resource.shape.ShapeScanTask
+import com.tencent.wesing.background.plugin.util.BackgroundUtil
 import com.tencent.wesing.background.plugin.util.LogUtil
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -24,27 +26,17 @@ class WesingBackgroundPlugin implements Plugin<Project> {
 
     private WorkerExecutor mWorkerExecutor
 
+    private boolean  isDebugType = false
+
     @Override
     void apply(Project project) {
         project.extensions.create("backgroundPluginConfig", WesingExtensionContainer)
-        LogUtil.logI(TAG, "apply WesingBackgroundPlugin  projectName: ${project.name}")
 
-        //定义些参数
-        if (!project.rootProject.ext.hasProperty("shapeContainer")) {
-            LogUtil.logI(TAG, "create shapeContainer Property!!")
-            project.rootProject.gradle.ext.shapeContainer = new ArrayList<String>()
+        StartParams startParams = new StartParams(project.gradle.getStartParameter())
+        if (!startParams.buildApk) {
+            LogUtil.logI(TAG, "is not BuildApk!!")
+            return
         }
-        if (!project.rootProject.ext.hasProperty("isDebugType")) {
-            project.rootProject.gradle.ext.isDebugType = false
-            StartParams startParams = new StartParams(project.gradle.getStartParameter())
-            project.rootProject.gradle.ext.isDebugType = startParams.debug
-            LogUtil.logI(TAG, "isDebugType: ${project.rootProject.gradle.ext.isDebugType}")
-        }
-        if (!project.rootProject.ext.hasProperty("pluginCostTime")) {
-            LogUtil.logI(TAG, "init pluginCostTime")
-            project.rootProject.gradle.ext.pluginCostTime = 0
-        }
-
         def shapeScanTask = null
         def variants
         if (project.plugins.hasPlugin("com.android.application")) {
@@ -55,10 +47,15 @@ class WesingBackgroundPlugin implements Plugin<Project> {
             transform.setProject(project)
             android.registerTransform(transform)
 
+
+            //定义些参数，定义在application moudule中
+            project.gradle.ext.shapeContainer = new ArrayList<String>()
+            isDebugType = startParams.debug
+            LogUtil.logI(TAG, "isDebugType: " + isDebugType)
+
             //由app module来遍历drawable xml文件
             shapeScanTask = project.tasks.create("shapeScanTask", ShapeScanTask)
-            StartParams startParams = new StartParams(project.gradle.getStartParameter())
-            shapeScanTask.setShapeScanTaskParams(startParams, getGenerateJavaDir(project))
+            shapeScanTask.setJavaPath(getGenerateJavaDir(project), isDebugType)
         } else {
             variants = (project.property("android") as LibraryExtension).libraryVariants
         }
@@ -69,38 +66,37 @@ class WesingBackgroundPlugin implements Plugin<Project> {
 
                 if (shapeScanTask != null) {
                     //扫描drawable xml task
-                    def preBuildTask = variant.getPreBuildProvider().get()
-                    preBuildTask.dependsOn(shapeScanTask)
+                    shapeScanTask.run()
                 }
 
-//                if (!project.backgroundPluginConfig.isOpen) {
-//                    LogUtil.logI(TAG, "backgroundPluginConfig not Open!! projectName: ${project.name}")
-//                    return
-//                }
-//                if (project.backgroundPluginConfig.isOnlyAnalysisShape) {
-//                    LogUtil.logI(TAG, "projectName: ${project.name} isOnlyAnalysisShape")
-//                    return
-//                }
-//                //hook 编译资处理
-//                if (project.plugins.hasPlugin("com.android.application")) {
-//                    MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()
-//                    mergeResourcesTask.doFirst {
-//                        hookAndroidVariantTask(mergeResourcesTask, project)
-//                    }
-//                    mergeResourcesTask.doLast {
-//                        recoveryAndroidVariantTask(mergeResourcesTask)
-//                    }
-//                } else {
-//                    def typeName = project.rootProject.gradle.ext.isDebugType ? "Debug" : "Release"
-//                    def resTaskName = "compile" + typeName + "LibraryResources"
-//                    def resourcesTask = project.getTasksByName(resTaskName, true)
-//                    resourcesTask[0].doFirst {
-//                        hookAndroidVariantTask(resourcesTask[0], project)
-//                    }
-//                    resourcesTask[0].doLast {
-//                        recoveryAndroidVariantTask(resourcesTask[0])
-//                    }
-//                }
+                if (!project.backgroundPluginConfig.isOpen) {
+                    LogUtil.logI(TAG, "backgroundPluginConfig not Open!! projectName: ${project.name}")
+                    return
+                }
+                if (project.backgroundPluginConfig.isOnlyAnalysisShape) {
+                    LogUtil.logI(TAG, "projectName: ${project.name} isOnlyAnalysisShape")
+                    return
+                }
+                //hook 编译资处理
+                if (project.plugins.hasPlugin("com.android.application")) {
+                    MergeResources mergeResourcesTask = variant.getMergeResourcesProvider().get()
+                    mergeResourcesTask.doFirst {
+                        hookAndroidVariantTask(mergeResourcesTask, project)
+                    }
+                    mergeResourcesTask.doLast {
+                        recoveryAndroidVariantTask(mergeResourcesTask)
+                    }
+                } else {
+                    def typeName = isDebugType ? "Debug" : "Release"
+                    def resTaskName = "compile" + typeName + "LibraryResources"
+                    def resourcesTask = project.getTasksByName(resTaskName, true)
+                    resourcesTask[0].doFirst {
+                        hookAndroidVariantTask(resourcesTask[0], project)
+                    }
+                    resourcesTask[0].doLast {
+                        recoveryAndroidVariantTask(resourcesTask[0])
+                    }
+                }
             }
         }
     }
